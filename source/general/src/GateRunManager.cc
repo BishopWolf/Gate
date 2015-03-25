@@ -69,7 +69,11 @@ void GateRunManager::InitializeAll()
   if (currentState!=G4State_PreInit && currentState!=G4State_Idle)
     {
       G4cerr << "Illegal application state - "
-	     << "G4RunManager::Initialize() ignored." << G4endl;
+      #ifdef G4MULTITHREADED
+	     << "G4MTRunManager::Initialize() ignored." << G4endl;
+#else
+	     << "G4RunManager::Initialize() ignored." << G4endl; 
+#endif
       return;
     }
 

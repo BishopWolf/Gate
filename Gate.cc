@@ -51,7 +51,10 @@
 #ifdef G4UI_USE
 #include "G4UIExecutive.hh"
 #endif
-
+#ifdef G4MULTITHREADED
+#include "GateActionInitialization.hh"
+#include "G4MTRunManager.hh"
+#endif
 //-----------------------------------------------------------------------------
 void printHelpAndQuit( G4String msg )
 {
@@ -159,6 +162,9 @@ void welcome()
   GateMessage("Core", 0, "**********************************************************************" << G4endl);
 #ifdef GATE_USE_GPU
   GateMessage("Core", 0, "GPU support activated" << G4endl );
+#endif
+#ifdef G4MULTITHREADED
+  GateMessage("Core", 0, "Multi Thread support activated" << G4endl );
 #endif
   GateMessage("Core", 0, G4endl);
 }
@@ -268,6 +274,9 @@ int main( int argc, char* argv[] )
 
   // Construct the default run manager
   GateRunManager* runManager = new GateRunManager;
+#ifdef G4MULTITHREADED
+  runManager->SetNumberOfThreads(4); // Is equal to 2 by default
+#endif
 
   // Set the Basic ROOT Output
   GateRecorderBase* myRecords = 0;
@@ -297,7 +306,12 @@ int main( int argc, char* argv[] )
   runManager->InitializeAll();
 
   // Incorporate the user actions, set the particles generator
-  runManager->SetUserAction( new GatePrimaryGeneratorAction() );
+#ifdef G4MULTITHREADED
+   // User action initialization  
+   runManager->SetUserInitialization( new GateActionInitialization( myActions, myRecords ) );
+#else
+   runManager->SetUserAction( new GatePrimaryGeneratorAction() );
+#endif
 
   // Create various singleton objets
 #ifdef G4ANALYSIS_USE_GENERAL
