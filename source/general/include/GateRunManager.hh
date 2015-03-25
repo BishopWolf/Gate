@@ -28,12 +28,19 @@
 #define GateRunManager_h 1
 
 #include "G4RunManager.hh"
+#ifdef G4MULTITHREADED
+ #include "G4MTRunManager.hh"
+#endif
 #include "GateHounsfieldToMaterialsBuilder.hh"
 
 class GateRunManagerMessenger;
 class GateDetectorConstruction;
 
+#ifdef G4MULTITHREADED
+class GateRunManager : public G4MTRunManager
+#else
 class GateRunManager : public G4RunManager
+#endif
 {
 public:
   //! Constructor
@@ -60,8 +67,11 @@ public:
 
   //! Return the instance of the run manager
   static GateRunManager* GetRunManager()
+  #ifdef G4MULTITHREADED
+  {	return dynamic_cast<GateRunManager*>(G4MTRunManager::GetRunManager()); }
+  #else
   {	return dynamic_cast<GateRunManager*>(G4RunManager::GetRunManager()); }
-
+  #endif
   bool GetGlobalOutputFlag() { return mGlobalOutputFlag; }
   void EnableGlobalOutput(bool b) { mGlobalOutputFlag = b; }
   void SetUserPhysicList(G4VUserPhysicsList * m) { mUserPhysicList = m; }

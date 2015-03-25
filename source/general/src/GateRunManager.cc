@@ -8,6 +8,9 @@
 
 
 #include "GateRunManager.hh"
+#ifdef G4MULTITHREADED
+ #include "G4MTRunManager.hh"
+#endif
 #include "GateDetectorConstruction.hh"
 #include "GateRunManagerMessenger.hh"
 #include "GateHounsfieldToMaterialsBuilder.hh"
@@ -27,7 +30,11 @@
 #endif
 
 //----------------------------------------------------------------------------------------
+#ifdef G4MULTITHREADED
+GateRunManager::GateRunManager():G4MTRunManager()
+#else
 GateRunManager::GateRunManager():G4RunManager()
+#endif
 {
   pMessenger = new GateRunManagerMessenger(this);
   mHounsfieldToMaterialsBuilder = new GateHounsfieldToMaterialsBuilder();
@@ -112,7 +119,11 @@ void GateRunManager::InitializeAll()
                                                                     G4ProductionCutsTable::GetProductionCutsTable()->GetHighEdgeEnergy());
 
     // Initialization
+#ifdef G4MULTITHREADED
+    G4MTRunManager::SetUserInitialization(mUserPhysicList);
+#else
     G4RunManager::SetUserInitialization(mUserPhysicList);
+#endif
 
     //To take into account the user cuts (steplimiter and special cuts)
 #if (G4VERSION_MAJOR > 9)
@@ -126,7 +137,11 @@ void GateRunManager::InitializeAll()
   } // End if (mUserPhysicListName != "")
 
   // InitializePhysics
+#ifdef G4MULTITHREADED
   G4RunManager::InitializePhysics();
+#else
+  G4MTRunManager::InitializePhysics();
+#endif
 
   // Take into account the em option set by the user (dedx bin etc)
   GatePhysicsList::GetInstance()->SetEmProcessOptions();
@@ -169,7 +184,11 @@ void GateRunManager::InitGeometryOnly()
   if (!geometryInitialized)
     {
       GateMessage("Core", 1, "Initialization of geometry" << G4endl);
+#ifdef G4MULTITHREADED
+      G4MTRunManager::InitializeGeometry();
+#else
       G4RunManager::InitializeGeometry();
+#endif
     }
   else
     {
@@ -189,7 +208,11 @@ void GateRunManager::InitGeometryOnly()
 //----------------------------------------------------------------------------------------
 void GateRunManager::InitPhysics()
 {
+  #ifdef G4MULTITHREADED
+  G4MTRunManager::InitializePhysics();
+#else
   G4RunManager::InitializePhysics();
+#endif
 }
 //----------------------------------------------------------------------------------------
 
@@ -205,7 +228,11 @@ void GateRunManager::RunInitialization()
 
   // GateMessage("Core", 0, "Initialization of the run " << G4endl);
   // Perform a regular initialisation
+  #ifdef G4MULTITHREADED
+  G4MTRunManager::RunInitialization();
+#else
   G4RunManager::RunInitialization();
+#endif
 
   // Initialization of the atom deexcitation processes
   // must be done after all other initialization
