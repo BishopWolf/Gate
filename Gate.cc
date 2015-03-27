@@ -292,7 +292,7 @@ int main( int argc, char* argv[] )
   runManager->SetUserInitialization( GatePhysicsList::GetInstance() );
 
   // Set the users actions to handle callback for actors - before the initialisation
-  new GateUserActions( runManager, myRecords );
+  GateUserActions* myActions = new GateUserActions( runManager, myRecords );
 
   // Set the Visualization Manager
 #ifdef G4VIS_USE
