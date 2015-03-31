@@ -88,7 +88,7 @@ inline void phaseSaitoX_1D(const Vol &V, Longvol &sdt_x, const bool isMultiregio
 
       for (unsigned int x = 1; x < bound; x++)
         {
-	  if (not (isMultiregion))
+	  if (!(isMultiregion))
             {
 	      if (V(cpt,y,z) == 0)
 		sdt_x(cpt,y,z) = 0;
