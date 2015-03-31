@@ -29,7 +29,7 @@ void GateActionInitialization::BuildForMaster() const
 	// different than the one used for the workers.
 	// This RunAction will be called before and after starting the
 	// workers.
-  SetUserAction( new GateRunAction(pCallbackMan, recorder) ); 
+  //SetUserAction( new GateRunAction(pCallbackMan, recorder) ); 
 }
 
 void GateActionInitialization::Build() const

@@ -54,6 +54,7 @@
 #ifdef G4MULTITHREADED
 #include "GateActionInitialization.hh"
 #include "G4MTRunManager.hh"
+#include "GateAnalysis.hh"
 #endif
 //-----------------------------------------------------------------------------
 void printHelpAndQuit( G4String msg )
@@ -278,11 +279,24 @@ int main( int argc, char* argv[] )
   G4int nThreads = G4Threading::G4GetNumberOfCores();
   runManager->SetNumberOfThreads(nThreads); // Is equal to 2 by default
 #endif
+  
+  // Create various singleton objets
+#ifdef G4ANALYSIS_USE_GENERAL
+  GateOutputMgr::SetDigiMode( aDigiMode );
+  GateOutputMgr* outputMgr = GateOutputMgr::GetInstance();
+  GateDigitizer* digitizer = GateDigitizer::GetInstance();
+  GatePulseProcessorChain* singleChain = new GatePulseProcessorChain( digitizer, "Singles" );
+  digitizer->StoreNewPulseProcessorChain( singleChain );
+#endif
 
+#ifdef G4MULTITHREADED
+  GateAnalysis* myRecords = new GateAnalysis("analysis", outputMgr, aDigiMode);
+#else
   // Set the Basic ROOT Output
   GateRecorderBase* myRecords = 0;
 #ifdef G4ANALYSIS_USE_ROOT
   myRecords = new GateROOTBasicOutput;
+#endif  
 #endif
 
   // Set the DetectorConstruction
@@ -312,15 +326,6 @@ int main( int argc, char* argv[] )
    runManager->SetUserInitialization( new GateActionInitialization( myActions, myRecords ) );
 #else
    runManager->SetUserAction( new GatePrimaryGeneratorAction() );
-#endif
-
-  // Create various singleton objets
-#ifdef G4ANALYSIS_USE_GENERAL
-  GateOutputMgr::SetDigiMode( aDigiMode );
-  GateOutputMgr* outputMgr = GateOutputMgr::GetInstance();
-  GateDigitizer* digitizer = GateDigitizer::GetInstance();
-  GatePulseProcessorChain* singleChain = new GatePulseProcessorChain( digitizer, "Singles" );
-  digitizer->StoreNewPulseProcessorChain( singleChain );
 #endif
 
   if( aDigiMode == kofflineMode )
