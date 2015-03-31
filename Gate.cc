@@ -275,7 +275,8 @@ int main( int argc, char* argv[] )
   // Construct the default run manager
   GateRunManager* runManager = new GateRunManager;
 #ifdef G4MULTITHREADED
-  runManager->SetNumberOfThreads(4); // Is equal to 2 by default
+  G4int nThreads = G4Threading::G4GetNumberOfCores();
+  runManager->SetNumberOfThreads(nThreads); // Is equal to 2 by default
 #endif
 
   // Set the Basic ROOT Output

@@ -29,20 +29,24 @@ void GateActionInitialization::BuildForMaster() const
 	// different than the one used for the workers.
 	// This RunAction will be called before and after starting the
 	// workers.
-
+  SetUserAction( new GateRunAction(pCallbackMan, recorder) ); 
 }
 
 void GateActionInitialization::Build() const
 {   
+ 
+  // Initialize the primary particles
+  GatePrimaryGeneratorAction* prim = new GatePrimaryGeneratorAction();  
+  SetUserAction( prim ); 
 
- // Initialize the primary particles
-SetUserAction( new GatePrimaryGeneratorAction() ); 
+  GateRunAction* run = new GateRunAction(pCallbackMan, recorder);
+  SetUserAction( run );
 
-SetUserAction( new GateEventAction(pCallbackMan, recorder) );
-
-SetUserAction( new GateRunAction(pCallbackMan, recorder) ); 
-
-SetUserAction( new GateSteppingAction(pCallbackMan, recorder) );
-
+  GateEventAction* event = new GateEventAction(pCallbackMan, recorder);
+  SetUserAction( event );
+  
+  SetUserAction( new GateTrackingAction(pCallbackMan, recorder));
+  SetUserAction( new GateSteppingAction(pCallbackMan, recorder));
+  SetUserAction( new GateStackingAction(pCallbackMan, recorder));
 	
 } 
