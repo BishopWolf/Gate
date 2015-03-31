@@ -47,6 +47,6 @@ void GateActionInitialization::Build() const
   
   SetUserAction( new GateTrackingAction(pCallbackMan, recorder));
   SetUserAction( new GateSteppingAction(pCallbackMan, recorder));
-  SetUserAction( new GateStackingAction(pCallbackMan, recorder));
+//SetUserAction( new GateStackingAction(pCallbackMan, recorder));
 	
 } 
