@@ -444,9 +444,11 @@ G4int GateVSource::GeneratePrimaries( G4Event* event )
   if (event) GateMessage("Beam", 2, "Generating particle " << event->GetEventID() << G4endl);
   
   G4int numVertices = 0;
-
+#ifdef G4MULTITHREADED
+  GateSteppingAction* myAction = (GateSteppingAction *) ( G4MTRunManager::GetRunManager()->GetUserSteppingAction() );  
+#else
   GateSteppingAction* myAction = (GateSteppingAction *) ( G4RunManager::GetRunManager()->GetUserSteppingAction() );
-
+#endif
   TrackingMode theMode =myAction->GetMode();
 
   G4bool test = (theMode ==1 ) || ( theMode == 2 );
@@ -534,7 +536,11 @@ G4int GateVSource::GeneratePrimaries( G4Event* event )
           numVertices = 0;
           return numVertices;
         }
+#ifdef G4MULTITHREADED
+      G4Run* currentRun = const_cast<G4Run*> ( G4MTRunManager::GetRunManager()->GetCurrentRun() );  
+#else
       G4Run* currentRun = const_cast<G4Run*> ( G4RunManager::GetRunManager()->GetCurrentRun() );
+#endif
       currentRun->SetRunID( m_currentTrack->GetRunID() );
       event->SetEventID( m_currentTrack->GetEventID() );
       G4int event_id =  m_currentTrack->GetEventID();
@@ -665,7 +671,11 @@ void GateVSource::GeneratePrimaryVertex( G4Event* aEvent )
   }
 
   /* PY Descourt 08/09/2009 */  
+#ifdef G4MULTITHREADED
+  TrackingMode theMode =( (GateSteppingAction *)(G4MTRunManager::GetRunManager()->GetUserSteppingAction() ) )->GetMode();
+#else
   TrackingMode theMode =( (GateSteppingAction *)(G4RunManager::GetRunManager()->GetUserSteppingAction() ) )->GetMode();
+#endif
   if (  theMode == kBoth || theMode == kTracker ) 
     {
       G4ThreeVector particle_position;

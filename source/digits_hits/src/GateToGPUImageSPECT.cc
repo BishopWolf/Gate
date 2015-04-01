@@ -12,7 +12,6 @@
 #include "GateConfiguration.h"
 #include "G4VProcess.hh"
 #include "G4UnitsTable.hh"
-#include "G4RunManager.hh"
 #include "G4EmCalculator.hh"
 #include "G4TouchableHistory.hh"
 #include "G4TransportationManager.hh"

@@ -378,10 +378,17 @@ void GatePhaseSpaceActor::UserSteppingAction(const GateVVolume *, const G4Step *
                    << " stepPoint time proper=" << G4BestUnit(stepPoint->GetProperTime(), "Time")
                    << " global=" << G4BestUnit(stepPoint->GetGlobalTime(), "Time")
                    << " local=" << G4BestUnit(stepPoint->GetLocalTime(), "Time") << G4endl);
+#ifdef G4MULTITHREADED
+  GateDebugMessage("Actor", 4, "trackid="
+                   << step->GetTrack()->GetParentID()
+                   << " event=" << G4MTRunManager::GetRunManager()->GetCurrentEvent()->GetEventID()
+                   << " run=" << G4MTRunManager::GetRunManager()->GetCurrentRun()->GetRunID() << G4endl);
+#else
   GateDebugMessage("Actor", 4, "trackid="
                    << step->GetTrack()->GetParentID()
                    << " event=" << G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID()
                    << " run=" << G4RunManager::GetRunManager()->GetCurrentRun()->GetRunID() << G4endl);
+#endif
   GateDebugMessage("Actor", 4, "pos = " << x << " " << y  << " " << z << G4endl);
   GateDebugMessage("Actor", 4, "E = " << G4BestUnit(stepPoint->GetKineticEnergy(), "Energy") << G4endl);
 

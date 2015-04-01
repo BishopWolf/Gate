@@ -87,8 +87,11 @@ void GateSignalHandler::QuitSignalHandler(int sig)
 
       // If a beamOn/StartDAQ is running, launch abort sequence
       G4cerr << "--- Aborting run/acquisition! ---" << G4endl << G4endl;
-
+#ifdef G4MULTITHREADED
+      G4MTRunManager::GetRunManager()->AbortRun(true);
+#else
       G4RunManager::GetRunManager()->AbortRun(true);
+#endif
 
       GateApplicationMgr::GetInstance()->StopDAQ();
       break;

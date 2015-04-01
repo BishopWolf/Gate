@@ -24,6 +24,9 @@ See GATE/LICENSE.txt for further details
 #include "GateCrystalHit.hh"
 #include "GateSourceMgr.hh"
 #include "GateOutputMgr.hh"
+#ifdef G4MULTITHREADED
+#include "G4MTRunManager.hh"
+#endif
 
 GateFastAnalysis::GateFastAnalysis(const G4String& name, GateOutputMgr* outputMgr, DigiMode digiMode)
   : GateVOutputModule(name,outputMgr,digiMode)
@@ -86,7 +89,11 @@ void GateFastAnalysis::RecordEndOfEvent(const G4Event* event)
 
     G4int sourceID = (((GateSourceMgr::GetInstance())->GetSourcesForThisEvent())[0])->GetSourceID();
     G4int eventID  = event->GetEventID();
+#ifdef G4MULTITHREADED
+    G4int runID    = G4MTRunManager::GetRunManager()->GetCurrentRun()->GetRunID();
+#else
     G4int runID    = G4RunManager::GetRunManager()->GetCurrentRun()->GetRunID();
+#endif
 
         for (G4int iHit=0;iHit<NbHits;iHit++)
            {

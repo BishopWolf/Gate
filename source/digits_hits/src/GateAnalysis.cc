@@ -35,6 +35,9 @@
 #include "GateVVolume.hh"
 #include "GateActions.hh"
 #include "GateToRoot.hh"
+#ifdef G4MULTITHREADED
+#include "G4MTRunManager.hh"
+#endif
 //--------------------------------------------------------------------------------------------------
 GateAnalysis::GateAnalysis(const G4String& name, GateOutputMgr* outputMgr,DigiMode digiMode)
   : GateVOutputModule(name,outputMgr,digiMode)
@@ -125,7 +128,11 @@ void GateAnalysis::RecordEndOfEvent(const G4Event* event)
     m_trajectoryNavigator->SetTrajectoryContainer(trajectoryContainer);
 
   G4int eventID = event->GetEventID();
+#ifdef G4MULTITHREADED
+  G4int runID   = G4MTRunManager::GetRunManager()->GetCurrentRun()->GetRunID();
+#else
   G4int runID   = G4RunManager::GetRunManager()->GetCurrentRun()->GetRunID();
+#endif
   //G4cout << "GateAnalysis::EventID et RunID :  " <<eventID<<" - "<<runID<< G4endl;
 
   //G4int i;
@@ -317,8 +324,11 @@ void GateAnalysis::RecordEndOfEvent(const G4Event* event)
                     }
                 }
             } // end loop NpHits
-
+#ifdef G4MULTITHREADED
+          TrackingMode theMode =( (GateSteppingAction *)(G4MTRunManager::GetRunManager()->GetUserSteppingAction() ) )->GetMode();
+#else
           TrackingMode theMode =( (GateSteppingAction *)(G4RunManager::GetRunManager()->GetUserSteppingAction() ) )->GetMode();
+#endif
 
 
           if (  theMode == kTracker ) // in tracker mode we store the infos about the number of compton and rayleigh

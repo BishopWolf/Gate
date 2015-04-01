@@ -124,8 +124,11 @@ GateEventAction::GateEventAction(GateUserActions * cbm, GateRecorderBase* r)
 inline void GateEventAction::BeginOfEventAction(const G4Event* anEvent)
 {
   GateMessage("Core", 2, "Begin Of Event " << anEvent->GetEventID() << "\n");
-
+#ifdef G4MULTITHREADED
+  TrackingMode theMode =( (GateSteppingAction *)(G4MTRunManager::GetRunManager()->GetUserSteppingAction() ) )->GetMode();
+#else
   TrackingMode theMode =( (GateSteppingAction *)(G4RunManager::GetRunManager()->GetUserSteppingAction() ) )->GetMode();
+#endif
   if ( theMode != kTracker )
     {
       if (GetFlagBasicOutput()){
@@ -165,8 +168,11 @@ inline void GateEventAction::EndOfEventAction(const G4Event* anEvent)
 #endif
 
   /* PY Descourt 08/09/2009 */
-
+#ifdef G4MULTITHREADED
+  GateSteppingAction* myAction = ( (GateSteppingAction *)(G4MTRunManager::GetRunManager()->GetUserSteppingAction() ) );
+#else
   GateSteppingAction* myAction = ( (GateSteppingAction *)(G4RunManager::GetRunManager()->GetUserSteppingAction() ) );
+#endif
   TrackingMode theMode = myAction->GetMode();
 
   if ( theMode == kTracker )
@@ -222,9 +228,11 @@ void GateTrackingAction::PreUserTrackingAction(const G4Track* a)
   }
 
   /* PY Descourt 08/09/2009 */
-
+#ifdef G4MULTITHREADED
+  GateSteppingAction*  myAction = (GateSteppingAction *) (G4MTRunManager::GetRunManager()->GetUserSteppingAction()) ;
+#else
   GateSteppingAction*  myAction = (GateSteppingAction *) (G4RunManager::GetRunManager()->GetUserSteppingAction()) ;
-
+#endif
   TrackingMode theMode = myAction->GetMode();
 
   if ( theMode == kDetector )
@@ -310,8 +318,11 @@ void GateTrackingAction::PostUserTrackingAction(const G4Track* aTrack)
         delete dummy_step_vector[i];
       dummy_step_vector.clear();
     }
-
+#ifdef G4MULTITHREADED
+  GateSteppingAction*  myAction = (GateSteppingAction *) (G4MTRunManager::GetRunManager()->GetUserSteppingAction()) ;
+#else
   GateSteppingAction*  myAction = (GateSteppingAction *) (G4RunManager::GetRunManager()->GetUserSteppingAction()) ;
+#endif
   TrackingMode theMode = myAction->GetMode();
   if ( theMode == kDetector )
     {
@@ -776,7 +787,11 @@ void GateSteppingAction::UserSteppingAction(const G4Step* theStep)
   if ( TheMode == kTracker )
     {
       G4int EventID = G4EventManager::GetEventManager()->GetNonconstCurrentEvent()->GetEventID();
+#ifdef G4MULTITHREADED
+      G4int RunID   = G4MTRunManager::GetRunManager()->GetCurrentRun()->GetRunID();
+#else
       G4int RunID   = G4RunManager::GetRunManager()->GetCurrentRun()->GetRunID();
+#endif
       G4Track * fTrack = theStep->GetTrack();
       G4int ParentID  =  fTrack->GetParentID();
       G4int TrackID = fTrack->GetTrackID();
@@ -1026,7 +1041,11 @@ void GateSteppingAction::UserSteppingAction(const GateVVolume *v, const G4Step* 
   G4bool drawTrj = false;
   if (m_drawTrjLevel == 0) {
   } else if (m_drawTrjLevel == 1) {
+#ifdef G4MULTITHREADED
+    G4int currentEvent = G4MTRunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
+#else
     G4int currentEvent = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
+#endif
     if (currentEvent <= 10) {
       drawTrj = true;
     }
@@ -1238,7 +1257,11 @@ void GateSteppingAction::UserSteppingAction(const GateVVolume *v, const G4Step* 
   if ( TheMode == kTracker )
     {
       G4int EventID = G4EventManager::GetEventManager()->GetNonconstCurrentEvent()->GetEventID();
+#ifdef G4MULTITHREADED
+      G4int RunID   = G4MTRunManager::GetRunManager()->GetCurrentRun()->GetRunID();
+#else
       G4int RunID   = G4RunManager::GetRunManager()->GetCurrentRun()->GetRunID();
+#endif
       G4Track * fTrack = theStep->GetTrack();
       G4int ParentID  =  fTrack->GetParentID();
       G4int TrackID = fTrack->GetTrackID();

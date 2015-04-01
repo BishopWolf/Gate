@@ -118,8 +118,11 @@ G4int GateTrajectoryNavigator::FindPositronTrackID()
 /* modifs pour cas du mode detector : PY Descourt 08/09/2009 */
 std::vector<G4int> GateTrajectoryNavigator::FindAnnihilationGammasTrackID()
 {
-
+#ifdef G4MULTITHREADED
+TrackingMode theMode =( (GateSteppingAction *)(G4MTRunManager::GetRunManager()->GetUserSteppingAction() ) )->GetMode();  
+#else
 TrackingMode theMode =( (GateSteppingAction *)(G4RunManager::GetRunManager()->GetUserSteppingAction() ) )->GetMode();
+#endif
 
   if (nVerboseLevel > 2)
     G4cout << "GateTrajectoryNavigator::FindAnnihilationGammasTrackID" << G4endl;
