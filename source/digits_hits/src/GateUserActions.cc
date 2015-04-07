@@ -12,7 +12,9 @@ See GATE/LICENSE.txt for further details
 
 #include "GateUserActions.hh"
 #include "GateActions.hh"
-
+#ifdef G4MULTITHREADED
+#include "GateActionInitialization.hh"
+#endif
 #include "G4UImanager.hh"
 #include "G4VVisManager.hh"
 //#include "G4Run.hh"
@@ -51,6 +53,10 @@ GateUserActions::GateUserActions(GateRunManager* m, GateRecorderBase* r)
 
 
   // Set fGate' user action classes to the GateRunmanager :
+#ifdef G4MULTITHREADED
+  GateActionInitialization* ActionInitialization = new GateActionInitialization(this, recorder);
+  pRunManager->SetUserInitialization(ActionInitialization);
+#else
   // Run/Event/Tracking/Stepping in order to get the callbacks
   GateRunAction* RunAction = new GateRunAction(this, recorder);
   GateEventAction* EventAction = new GateEventAction(this, recorder);
@@ -60,7 +66,8 @@ GateUserActions::GateUserActions(GateRunManager* m, GateRecorderBase* r)
   pRunManager->SetUserAction(RunAction);
   pRunManager->SetUserAction(EventAction);
   pRunManager->SetUserAction(TrackingAction);
-  pRunManager->SetUserAction(SteppingAction);
+  pRunManager->SetUserAction(SteppingAction);  
+#endif
 
   //pRunManager->SetUserAction(dynamic_cast<G4UserRunAction *>(this)); //Don't know why this don't work
   //pRunManager->SetUserAction(dynamic_cast<G4UserEventAction *>(this));

@@ -25,7 +25,7 @@
 # GEOMETRY
 #=====================================================
 
-/gate/geometry/setMaterialDatabase                 data/GateMaterials.db
+/gate/geometry/setMaterialDatabase                 ../data/GateMaterials.db
 
 # WORLD
 /gate/world/setMaterial                      Air
