@@ -709,11 +709,9 @@ void GateApplicationMgr::EnableTimeStudyForSteps(G4String filename)
 
 void GateApplicationMgr::PrintStatus()
 {
-#ifdef G4MULTITHREADED
-    const G4Run * run = G4MTRunManager::GetRunManager()->GetCurrentRun();
-#else
-    const G4Run * run = G4RunManager::GetRunManager()->GetCurrentRun();
-#endif
+
+    const G4Run * run = GateRunManager::GetRunManager()->GetCurrentRun();
+
     const int runID = run->GetRunID() + 1;
     const int runTotal = listOfTimeSlice.size();
 

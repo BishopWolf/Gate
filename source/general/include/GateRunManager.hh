@@ -36,9 +36,13 @@
 class GateRunManagerMessenger;
 class GateDetectorConstruction;
 
+static G4String DefaultRegion="DefaultRegionForTheWorld";
+
 #ifdef G4MULTITHREADED
+//static G4String DefaultRegion="DefaultRegionForParallelWorld";
 class GateRunManager : public G4MTRunManager
 #else
+//static G4String DefaultRegion="DefaultRegionForTheWorld";
 class GateRunManager : public G4RunManager
 #endif
 {

@@ -29,9 +29,7 @@
 #include <cmath>
 #include "GateActions.hh"
 #include "G4RunManager.hh"
-#ifdef G4MULTITHREADED
-#include "G4MTRunManager.hh"
-#endif
+
 
 //----------------------------------------------------------------------------------------
 GateSourceMgr* GateSourceMgr::mInstance = 0;
@@ -528,11 +526,9 @@ G4int GateSourceMgr::PrepareNextEvent( G4Event* event )
 {
   // GateDebugMessage("Acquisition", 0, "PrepareNextEvent "  << event->GetEventID()
   //                    << " at time " << m_time/s << " sec." << G4endl);
-#ifdef G4MULTITHREADED
-  GateSteppingAction* myAction = (GateSteppingAction *) ( G4MTRunManager::GetRunManager()->GetUserSteppingAction() );
-#else
-  GateSteppingAction* myAction = (GateSteppingAction *) ( G4RunManager::GetRunManager()->GetUserSteppingAction() );
-#endif
+
+  GateSteppingAction* myAction = (GateSteppingAction *) ( GateRunManager::GetRunManager()->GetUserSteppingAction() );
+
   TrackingMode theMode =myAction->GetMode();
   m_currentSources.clear();
 

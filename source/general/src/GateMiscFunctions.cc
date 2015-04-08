@@ -11,6 +11,7 @@ See GATE/LICENSE.txt for further details
 
 #include "GateMiscFunctions.hh"
 #include "GateActorManager.hh"
+#include "GateRunManager.hh"
 
 #include "G4SystemOfUnits.hh"
 #include "G4UIcmdWithADouble.hh"
@@ -23,9 +24,6 @@ See GATE/LICENSE.txt for further details
 #include "G4ThreeVector.hh"
 #include "G4RunManager.hh"
 #include "G4Run.hh"
-#ifdef G4MULTITHREADED
-#include "G4MTRunManager.hh"
-#endif
 
 #include <sys/types.h> 
 #include <sys/file.h>
@@ -673,11 +671,9 @@ int GetIndexFromTime(std::vector<double> & mTimeList, double aTime) {
 G4String GetSaveCurrentFilename(G4String & mSaveFilename) {
   int nr=0;
   int ne=0;
-#ifdef G4MULTITHREADED
-  const G4Run * run = G4MTRunManager::GetRunManager()->GetCurrentRun();  
-#else
-  const G4Run * run = G4RunManager::GetRunManager()->GetCurrentRun();
-#endif
+
+  const G4Run * run = GateRunManager::GetRunManager()->GetCurrentRun();  
+
   if (run) nr = run->GetRunID(); 
   else {
     nr = 0;

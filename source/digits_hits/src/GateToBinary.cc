@@ -20,9 +20,7 @@
 #include "GateOutputMgr.hh"
 #include "GateVGeometryVoxelStore.hh"
 #include "G4DigiManager.hh"
-#ifdef G4MULTITHREADED
-#include "G4MTRunManager.hh"
-#endif
+#include "GateRunManager.hh"
 
 // 0x79000000 equivalent to 2,030,043,136 bytes
 #define LIMIT_SIZE 0x79000000
@@ -139,15 +137,11 @@ void GateToBinary::RecordEndOfRun( G4Run const* )
 
 	if( m_outFileRunsFlag )
 	{
-#ifdef G4MULTITHREADED
+
 		G4int nEvent =
-			( ( (GatePrimaryGeneratorAction*)G4MTRunManager::GetRunManager()->
+			( ( (GatePrimaryGeneratorAction*)GateRunManager::GetRunManager()->
 			GetUserPrimaryGeneratorAction())->GetEventNumber() );
-#else
-		G4int nEvent =
-			( ( (GatePrimaryGeneratorAction*)G4RunManager::GetRunManager()->
-			GetUserPrimaryGeneratorAction())->GetEventNumber() );
-#endif
+
 		if( nVerboseLevel > 0 )
 		{
 			G4cout << "GateToBinary::RecordEndOfRun: Events in the past run: "

@@ -19,9 +19,6 @@
 #include "G4EmCalculator.hh"
 #include "G4TouchableHistory.hh"
 #include "G4TransportationManager.hh"
-#ifdef G4MULTITHREADED
-#include "G4MTRunManager.hh"
-#endif
 
 #include "GateOutputMgr.hh"
 #include "GateToImageCT.hh"
@@ -29,6 +26,7 @@
 #include "GateToImageCTMessenger.hh"
 #include "GateArrayComponent.hh"
 #include "GateVSystem.hh"
+#include "GateRunManager.hh"
 
 GateToImageCT::GateToImageCT( const G4String& name, GateOutputMgr* outputMgr,
                               GateVSystem* itsSystem, DigiMode digiMode )
@@ -389,11 +387,9 @@ void GateToImageCT::RecordBeginOfEvent( const G4Event* aEvent )
   if( fabs( newPosition.getX() ) > m_detectorInX / 2
       || fabs( newPosition.getY() )  > m_detectorInY / 2 )
     {
-#ifdef G4MULTITHREADED
-      G4MTRunManager::GetRunManager()->AbortEvent();
-#else
-      G4RunManager::GetRunManager()->AbortEvent();
-#endif
+
+      GateRunManager::GetRunManager()->AbortEvent();
+
       if ( nVerboseLevel > 1 )
         G4cout << " Abort event: Out of detector section "<< G4endl;
     }

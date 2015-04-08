@@ -67,7 +67,7 @@ GatePhysicsList::GatePhysicsList(): G4VUserPhysicsList()
   worldCuts.electronCut = -1;
   worldCuts.positronCut = -1;
   worldCuts.protonCut = -1;
-  mapOfRegionCuts["DefaultRegionForTheWorld"] = worldCuts;
+  mapOfRegionCuts[DefaultRegion] = worldCuts;
   mLoadState=0;
   mDEDXBinning=-1;
   mLambdaBinning=-1;
@@ -757,7 +757,7 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
 
   //-----------------------------------------------------------------------------
   // Set defaults production cut for the world
-  ParticleCutType worldCuts =  mapOfRegionCuts["DefaultRegionForTheWorld"];
+  ParticleCutType worldCuts =  mapOfRegionCuts[DefaultRegion];
 
   if(worldCuts.gammaCut == -1) worldCuts.gammaCut = defaultCutValue;
   if(worldCuts.electronCut == -1) worldCuts.electronCut = defaultCutValue;
@@ -770,10 +770,10 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
               << worldCuts.positronCut << " "
               << worldCuts.protonCut   << " mm" << G4endl);
 
-  phys->SetCutValue(worldCuts.gammaCut, "gamma","DefaultRegionForTheWorld");
-  phys->SetCutValue(worldCuts.electronCut, "e-","DefaultRegionForTheWorld");
-  phys->SetCutValue(worldCuts.positronCut, "e+","DefaultRegionForTheWorld");
-  phys->SetCutValue(worldCuts.protonCut, "proton","DefaultRegionForTheWorld");
+  phys->SetCutValue(worldCuts.gammaCut, "gamma",DefaultRegion);
+  phys->SetCutValue(worldCuts.electronCut, "e-",DefaultRegion);
+  phys->SetCutValue(worldCuts.positronCut, "e+",DefaultRegion);
+  phys->SetCutValue(worldCuts.protonCut, "proton",DefaultRegion);
 
   //-----------------------------------------------------------------------------
   // Set default production cut to other regions
@@ -783,7 +783,7 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
   while (pi != pe) {
     G4String regionName = (*pi)->GetName();
 
-    if (regionName != "DefaultRegionForTheWorld" && regionName !="world") {
+    if (regionName != DefaultRegion && regionName !="world") {
       RegionCutMapType::iterator current = mapOfRegionCuts.find(regionName);
       if (current == mapOfRegionCuts.end()) {
 	// GateMessage("Cuts",5, " Cut not set for region " << regionName << " put -1" << G4endl);
@@ -802,7 +802,7 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
   while (it != mapOfRegionCuts.end()) {
     // do not apply cut for the world region
     // GateMessage("Cuts", 5, "Region (*it).first : " << (*it).first<< G4endl);
-    if (((*it).first != "DefaultRegionForTheWorld") && ((*it).first != "world")) {
+    if (((*it).first != DefaultRegion) && ((*it).first != "world")) {
       G4Region* region = RegionStore->GetRegion((*it).first);
       if (!region) {
 	GateError( "The region '" << (*it).first << "' does not exist !");
@@ -816,7 +816,7 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
         {
           G4bool unique;
           parentRegion =  parentRegion->GetParentRegion(unique);
-          if(parentRegion->GetName() != "DefaultRegionForTheWorld"){
+          if(parentRegion->GetName() != DefaultRegion){
             ParticleCutType parentRegionCuts = mapOfRegionCuts[parentRegion->GetName()];
             regionCuts.gammaCut = parentRegionCuts.gammaCut;
           }
@@ -829,7 +829,7 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
         {
           G4bool unique;
           parentRegion =  parentRegion->GetParentRegion(unique);
-          if(parentRegion->GetName() != "DefaultRegionForTheWorld"){
+          if(parentRegion->GetName() != DefaultRegion){
             ParticleCutType parentRegionCuts = mapOfRegionCuts[parentRegion->GetName()];
             regionCuts.electronCut = parentRegionCuts.electronCut;
           }
@@ -842,7 +842,7 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
         {
           G4bool unique;
           parentRegion =  parentRegion->GetParentRegion(unique);
-          if(parentRegion->GetName() != "DefaultRegionForTheWorld"){
+          if(parentRegion->GetName() != DefaultRegion){
             ParticleCutType parentRegionCuts = mapOfRegionCuts[parentRegion->GetName()];
             regionCuts.positronCut = parentRegionCuts.positronCut;
           }
@@ -854,7 +854,7 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
         {
           G4bool unique;
           parentRegion =  parentRegion->GetParentRegion(unique);
-          if(parentRegion->GetName() != "DefaultRegionForTheWorld"){
+          if(parentRegion->GetName() != DefaultRegion){
             ParticleCutType parentRegionCuts = mapOfRegionCuts[parentRegion->GetName()];
             regionCuts.protonCut = parentRegionCuts.protonCut;
           }
@@ -901,18 +901,18 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
   //G4LogicalVolumeStore * logicalVolumeStore = G4LogicalVolumeStore::GetInstance();
 
   GateUserLimits *  worldUserLimit = new GateUserLimits();
-  if(mapOfVolumeUserLimits["DefaultRegionForTheWorld"] != 0)
+  if(mapOfVolumeUserLimits[DefaultRegion] != 0)
     {
-      if(mapOfVolumeUserLimits["DefaultRegionForTheWorld"]->GetMaxStepSize()       != -1.)
-        worldUserLimit->SetMaxStepSize(mapOfVolumeUserLimits["DefaultRegionForTheWorld"]->GetMaxStepSize());
-      if(mapOfVolumeUserLimits["DefaultRegionForTheWorld"]->GetMaxTrackLength()    != -1.)
-        worldUserLimit->SetMaxTrackLength(mapOfVolumeUserLimits["DefaultRegionForTheWorld"]->GetMaxTrackLength());
-      if(mapOfVolumeUserLimits["DefaultRegionForTheWorld"]->GetMaxToF()            != -1.)
-        worldUserLimit->SetMaxToF(mapOfVolumeUserLimits["DefaultRegionForTheWorld"]->GetMaxToF());
-      if(mapOfVolumeUserLimits["DefaultRegionForTheWorld"]->GetMinKineticEnergy()  != -1.)
-        worldUserLimit->SetMinKineticEnergy(mapOfVolumeUserLimits["DefaultRegionForTheWorld"]->GetMinKineticEnergy());
-      if(mapOfVolumeUserLimits["DefaultRegionForTheWorld"]->GetMinRemainingRange() != -1.)
-        worldUserLimit->SetMinRemainingRange(mapOfVolumeUserLimits["DefaultRegionForTheWorld"]->GetMinRemainingRange());
+      if(mapOfVolumeUserLimits[DefaultRegion]->GetMaxStepSize()       != -1.)
+        worldUserLimit->SetMaxStepSize(mapOfVolumeUserLimits[DefaultRegion]->GetMaxStepSize());
+      if(mapOfVolumeUserLimits[DefaultRegion]->GetMaxTrackLength()    != -1.)
+        worldUserLimit->SetMaxTrackLength(mapOfVolumeUserLimits[DefaultRegion]->GetMaxTrackLength());
+      if(mapOfVolumeUserLimits[DefaultRegion]->GetMaxToF()            != -1.)
+        worldUserLimit->SetMaxToF(mapOfVolumeUserLimits[DefaultRegion]->GetMaxToF());
+      if(mapOfVolumeUserLimits[DefaultRegion]->GetMinKineticEnergy()  != -1.)
+        worldUserLimit->SetMinKineticEnergy(mapOfVolumeUserLimits[DefaultRegion]->GetMinKineticEnergy());
+      if(mapOfVolumeUserLimits[DefaultRegion]->GetMinRemainingRange() != -1.)
+        worldUserLimit->SetMinRemainingRange(mapOfVolumeUserLimits[DefaultRegion]->GetMinRemainingRange());
     }
 
 
@@ -962,7 +962,7 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
   while (pi != pe) {
     G4String regionName = (*pi)->GetName();
 
-    if (regionName != "DefaultRegionForTheWorld" && regionName !="world") {
+    if (regionName != DefaultRegion && regionName !="world") {
       VolumeUserLimitsMapType::iterator current = mapOfVolumeUserLimits.find(regionName);
       if (current == mapOfVolumeUserLimits.end()) {
 	GateMessage("Cuts",5, " UserCuts not set for region " << regionName << " put -1" << G4endl);
@@ -976,7 +976,7 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
   while (it2 != mapOfVolumeUserLimits.end()) {
     // do not apply cut for the world region
     // GateMessage("Cuts", 5, "Region (*it2).first : " << (*it2).first<< G4endl);
-    if (((*it2).first != "DefaultRegionForTheWorld") && ((*it2).first != "world")) {
+    if (((*it2).first != DefaultRegion) && ((*it2).first != "world")) {
       G4Region* region = RegionStore->GetRegion((*it2).first);
       if (!region) {
 	GateError( "The region '" << (*it2).first << "' does not exist !");
@@ -986,11 +986,11 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
       G4Region* parentRegion =  region;
       G4Region* regionTmp =  region;
       while((regionUserLimit->GetMaxStepSize() == -1) &&
-            (regionTmp->GetName() != "DefaultRegionForTheWorld"))
+            (regionTmp->GetName() != DefaultRegion))
         {
           G4bool unique;
           parentRegion =  regionTmp->GetParentRegion(unique);
-          if(parentRegion->GetName() != "DefaultRegionForTheWorld"){
+          if(parentRegion->GetName() != DefaultRegion){
             GateUserLimits * parentRegionUserLimits = mapOfVolumeUserLimits[parentRegion->GetName()];
             regionUserLimit->SetMaxStepSize(  parentRegionUserLimits->GetMaxStepSize()) ;
             GateMessage("Cuts", 5, "Region " << (*it2).first << " maxStepSize " << parentRegionUserLimits->GetMaxStepSize() << G4endl);
@@ -1000,11 +1000,11 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
         }
 
       regionTmp =  region;
-      while(regionUserLimit->GetMaxTrackLength() == -1 && regionTmp->GetName() != "DefaultRegionForTheWorld")
+      while(regionUserLimit->GetMaxTrackLength() == -1 && regionTmp->GetName() != DefaultRegion)
         {
           G4bool unique;
           parentRegion =  regionTmp->GetParentRegion(unique);
-          if(parentRegion->GetName() != "DefaultRegionForTheWorld"){
+          if(parentRegion->GetName() != DefaultRegion){
             GateUserLimits * parentRegionUserLimits = mapOfVolumeUserLimits[parentRegion->GetName()];
             regionUserLimit->SetMaxTrackLength(  parentRegionUserLimits->GetMaxTrackLength()) ;
             GateMessage("Cuts", 5, "Region " << (*it2).first << " maxTrackLength " << parentRegionUserLimits->GetMaxTrackLength() << G4endl);
@@ -1015,11 +1015,11 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
 
 
       regionTmp =  region;
-      while(regionUserLimit->GetMaxToF() == -1 && regionTmp->GetName() != "DefaultRegionForTheWorld")
+      while(regionUserLimit->GetMaxToF() == -1 && regionTmp->GetName() != DefaultRegion)
         {
           G4bool unique;
           parentRegion =  regionTmp->GetParentRegion(unique);
-          if(parentRegion->GetName() != "DefaultRegionForTheWorld"){
+          if(parentRegion->GetName() != DefaultRegion){
             GateUserLimits * parentRegionUserLimits = mapOfVolumeUserLimits[parentRegion->GetName()];
             regionUserLimit->SetMaxToF(  parentRegionUserLimits->GetMaxToF()) ;
           }
@@ -1028,11 +1028,11 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
         }
 
       regionTmp =  region;
-      while(regionUserLimit->GetMinKineticEnergy() == -1 && regionTmp->GetName() != "DefaultRegionForTheWorld")
+      while(regionUserLimit->GetMinKineticEnergy() == -1 && regionTmp->GetName() != DefaultRegion)
         {
           G4bool unique;
           parentRegion =  regionTmp->GetParentRegion(unique);
-          if(parentRegion->GetName() != "DefaultRegionForTheWorld"){
+          if(parentRegion->GetName() != DefaultRegion){
             GateUserLimits * parentRegionUserLimits = mapOfVolumeUserLimits[parentRegion->GetName()];
             regionUserLimit->SetMinKineticEnergy(  parentRegionUserLimits->GetMinKineticEnergy()) ;
           }
@@ -1041,11 +1041,11 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
         }
 
       regionTmp =  region;
-      while(regionUserLimit->GetMinRemainingRange() == -1 && regionTmp->GetName() != "DefaultRegionForTheWorld")
+      while(regionUserLimit->GetMinRemainingRange() == -1 && regionTmp->GetName() != DefaultRegion)
         {
           G4bool unique;
           parentRegion =  regionTmp->GetParentRegion(unique);
-          if(parentRegion->GetName() != "DefaultRegionForTheWorld"){
+          if(parentRegion->GetName() != DefaultRegion){
             GateUserLimits * parentRegionUserLimits = mapOfVolumeUserLimits[parentRegion->GetName()];
             regionUserLimit->SetMinRemainingRange(  parentRegionUserLimits->GetMinRemainingRange()) ;
           }
@@ -1129,7 +1129,7 @@ void GatePhysicsList::SetCutInRegion(G4String particleName, G4String regionName,
     << "' : " << cutValue << G4endl);
   */
 
-  if(regionName=="world") regionName="DefaultRegionForTheWorld";
+  if(regionName=="world") regionName=DefaultRegion;
 
   RegionCutMapType::iterator it = mapOfRegionCuts.find(regionName);
   if (it == mapOfRegionCuts.end()) {
@@ -1159,7 +1159,7 @@ void GatePhysicsList::SetCutInRegion(G4String particleName, G4String regionName,
 //-----------------------------------------------------------------------------
 void GatePhysicsList::SetSpecialCutInRegion(G4String cutType, G4String regionName, G4double cutValue)
 {
-  if(regionName=="world") regionName="DefaultRegionForTheWorld";
+  if(regionName=="world") regionName=DefaultRegion;
 
   VolumeUserLimitsMapType::iterator it = mapOfVolumeUserLimits.find(regionName);
   if (it == mapOfVolumeUserLimits.end()) {

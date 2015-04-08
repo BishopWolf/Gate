@@ -38,9 +38,6 @@
 #include "G4Positron.hh"
 #include "G4GenericIon.hh"
 #include "G4DigiManager.hh"
-#ifdef G4MULTITHREADED
-#include "G4MTRunManager.hh"
-#endif
 
 #include <iomanip>
 #include <iostream>
@@ -150,13 +147,10 @@ void GateToASCII::RecordEndOfRun(const G4Run * )
   if (nVerboseLevel > 2)
     G4cout << "GateToASCII::RecordEndOfRun" << G4endl;
   if (m_outFileRunsFlag) {
-#ifdef G4MULTITHREADED
-    G4int nEvent = ((GatePrimaryGeneratorAction*)G4MTRunManager::GetRunManager()->
+
+    G4int nEvent = ((GatePrimaryGeneratorAction*)GateRunManager::GetRunManager()->
 		    GetUserPrimaryGeneratorAction())->GetEventNumber();
-#else
-    G4int nEvent = ((GatePrimaryGeneratorAction*)G4RunManager::GetRunManager()->
-		    GetUserPrimaryGeneratorAction())->GetEventNumber();
-#endif
+
     if (nVerboseLevel > 0) G4cout
       << "GateToASCII::RecordEndOfRun: Events in the past run: " << nEvent << G4endl;
     m_outFileRun

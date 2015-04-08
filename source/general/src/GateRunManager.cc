@@ -111,7 +111,7 @@ void GateRunManager::InitializeAll()
     // the Gate one is used to store/retrieve cuts parameters.
 
     // Consider the e- cut as default (in mm)
-    double def = GatePhysicsList::GetInstance()->mapOfRegionCuts["DefaultRegionForTheWorld"].electronCut;
+    double def = GatePhysicsList::GetInstance()->mapOfRegionCuts[DefaultRegion].electronCut;
     mUserPhysicList->SetDefaultCutValue(def*mm);
     mUserPhysicList->SetCutsWithDefault();
 
@@ -176,7 +176,7 @@ void GateRunManager::InitGeometryOnly()
     //G4bool unique;
     G4String regionName = (*pi)->GetName();
 
-    if(regionName!="DefaultRegionForTheWorld"){
+    if(regionName!=DefaultRegion){
       RegionStore->DeRegister((*pi));
       GateMessage("Cuts", 5, "Region "<<regionName<<" deleted."<< G4endl);
     }
