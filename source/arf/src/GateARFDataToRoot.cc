@@ -33,6 +33,7 @@ See GATE/LICENSE.txt for further details
 #include "G4RunManager.hh"
 #include "GatePrimaryGeneratorAction.hh"
 #include "GateHitConvertor.hh"
+#include "GateMessageManager.hh"
 
 #include "G4ParticleDefinition.hh"
 #include "G4Positron.hh"
@@ -94,8 +95,8 @@ OUT_camera = 0;
 GateARFDataToRoot::~GateARFDataToRoot() 
 {
   delete m_rootMessenger;
-  if (nVerboseLevel > 0) G4cout << "GateARFDataToRoot deleting..." << G4endl;
-
+  //if (nVerboseLevel > 0) G4cout << "GateARFDataToRoot deleting..." << G4endl;
+  GateMessage("GateARFDataToRoot", nVerboseLevel, "GateARFDataToRoot deleting..." << G4endl);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo...

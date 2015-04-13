@@ -68,12 +68,9 @@ void GateRunManager::InitializeAll()
   // Check that we're in PreInit or Idle state
   if (currentState!=G4State_PreInit && currentState!=G4State_Idle)
     {
-      G4cerr << "Illegal application state - "
-      #ifdef G4MULTITHREADED
-	     << "G4MTRunManager::Initialize() ignored." << G4endl;
-#else
-	     << "G4RunManager::Initialize() ignored." << G4endl; 
-#endif
+      /*G4cerr << "Illegal application state - "
+	     << "G4RunManager::Initialize() ignored." << G4endl;*/ 
+	  GateError("Illegal application state - " << "GateRunManager::InitializeAll() failed.");
       return;
     }
 
@@ -123,6 +120,7 @@ void GateRunManager::InitializeAll()
                                                                     G4ProductionCutsTable::GetProductionCutsTable()->GetHighEdgeEnergy());
 
     // Initialization
+	// Shouldn't it be better GateRunManager::SetUserInitialization(mUserPhysicList);??
 #ifdef G4MULTITHREADED
     G4MTRunManager::SetUserInitialization(mUserPhysicList);
 #else
@@ -141,10 +139,11 @@ void GateRunManager::InitializeAll()
   } // End if (mUserPhysicListName != "")
 
   // InitializePhysics
+  // Shouldn't it be better GateRunManager::InitPhysics(); or just InitPhysics();??
 #ifdef G4MULTITHREADED
-  G4RunManager::InitializePhysics();
-#else
   G4MTRunManager::InitializePhysics();
+#else
+  G4RunManager::InitializePhysics();
 #endif
 
   // Take into account the em option set by the user (dedx bin etc)
@@ -187,12 +186,8 @@ void GateRunManager::InitGeometryOnly()
   // Initialise the geometry in the main() programm
   if (!geometryInitialized)
     {
-      GateMessage("Core", 1, "Initialization of geometry" << G4endl);
-#ifdef G4MULTITHREADED
-      G4MTRunManager::InitializeGeometry();
-#else
-      G4RunManager::InitializeGeometry();
-#endif
+      GateMessage("Core", 1, "Initialization of geometry" << G4endl); 
+      G4RunManager::InitializeGeometry(); // G4MTRunManager class doesn't override this method
     }
   else
     {
@@ -200,9 +195,11 @@ void GateRunManager::InitGeometryOnly()
       det = detConstruction->GateDetectorConstruction::GetGateDetectorConstruction();
       det->GateDetectorConstruction::SetGeometryStatusFlag(GateDetectorConstruction::geometry_needs_rebuild);
       det->GateDetectorConstruction::UpdateGeometry();
-      //	  nParallelWorlds = userDetector->ConstructParallelGeometries();
-      //          kernel->SetNumberOfParallelWorld(nParallelWorlds);
-      //	  geometryInitialized=true;
+#ifdef G4MULTITHREADED
+      nParallelWorlds = det->ConstructParallelGeometries();
+                kernel->SetNumberOfParallelWorld(nParallelWorlds);
+      geometryInitialized=true;
+#endif
     }
 
 }
@@ -212,7 +209,8 @@ void GateRunManager::InitGeometryOnly()
 //----------------------------------------------------------------------------------------
 void GateRunManager::InitPhysics()
 {
-  #ifdef G4MULTITHREADED
+// Shouldn't it be better GateRunManager::InitializePhysics();??
+#ifdef G4MULTITHREADED
   G4MTRunManager::InitializePhysics();
 #else
   G4RunManager::InitializePhysics();
@@ -231,12 +229,8 @@ void GateRunManager::RunInitialization()
   }
 
   // GateMessage("Core", 0, "Initialization of the run " << G4endl);
-  // Perform a regular initialisation
-  #ifdef G4MULTITHREADED
-  G4MTRunManager::RunInitialization();
-#else
-  G4RunManager::RunInitialization();
-#endif
+  // Perform a regular initialisation from parent class
+  G4RunManager::RunInitialization(); // G4MTRunManager class doesn't override this method
 
   // Initialization of the atom deexcitation processes
   // must be done after all other initialization

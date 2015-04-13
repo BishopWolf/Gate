@@ -23,6 +23,8 @@ See GATE/LICENSE.txt for further details
 #include "TTree.h"
 #include "TBranch.h"
 
+#include "GateMessageManager.hh"
+
 class TH2I;
 class TH2D;
 class TH1D;
@@ -80,7 +82,11 @@ G4String GetName() { return m_name;};
 void GetARFAsBinaryBuffer(G4double*&);
 void FillTableFromBuffer(G4double*&);
 void SetNSimuPhotons(G4double N)
-{m_TotSimuPhotons = N;G4cout<<" TOTAL number of photons   " <<(long unsigned int)(m_TotSimuPhotons)<<G4endl; };
+{
+  m_TotSimuPhotons = N;
+  //G4cout<<" TOTAL number of photons   " <<(long unsigned int)(m_TotSimuPhotons)<<G4endl; 
+  GateMessage("Core", 0, " TOTAL number of photons   " <<(long unsigned int)(m_TotSimuPhotons)<<G4endl);
+};
 G4int GetPrimary() { return m_isprimary;};
 void SetPrimary() { m_isprimary = 1;}
 void SetNoPrimary() { m_isprimary = 0;}

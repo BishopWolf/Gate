@@ -142,7 +142,8 @@ void executeCommandQueue( std::queue< G4String > commandQueue, G4UImanager* UIma
 {
   while( commandQueue.size() )
     {
-      G4cout << commandQueue.front() << G4endl;
+      //G4cout << commandQueue.front() << G4endl;
+      GateMessage("G4", 0, commandQueue.front() << G4endl);
       UImanager->ApplyCommand( commandQueue.front() );
       commandQueue.pop();
     }
