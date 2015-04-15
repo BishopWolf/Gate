@@ -84,8 +84,8 @@ void FillTableFromBuffer(G4double*&);
 void SetNSimuPhotons(G4double N)
 {
   m_TotSimuPhotons = N;
-  //G4cout<<" TOTAL number of photons   " <<(long unsigned int)(m_TotSimuPhotons)<<G4endl; 
-  GateMessage("Core", 0, " TOTAL number of photons   " <<(long unsigned int)(m_TotSimuPhotons)<<G4endl);
+  //G4cout<<" TOTAL number of photons   " <<(long unsigned int)(m_TotSimuPhotons)<<Gateendl; 
+  GateMessage("Core", 0, " TOTAL number of photons   " <<(long unsigned int)(m_TotSimuPhotons)<<Gateendl);
 };
 G4int GetPrimary() { return m_isprimary;};
 void SetPrimary() { m_isprimary = 1;}

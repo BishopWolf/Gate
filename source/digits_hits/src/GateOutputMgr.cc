@@ -71,7 +71,7 @@ GateOutputMgr::GateOutputMgr(const G4String name)
     m_acquisitionStarted(false),
     m_allowNoOutput(false)
 {
-  GateMessage("Output",4,"GateOutputMgr() -- begin"<<G4endl);
+  GateMessage("Output",4,"GateOutputMgr() -- begin"<<Gateendl);
 
 
   m_messenger = new GateOutputMgrMessenger(this);
@@ -109,7 +109,7 @@ GateOutputMgr::GateOutputMgr(const G4String name)
   AddOutputModule((GateVOutputModule*)gateARFDataToRoot);
 #endif
 
-  GateMessage("Output",4,"GateOutputMgr() -- end"<<G4endl);
+  GateMessage("Output",4,"GateOutputMgr() -- end"<<Gateendl);
 }
 //--------------------------------------------------------------------------------
 
@@ -125,7 +125,7 @@ GateOutputMgr::~GateOutputMgr()
   m_outputModules.clear();
   delete m_messenger;
 
-  if (nVerboseLevel > 0) G4cout << "GateOutputMgr deleting..." << G4endl;
+  if (nVerboseLevel > 0) G4cout << "GateOutputMgr deleting..." << Gateendl;
 
 }
 //----------------------------------------------------------------------------------
@@ -135,7 +135,7 @@ GateOutputMgr::~GateOutputMgr()
 void GateOutputMgr::AddOutputModule(GateVOutputModule* module)
 {
   if (nVerboseLevel > 2)
-    G4cout << "GateOutputMgr::AddOutputModule" << G4endl;
+    G4cout << "GateOutputMgr::AddOutputModule" << Gateendl;
 
   m_outputModules.push_back(module);
 }
@@ -145,7 +145,7 @@ void GateOutputMgr::AddOutputModule(GateVOutputModule* module)
 //----------------------------------------------------------------------------------
 void GateOutputMgr::RecordBeginOfEvent(const G4Event* event)
 {
-  GateMessage("Output", 5, "GateOutputMgr::RecordBeginOfEvent" << G4endl;);
+  GateMessage("Output", 5, "GateOutputMgr::RecordBeginOfEvent" << Gateendl;);
 
 
   for (size_t iMod=0; iMod<m_outputModules.size(); iMod++) {
@@ -159,7 +159,7 @@ void GateOutputMgr::RecordBeginOfEvent(const G4Event* event)
 //----------------------------------------------------------------------------------
 void GateOutputMgr::RecordEndOfEvent(const G4Event* event)
 {
-  GateMessage("Output", 5, "GateOutputMgr::RecordEndOfEvent" << G4endl;);
+  GateMessage("Output", 5, "GateOutputMgr::RecordEndOfEvent" << Gateendl;);
 
 #ifdef G4ANALYSIS_USE_ROOT
   if (m_digiMode==kofflineMode)
@@ -179,14 +179,14 @@ void GateOutputMgr::RecordEndOfEvent(const G4Event* event)
 //----------------------------------------------------------------------------------
 void GateOutputMgr::RecordBeginOfRun(const G4Run* run)
 {
-  GateMessage("Output", 5, "GateOutputMgr::RecordBeginOfRun" << G4endl;);
+  GateMessage("Output", 5, "GateOutputMgr::RecordBeginOfRun" << Gateendl;);
 
   // If the verbosity for the random engine is set, we call the status method
   GateRandomEngine* theRandomEngine = GateRandomEngine::GetInstance();
   if (theRandomEngine->GetVerbosity()>=2) theRandomEngine->ShowStatus();
 
   if (nVerboseLevel > 2)
-    G4cout << "GateOutputMgr::RecordBeginOfRun" << G4endl;
+    G4cout << "GateOutputMgr::RecordBeginOfRun" << Gateendl;
 
   if (!m_acquisitionStarted)
     RecordBeginOfAcquisition();
@@ -202,10 +202,10 @@ void GateOutputMgr::RecordBeginOfRun(const G4Run* run)
 //----------------------------------------------------------------------------------
 void GateOutputMgr::RecordEndOfRun(const G4Run* run)
 {
-  GateMessage("Output", 5, "GateOutputMgr::RecordEndOfRun" << G4endl;);
+  GateMessage("Output", 5, "GateOutputMgr::RecordEndOfRun" << Gateendl;);
 
   if (nVerboseLevel > 2)
-    G4cout << "GateOutputMgr::RecordEndOfRun" << G4endl;
+    G4cout << "GateOutputMgr::RecordEndOfRun" << Gateendl;
 
   for (size_t iMod=0; iMod<m_outputModules.size(); iMod++) {
     if ( m_outputModules[iMod]->IsEnabled() )
@@ -218,10 +218,10 @@ void GateOutputMgr::RecordEndOfRun(const G4Run* run)
 //----------------------------------------------------------------------------------
 void GateOutputMgr::RecordBeginOfAcquisition()
 {
-  GateMessage("Output", 5, " GateOutputMgr::RecordBeginOfAcquisition " << G4endl;);
+  GateMessage("Output", 5, " GateOutputMgr::RecordBeginOfAcquisition " << Gateendl;);
 
   if (nVerboseLevel > 2)
-    G4cout << "GateOutputMgr::RecordBeginOfAcquisition" << G4endl;
+    G4cout << "GateOutputMgr::RecordBeginOfAcquisition" << Gateendl;
 
 #ifdef G4ANALYSIS_USE_ROOT
   if (m_digiMode==kofflineMode)
@@ -246,10 +246,10 @@ void GateOutputMgr::RecordBeginOfAcquisition()
 void GateOutputMgr::RecordEndOfAcquisition()
 {
 
-  GateMessage("Output", 5, "GateOutputMgr::RecordEndOfAcquisition" << G4endl;);
+  GateMessage("Output", 5, "GateOutputMgr::RecordEndOfAcquisition" << Gateendl;);
 
   if (nVerboseLevel > 2)
-    G4cout << "GateOutputMgr::RecordEndOfAcquisition" << G4endl;
+    G4cout << "GateOutputMgr::RecordEndOfAcquisition" << Gateendl;
 
   for (size_t iMod=0; iMod<m_outputModules.size(); iMod++) {
     if ( m_outputModules[iMod]->IsEnabled() )
@@ -266,9 +266,9 @@ void GateOutputMgr::RecordEndOfAcquisition()
   // Stop the time
   m_timer.Stop();
   if (nVerboseLevel > 1) {
-    G4cout << "     User simulation time (sec)   := " << (m_timer.GetUserElapsed()) << G4endl;
-    G4cout << "     Real simulation time (sec)   := " << (m_timer.GetRealElapsed()) << G4endl;
-    G4cout << "     System simulation time (sec) := " << (m_timer.GetSystemElapsed()) << G4endl;
+    G4cout << "     User simulation time (sec)   := " << (m_timer.GetUserElapsed()) << Gateendl;
+    G4cout << "     Real simulation time (sec)   := " << (m_timer.GetRealElapsed()) << Gateendl;
+    G4cout << "     System simulation time (sec) := " << (m_timer.GetSystemElapsed()) << Gateendl;
   }
 
 }
@@ -278,9 +278,9 @@ void GateOutputMgr::RecordEndOfAcquisition()
 //----------------------------------------------------------------------------------
 void GateOutputMgr::RecordStepWithVolume(const GateVVolume * v, const G4Step* step)
 {
-  GateMessage("Output", 5, " GateOutputMgr::RecordStep" << G4endl;);
+  GateMessage("Output", 5, " GateOutputMgr::RecordStep" << Gateendl;);
   if (nVerboseLevel > 2)
-    G4cout << "GateOutputMgr::RecordStep" << G4endl;
+    G4cout << "GateOutputMgr::RecordStep" << Gateendl;
 
   for (size_t iMod=0; iMod<m_outputModules.size(); iMod++) {
     if ( m_outputModules[iMod]->IsEnabled() )
@@ -292,7 +292,7 @@ void GateOutputMgr::RecordStepWithVolume(const GateVVolume * v, const G4Step* st
 //----------------------------------------------------------------------------------
 void GateOutputMgr::RecordVoxels(GateVGeometryVoxelStore* voxelStore)
 {
-  GateMessage("Output", 5 , " GateOutputMgr::RecordVoxels " << G4endl;);
+  GateMessage("Output", 5 , " GateOutputMgr::RecordVoxels " << Gateendl;);
 
   for (size_t iMod=0; iMod<m_outputModules.size(); iMod++) {
     if ( m_outputModules[iMod]->IsEnabled() )
@@ -304,9 +304,9 @@ void GateOutputMgr::RecordVoxels(GateVGeometryVoxelStore* voxelStore)
 //----------------------------------------------------------------------------------
 void GateOutputMgr::Describe(size_t /*indent*/)
 {
-  G4cout << "GateOutputMgr name: " << mName << G4endl;
-  G4cout << "Number of output modules inserted: " << m_outputModules.size() << G4endl;
-  G4cout << "Description of the single modules: " << G4endl;
+  G4cout << "GateOutputMgr name: " << mName << Gateendl;
+  G4cout << "Number of output modules inserted: " << m_outputModules.size() << Gateendl;
+  G4cout << "Description of the single modules: " << Gateendl;
 
   for (size_t iMod=0; iMod<m_outputModules.size(); iMod++) {
     m_outputModules[iMod]->Describe();
@@ -318,7 +318,7 @@ void GateOutputMgr::Describe(size_t /*indent*/)
 //----------------------------------------------------------------------------------
 GateCrystalHitsCollection* GateOutputMgr::GetCrystalHitCollection()
 {
-  GateMessage("Output", 5 , " GateOutputMgr::GetCrystalHitCollection " << G4endl;);
+  GateMessage("Output", 5 , " GateOutputMgr::GetCrystalHitCollection " << Gateendl;);
 
   static G4int crystalCollID=-1;     	  //!< Collection ID for the crystal hits
 
@@ -377,7 +377,7 @@ GateCoincidenceDigiCollection* GateOutputMgr::GetCoincidenceDigiCollection(const
 //----------------------------------------------------------------------------------
 void GateOutputMgr::RegisterNewSingleDigiCollection(const G4String& aCollectionName,G4bool outputFlag)
 {
-  GateMessage("Output", 5, " GateOutputMgr::RegisterNewSingleDigiCollection" << G4endl;);
+  GateMessage("Output", 5, " GateOutputMgr::RegisterNewSingleDigiCollection" << Gateendl;);
 
   for (size_t iMod=0; iMod<m_outputModules.size(); iMod++)
     m_outputModules[iMod]->RegisterNewSingleDigiCollection(aCollectionName,outputFlag);
@@ -388,7 +388,7 @@ void GateOutputMgr::RegisterNewSingleDigiCollection(const G4String& aCollectionN
 //----------------------------------------------------------------------------------
 void GateOutputMgr::RegisterNewCoincidenceDigiCollection(const G4String& aCollectionName,G4bool outputFlag)
 {
-  GateMessage("Output", 5, " GateOutputMgr::RegisterNewCoincidenceDigiCollection " << G4endl;);
+  GateMessage("Output", 5, " GateOutputMgr::RegisterNewCoincidenceDigiCollection " << Gateendl;);
 
   for (size_t iMod=0; iMod<m_outputModules.size(); iMod++)
     m_outputModules[iMod]->RegisterNewCoincidenceDigiCollection(aCollectionName,outputFlag);
@@ -441,7 +441,7 @@ void GateOutputMgr::CheckFileNameForAllOutput()
 //----------------------------------------------------------------------------------
 void GateOutputMgr::BeginOfRunAction(const G4Run* /*aRun*/)
 {
-  GateMessage("Output", 5, " GateOutputMgr::BeginOfRunAction" << G4endl;);
+  GateMessage("Output", 5, " GateOutputMgr::BeginOfRunAction" << Gateendl;);
   /*
     #ifdef G4ANALYSIS_USE_GENERAL
     // Here we fill the histograms of the Analysis manager
@@ -456,7 +456,7 @@ void GateOutputMgr::BeginOfRunAction(const G4Run* /*aRun*/)
   //  outFile.open(name,ios::out);
   //  G4cout << "Opening outFile...";
   //  outFile.open("petsim.dat",ios::out);
-  //  G4cout << " ... outFile opened" << G4endl;
+  //  G4cout << " ... outFile opened" << Gateendl;
 
   // Prepare the visualization
   if (G4VVisManager::GetConcreteInstance()) {
@@ -473,7 +473,7 @@ void GateOutputMgr::BeginOfRunAction(const G4Run* /*aRun*/)
 void GateOutputMgr::EndOfRunAction(const G4Run* /*aRun*/)
 {
 
-  GateMessage("Output", 5, " GateOutputMgr::EndOfRunAction" << G4endl;);
+  GateMessage("Output", 5, " GateOutputMgr::EndOfRunAction" << Gateendl;);
   /*
     #ifdef G4ANALYSIS_USE_GENERAL
     // Here we fill the histograms of the Analysis manager
@@ -496,7 +496,7 @@ void GateOutputMgr::EndOfRunAction(const G4Run* /*aRun*/)
 //----------------------------------------------------------------------------------
 void GateOutputMgr::BeginOfEventAction(const G4Event* /*evt*/)
 {
-  GateMessage("Output", 5, " GateOutputMgr::BeginOfEventAction " << G4endl;);
+  GateMessage("Output", 5, " GateOutputMgr::BeginOfEventAction " << Gateendl;);
   /*
     #ifdef G4ANALYSIS_USE_GENERAL
     // Here we fill the histograms of the OutputMgr manager
@@ -511,7 +511,7 @@ void GateOutputMgr::BeginOfEventAction(const G4Event* /*evt*/)
 //----------------------------------------------------------------------------------
 void GateOutputMgr::EndOfEventAction(const G4Event* /*evt*/)
 {
-  GateMessage("Output", 5, " GateOutputMgr::EndOfEventAction " << G4endl;);
+  GateMessage("Output", 5, " GateOutputMgr::EndOfEventAction " << Gateendl;);
   /*
     #ifdef G4ANALYSIS_USE_GENERAL
     // Here we fill the histograms of the OutputMgr manager
@@ -527,7 +527,7 @@ void GateOutputMgr::EndOfEventAction(const G4Event* /*evt*/)
 //----------------------------------------------------------------------------------
 void GateOutputMgr::UserSteppingAction(const GateVVolume * /*v*/, const G4Step * /*theStep*/)
 {
-  GateMessage("Output", 5, " GateOutputMgr::UserSteppingAction -- begin " << G4endl;);
+  GateMessage("Output", 5, " GateOutputMgr::UserSteppingAction -- begin " << Gateendl;);
 
   /*
     #ifdef G4ANALYSIS_USE_GENERAL
@@ -535,7 +535,7 @@ void GateOutputMgr::UserSteppingAction(const GateVVolume * /*v*/, const G4Step *
     GateOutputMgr* outputMgr = GateOutputMgr::GetInstance();
     outputMgr->RecordStepWithVolume(v, theStep);
 
-    GateMessage("Output", 5, " GateOutputMgr  RecordStep " << G4endl;);
+    GateMessage("Output", 5, " GateOutputMgr  RecordStep " << Gateendl;);
 
     #endif
 
@@ -547,7 +547,7 @@ void GateOutputMgr::UserSteppingAction(const GateVVolume * /*v*/, const G4Step *
     if ( theStep->GetTrack()->GetCurrentStepNumber() > 10000 )
     theStep->GetTrack()->SetTrackStatus(fStopAndKill);
   */
-  GateMessage("Output", 5, " GateOutputMgr::UserSteppingAction -- end" << G4endl;);
+  GateMessage("Output", 5, " GateOutputMgr::UserSteppingAction -- end" << Gateendl;);
 }
 //----------------------------------------------------------------------------------
 
@@ -563,5 +563,5 @@ void GateOutputMgr::RecordTracks(GateSteppingAction* mySteppingAction){
     if ( m_outputModules[iMod]->IsEnabled() )
       m_outputModules[iMod]->RecordTracks(mySteppingAction);
   }
-  GateMessage("Output", 5, " GateOutputMgr::RecordTracks -- end" << G4endl;);
+  GateMessage("Output", 5, " GateOutputMgr::RecordTracks -- end" << Gateendl;);
 }

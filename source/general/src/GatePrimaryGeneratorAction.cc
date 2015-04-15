@@ -78,7 +78,7 @@ void GatePrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   }
   else {
     static int i=0;
-    GateMessage("Beam", 2, "Generating particle " << i << G4endl);
+    GateMessage("Beam", 2, "Generating particle " << i << Gateendl);
     // m_particleGun->GeneratePrimaryVertex(event);
     //    DD(m_particleGun->GetNumberOfParticles());
     //    DD(m_particleGun->GetNumberofSource());
@@ -89,7 +89,7 @@ void GatePrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
        << " pos.=" << m_particleGun->GetParticlePosition()
        << " energy=" <<  m_particleGun->GetParticleEnergy() 
        << " dir.=" << m_particleGun->GetParticleMomentumDirection()
-       << ")" << G4endl); */ 
+       << ")" << Gateendl); */ 
   }
 }
 //---------------------------------------------------------------------------
@@ -117,7 +117,7 @@ void GatePrimaryGeneratorAction::GenerateSimulationPrimaries(G4Event* event)
     G4RunManager* runManager = GateRunManager::GetRunManager();
 #endif
     runManager->AbortRun(true);
-    if (m_nVerboseLevel>1) G4cout << "GatePrimaryGeneratorAction::GeneratePrimaries: numVertices == 0, run aborted " << G4endl;  
+    if (m_nVerboseLevel>1) G4cout << "GatePrimaryGeneratorAction::GeneratePrimaries: numVertices == 0, run aborted " << Gateendl;  
   } 
   else {
     m_nEvents++;
@@ -127,7 +127,7 @@ void GatePrimaryGeneratorAction::GenerateSimulationPrimaries(G4Event* event)
    
     if (m_nVerboseLevel>0) {
       if ((m_nEvents%m_printModulo) == 0) {
-	G4cout << "GatePrimaryGeneratorAction::GeneratePrimaries: m_nEvents " << m_nEvents << G4endl;  
+	G4cout << "GatePrimaryGeneratorAction::GeneratePrimaries: m_nEvents " << m_nEvents << Gateendl;  
       }
     }
   }
@@ -150,12 +150,12 @@ if (numEvent == 0) {
 G4RunManager* runManager = G4RunManager::GetRunManager();
 
 runManager->AbortRun(true);
-if (m_nVerboseLevel>1) G4cout << "GatePrimaryGeneratorAction::GeneratePrimaries: numVertices == 0, run aborted " << G4endl;  
+if (m_nVerboseLevel>1) G4cout << "GatePrimaryGeneratorAction::GeneratePrimaries: numVertices == 0, run aborted " << Gateendl;  
 } else {
 m_nEvents++;
 if (m_nVerboseLevel>0) {
 if ((m_nEvents%m_printModulo) == 0) {
-G4cout << "GatePrimaryGeneratorAction::GeneratePrimaries: m_nEvents " << m_nEvents << G4endl;  
+G4cout << "GatePrimaryGeneratorAction::GeneratePrimaries: m_nEvents " << m_nEvents << Gateendl;  
 }
 }
 }
@@ -169,7 +169,7 @@ void GatePrimaryGeneratorAction::AddEvent()
 {
   if (m_nVerboseLevel>0) { 
     if ((m_nEvents%m_printModulo) == 0) {
-      G4cout << "GatePrimaryGeneratorAction::AddEvent: events " << m_nEvents << G4endl;
+      G4cout << "GatePrimaryGeneratorAction::AddEvent: events " << m_nEvents << Gateendl;
     }
   }
 }

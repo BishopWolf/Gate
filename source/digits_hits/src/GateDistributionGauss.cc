@@ -15,6 +15,7 @@ See GATE/LICENSE.txt for further details
 #include "Randomize.hh"
 #include "GateTools.hh"
 #include "GateConstants.hh"
+#include "GateMessageManager.hh"
 
 
 GateDistributionGauss::GateDistributionGauss(const G4String& itsName)
@@ -67,5 +68,5 @@ void GateDistributionGauss::DescribeMyself(size_t indent)
     	 <<"Mean : "         << m_Mean
          <<"  -- Sigma : "    << m_Sigma
          <<"  -- Amplitude : "<< m_Amplitude
-	 <<G4endl;
+	 <<Gateendl;
 }

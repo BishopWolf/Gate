@@ -9,6 +9,7 @@ See GATE/LICENSE.txt for further details
 
 #include "GateModuleListManager.hh"
 #include "GateTools.hh"
+#include "GateMessageManager.hh"
 
 //--------------------------------------------------------------------------------------------
 GateModuleListManager::GateModuleListManager(GateNamedObject* itsMotherObject,
@@ -36,6 +37,6 @@ GateModuleListManager::~GateModuleListManager()
 void GateModuleListManager::Describe(size_t indent)
 {
   GateListManager::Describe(indent);
-  G4cout << GateTools::Indent(indent) << "Attached to:        '" << pMotherObject->GetObjectName() << "'" << G4endl;
+  G4cout << GateTools::Indent(indent) << "Attached to:        '" << pMotherObject->GetObjectName() << "'" << Gateendl;
 }
 //--------------------------------------------------------------------------------------------

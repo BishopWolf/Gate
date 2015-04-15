@@ -11,6 +11,7 @@ See GATE/LICENSE.txt for further details
 
 #include "GateClock.hh"
 #include "GateTools.hh"
+#include "GateMessageManager.hh"
 
 //-------------------------------------------------------------------------------------------------------
 // Constructor.
@@ -43,7 +44,7 @@ void GateClockDependent::Describe(size_t indent)
 {
   GateNamedObject::Describe(indent);
   if (CanBeDisabled())
-    G4cout << GateTools::Indent(indent) << "Is enabled?         " << ( IsEnabled() ? "Yes" : "No") << G4endl;
+    G4cout << GateTools::Indent(indent) << "Is enabled?         " << ( IsEnabled() ? "Yes" : "No") << Gateendl;
 }
 //-------------------------------------------------------------------------------------------------------
 

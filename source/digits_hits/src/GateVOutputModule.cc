@@ -10,6 +10,7 @@ See GATE/LICENSE.txt for further details
 #include "GateVOutputModule.hh"
 //#include "GateOutputModuleMessenger.hh"
 #include "GateTools.hh"
+#include "GateMessageManager.hh"
 
 GateVOutputModule::GateVOutputModule(const G4String& name, GateOutputMgr* outputMgr,DigiMode digiMode)
   : m_outputMgr(outputMgr),
@@ -35,5 +36,5 @@ GateVOutputModule::~GateVOutputModule()
 */
 void GateVOutputModule::Describe(size_t indent)
 {
-  G4cout << G4endl << GateTools::Indent(indent) << "Output module: '" << m_name << "'" << G4endl;
+  G4cout << Gateendl << GateTools::Indent(indent) << "Output module: '" << m_name << "'" << Gateendl;
 }

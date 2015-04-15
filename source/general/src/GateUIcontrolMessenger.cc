@@ -8,6 +8,7 @@ See GATE/LICENSE.txt for further details
 
 
 #include "GateUIcontrolMessenger.hh"
+#include "GateMessageManager.hh"
 
 #include "G4UIdirectory.hh"
 #include "G4UIcmdWithoutParameter.hh"
@@ -69,7 +70,7 @@ void GateUIcontrolMessenger::LaunchMacroFile(G4String fileName)
 {
   G4String filePath = GateTools::FindGateFile(fileName);
   if (filePath.empty()) {
-    G4cerr << "Could not find macro file '" << fileName << "'! Ignored!" << G4endl;
+    G4cerr << "Could not find macro file '" << fileName << "'! Ignored!" << Gateendl;
     return;
   }
 

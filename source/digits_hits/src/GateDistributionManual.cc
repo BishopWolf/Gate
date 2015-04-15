@@ -13,6 +13,7 @@ See GATE/LICENSE.txt for further details
 #include <math.h>
 #include <CLHEP/Random/RandFlat.h>
 #include "GateTools.hh"
+#include "GateMessageManager.hh"
 
 
 GateDistributionManual::GateDistributionManual(const G4String& itsName)
@@ -29,7 +30,7 @@ void GateDistributionManual::DescribeMyself(size_t indent)
 {
   G4cout << GateTools::Indent(indent)
     	 <<"Size : "         << GetSize()
-	 <<G4endl;
+	 <<Gateendl;
 }
 //___________________________________________________________________
 void GateDistributionManual::AddPoint(G4double x,G4double y)

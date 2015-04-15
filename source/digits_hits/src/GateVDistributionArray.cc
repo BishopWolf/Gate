@@ -12,6 +12,7 @@ See GATE/LICENSE.txt for further details
 #include <math.h>
 #include <CLHEP/Random/RandFlat.h>
 #include "GateTools.hh"
+#include "GateMessageManager.hh"
 
 
 GateVDistributionArray::GateVDistributionArray(const G4String& itsName)
@@ -134,7 +135,7 @@ void GateVDistributionArray::FillRepartition()
     }
     for (G4int i=0;i<(G4int)m_arrayX.size();++i){
     	m_arrayRepartition[i]/=Integral();
-//	G4cout<<"Repartition["<<i<<"] : "<<m_arrayX[i]<<'\t'<<m_arrayRepartition[i]<<G4endl;
+//	G4cout<<"Repartition["<<i<<"] : "<<m_arrayX[i]<<'\t'<<m_arrayRepartition[i]<<Gateendl;
     }
 }
 //___________________________________________________________________
@@ -157,7 +158,7 @@ void GateVDistributionArray::InsertPoint(G4double x,G4double y)
     } else if ( (i>=0) && m_arrayX[i] == x ) { //element replacement
       m_arrayY[i] = y;
       G4cerr<<"[GateDistributionArray::InsertPoint] WARNING : replacing value for "
-  	    <<x<<G4endl;
+  	    <<x<<Gateendl;
     } else { //other cases
 	m_arrayX.insert( m_arrayX.begin()+i , x);
 	m_arrayY.insert( m_arrayY.begin()+i , y);

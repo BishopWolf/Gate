@@ -14,6 +14,7 @@
 #include "G4UIcmdWithAnInteger.hh"
 #include "G4UIcmdWithADoubleAndUnit.hh"
 #include "G4UIcmdWithoutParameter.hh"
+#include "GateMessageManager.hh"
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
 GateRTVPhantomMessenger::GateRTVPhantomMessenger(GateRTVPhantom* RTVPhantom)
@@ -84,7 +85,7 @@ void GateRTVPhantomMessenger::SetNewValue(G4UIcommand* command,G4String newValue
 {
 G4double TPF = SetTPFCmd->GetNewDoubleValue(newValue);
 m_RTVPhantom->SetTPF( TPF ) ;
-      G4cout << " Real Time RTVPhantom Time Per Frames set to " << m_RTVPhantom->GetTPF() << G4endl;
+      G4cout << " Real Time RTVPhantom Time Per Frames set to " << m_RTVPhantom->GetTPF() << Gateendl;
 return;  }
 
 
@@ -97,7 +98,7 @@ return;  }
 {
 G4int NbOfFrames = (G4int)(SetRTVPhantomTPFCmd->GetNewIntValue(newValue));
 m_RTVPhantom->SetNbOfFrames( NbOfFrames ) ;
-      G4cout << " Real Time RTVPhantom Number of Frames set to " << m_RTVPhantom->GetNbOfFrames() << G4endl;
+      G4cout << " Real Time RTVPhantom Number of Frames set to " << m_RTVPhantom->GetNbOfFrames() << Gateendl;
 return;  }
 
 if( command==SetRTVPhantomCmd )

@@ -100,7 +100,7 @@ void GateToBinary::RecordEndOfAcquisition()
 {
 	if( nVerboseLevel > 2 )
 	{
-		G4cout << "GateToBinary::RecordEndOfAcquisition" << G4endl;
+		G4cout << "GateToBinary::RecordEndOfAcquisition" << Gateendl;
 	}
 
 	// Close the file with the hits information
@@ -145,7 +145,7 @@ void GateToBinary::RecordEndOfRun( G4Run const* )
 		if( nVerboseLevel > 0 )
 		{
 			G4cout << "GateToBinary::RecordEndOfRun: Events in the past run: "
-				<< nEvent << G4endl;
+				<< nEvent << Gateendl;
 		}
 
 		m_outFileRun.write( reinterpret_cast< char* >( &nEvent ),
@@ -165,7 +165,7 @@ void GateToBinary::RecordEndOfEvent( G4Event const* event )
 {
   if( nVerboseLevel > 2 )
   {
-		G4cout << "GateToBinary::RecordEndOfEvent" << G4endl;
+		G4cout << "GateToBinary::RecordEndOfEvent" << Gateendl;
 	}
 
 	if( m_outFileHitsFlag )
@@ -291,7 +291,7 @@ void GateToBinary::RecordDigitizer( G4Event const* )
 {
 	if( nVerboseLevel > 2 )
 	{
-		G4cout << "GateToBinary::RecordDigitizer" << G4endl;
+		G4cout << "GateToBinary::RecordDigitizer" << Gateendl;
 	}
 
 	for( size_t i = 0; i < m_outputChannelVector.size(); ++i )
@@ -305,7 +305,7 @@ void GateToBinary::RecordStepWithVolume( GateVVolume const*,
 {
 	if( nVerboseLevel > 2 )
 	{
-		G4cout << "GateToBinary::RecordStep" << G4endl;
+		G4cout << "GateToBinary::RecordStep" << Gateendl;
 	}
 }
 
@@ -462,7 +462,7 @@ void GateToBinary::CoincidenceOutputChannel::RecordDigitizer()
 			G4cout
 				<< "[GateToBinary::CoincidenceOutputChannel::RecordDigitizer]: "
 				<< "digi collection '" << m_collectionName << "' not found"
-				<< G4endl;
+				<< Gateendl;
 		}
 	}
 	else
@@ -472,7 +472,7 @@ void GateToBinary::CoincidenceOutputChannel::RecordDigitizer()
 		{
 			G4cout
 				<< "[GateToBinary::CoincidenceOutputChannel::RecordDigitizer]: "
-				<< "Totals digits: " << CDC->entries() << G4endl;
+				<< "Totals digits: " << CDC->entries() << Gateendl;
 		}
 		if( m_outputFlag )
 		{

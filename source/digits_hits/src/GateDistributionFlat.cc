@@ -14,6 +14,7 @@ See GATE/LICENSE.txt for further details
 //#include <CLHEP/Random/RandFlat.h>
 #include "Randomize.hh"
 #include "GateTools.hh"
+#include "GateMessageManager.hh"
 
 
 GateDistributionFlat::GateDistributionFlat(const G4String& itsName)
@@ -66,5 +67,5 @@ void GateDistributionFlat::DescribeMyself(size_t indent)
     	 <<"Min : "         << m_Min
          <<"  -- Max : "    << m_Max
          <<"  -- Amplitude : "<< m_Amplitude
-	 <<G4endl;
+	 <<Gateendl;
 }

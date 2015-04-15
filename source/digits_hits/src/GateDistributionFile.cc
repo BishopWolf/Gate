@@ -13,6 +13,7 @@ See GATE/LICENSE.txt for further details
 #include <math.h>
 #include <CLHEP/Random/RandFlat.h>
 #include "GateTools.hh"
+#include "GateMessageManager.hh"
 
 
 GateDistributionFile::GateDistributionFile(const G4String& itsName)
@@ -33,16 +34,16 @@ void GateDistributionFile::DescribeMyself(size_t indent)
   G4cout << GateTools::Indent(indent)
     	 <<"File : "         << m_FileName
          <<'{'    << m_column_for_X<<':'<<m_column_for_Y<<'}'
-	 <<G4endl;
+	 <<Gateendl;
 }
 //___________________________________________________________________
 void GateDistributionFile::Read()
 {
     Clear();
-    G4cout<<"OPENING FILE "<<m_FileName<<G4endl;
+    G4cout<<"OPENING FILE "<<m_FileName<<Gateendl;
     std::ifstream f(m_FileName,std::ios::in);
     if (!f){
-       G4cerr<<"[GateDistributionFile::Read] WARNING : File "<<m_FileName<<" can't be opened"<<G4endl;
+       G4cerr<<"[GateDistributionFile::Read] WARNING : File "<<m_FileName<<" can't be opened"<<Gateendl;
        return;
     }
     G4String pattern;
@@ -73,7 +74,7 @@ void GateDistributionFile::Read()
        if (!f.good())  // file line can be read
 	 continue;
 //               G4cout<<"VALUE READ IN FILE "<<m_FileName
-// 	            <<"["<<GetArrayX().size()<<"]:"<<line<<G4endl;
+// 	            <<"["<<GetArrayX().size()<<"]:"<<line<<Gateendl;
 
 	  //++x;
     	  if (m_column_for_X<0){
@@ -89,7 +90,7 @@ void GateDistributionFile::Read()
 	  
       	  if (!ok){
 	    G4cerr<<"[GateDistributionFile::Read] WARNING : Line format unrecognised (expected == '" << pattern << "' )"
-	          <<G4endl<<line<<G4endl;
+	          <<Gateendl<<line<<Gateendl;
 	  }
 	  
     }
