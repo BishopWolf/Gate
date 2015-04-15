@@ -120,12 +120,7 @@ void GateRunManager::InitializeAll()
                                                                     G4ProductionCutsTable::GetProductionCutsTable()->GetHighEdgeEnergy());
 
     // Initialization
-	// Shouldn't it be better GateRunManager::SetUserInitialization(mUserPhysicList);??
-#ifdef G4MULTITHREADED
-    G4MTRunManager::SetUserInitialization(mUserPhysicList);
-#else
-    G4RunManager::SetUserInitialization(mUserPhysicList);
-#endif
+    GateRunManager::SetUserInitialization(mUserPhysicList);//use inheritance!!
 
     //To take into account the user cuts (steplimiter and special cuts)
 #if (G4VERSION_MAJOR > 9)
@@ -139,12 +134,8 @@ void GateRunManager::InitializeAll()
   } // End if (mUserPhysicListName != "")
 
   // InitializePhysics
-  // Shouldn't it be better GateRunManager::InitPhysics(); or just InitPhysics();??
-#ifdef G4MULTITHREADED
-  G4MTRunManager::InitializePhysics();
-#else
-  G4RunManager::InitializePhysics();
-#endif
+  InitPhysics();
+
 
   // Take into account the em option set by the user (dedx bin etc)
   GatePhysicsList::GetInstance()->SetEmProcessOptions();
@@ -196,8 +187,11 @@ void GateRunManager::InitGeometryOnly()
       det->GateDetectorConstruction::SetGeometryStatusFlag(GateDetectorConstruction::geometry_needs_rebuild);
       det->GateDetectorConstruction::UpdateGeometry();
 #ifdef G4MULTITHREADED
-      nParallelWorlds = det->ConstructParallelGeometries();
-                kernel->SetNumberOfParallelWorld(nParallelWorlds);
+      kernel->DefineWorldVolume(det->GateDetectorConstruction::GetWorldVolume(),false);
+      det->GateDetectorConstruction::ConstructSDandField();
+      nParallelWorlds = det->GateDetectorConstruction::ConstructParallelGeometries();
+      det->GateDetectorConstruction::ConstructParallelSD();
+      kernel->SetNumberOfParallelWorld(nParallelWorlds);
       geometryInitialized=true;
 #endif
     }
@@ -209,12 +203,7 @@ void GateRunManager::InitGeometryOnly()
 //----------------------------------------------------------------------------------------
 void GateRunManager::InitPhysics()
 {
-// Shouldn't it be better GateRunManager::InitializePhysics();??
-#ifdef G4MULTITHREADED
-  G4MTRunManager::InitializePhysics();
-#else
-  G4RunManager::InitializePhysics();
-#endif
+  GateRunManager::InitializePhysics();
 }
 //----------------------------------------------------------------------------------------
 
