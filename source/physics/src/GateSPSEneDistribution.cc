@@ -10,6 +10,7 @@ See GATE/LICENSE.txt for further details
 #include "Randomize.hh"
 
 #include "GateSPSEneDistribution.hh"
+#include "GateMessageManager.hh"
 #include <fstream>
 #include "G4SystemOfUnits.hh"
 #include "GateMessageManager.hh"

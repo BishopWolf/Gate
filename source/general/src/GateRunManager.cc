@@ -68,9 +68,10 @@ void GateRunManager::InitializeAll()
   // Check that we're in PreInit or Idle state
   if (currentState!=G4State_PreInit && currentState!=G4State_Idle)
     {
+      GateError("Illegal application state - "
+	     << "GateRunManager::Initialize() failed." << Gateendl);
       /*G4cerr << "Illegal application state - "
-	     << "G4RunManager::Initialize() ignored." << Gateendl;*/ 
-	  GateError("Illegal application state - " << "GateRunManager::InitializeAll() failed.");
+	     << "G4RunManager::Initialize() ignored." << Gateendl;*/
       return;
     }
 
@@ -120,7 +121,7 @@ void GateRunManager::InitializeAll()
                                                                     G4ProductionCutsTable::GetProductionCutsTable()->GetHighEdgeEnergy());
 
     // Initialization
-    GateRunManager::SetUserInitialization(mUserPhysicList);//use inheritance!!
+    GateRunManager::SetUserInitialization(mUserPhysicList);//use inheritance
 
     //To take into account the user cuts (steplimiter and special cuts)
 #if (G4VERSION_MAJOR > 9)
@@ -134,8 +135,7 @@ void GateRunManager::InitializeAll()
   } // End if (mUserPhysicListName != "")
 
   // InitializePhysics
-  InitPhysics();
-
+  GateRunManager::InitializePhysics();//use inheritance
 
   // Take into account the em option set by the user (dedx bin etc)
   GatePhysicsList::GetInstance()->SetEmProcessOptions();
@@ -177,8 +177,8 @@ void GateRunManager::InitGeometryOnly()
   // Initialise the geometry in the main() programm
   if (!geometryInitialized)
     {
-      GateMessage("Core", 1, "Initialization of geometry" << Gateendl); 
-      G4RunManager::InitializeGeometry(); // G4MTRunManager class doesn't override this method
+      GateMessage("Core", 1, "Initialization of geometry" << Gateendl);
+      GateRunManager::InitializeGeometry();//use inheritance
     }
   else
     {
@@ -205,7 +205,7 @@ void GateRunManager::InitGeometryOnly()
 //----------------------------------------------------------------------------------------
 void GateRunManager::InitPhysics()
 {
-  GateRunManager::InitializePhysics();
+  GateRunManager::InitializePhysics(); //use inheritance
 }
 //----------------------------------------------------------------------------------------
 
@@ -220,6 +220,7 @@ void GateRunManager::RunInitialization()
   }
 
   // GateMessage("Core", 0, "Initialization of the run " << Gateendl);
+
   // Perform a regular initialisation from parent class
   G4RunManager::RunInitialization(); // G4MTRunManager class doesn't override this method
 

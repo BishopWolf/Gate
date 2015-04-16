@@ -23,6 +23,7 @@ See GATE/LICENSE.txt for further details
 #include "Randomize.hh"
 #include "GateConstants.hh"
 #include "GateMessageManager.hh"
+
 // Reset the matrix and prepare a new acquisition
 void GateSinogram::Reset(size_t ringNumber, size_t crystalNumber, size_t radialElemNb, size_t virtualRingNumber, size_t virtualCrystalPerBlockNumber)
 {

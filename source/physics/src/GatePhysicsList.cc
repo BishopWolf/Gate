@@ -803,6 +803,7 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
     // do not apply cut for the world region
     // GateMessage("Cuts", 5, "Region (*it).first : " << (*it).first<< Gateendl);
     if (((*it).first != DefaultRegion) && ((*it).first != "world")) {
+
       G4Region* region = RegionStore->GetRegion((*it).first);
       if (!region) {
 	GateError( "The region '" << (*it).first << "' does not exist !");
@@ -977,6 +978,7 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
     // do not apply cut for the world region
     // GateMessage("Cuts", 5, "Region (*it2).first : " << (*it2).first<< Gateendl);
     if (((*it2).first != DefaultRegion) && ((*it2).first != "world")) {
+
       G4Region* region = RegionStore->GetRegion((*it2).first);
       if (!region) {
 	GateError( "The region '" << (*it2).first << "' does not exist !");

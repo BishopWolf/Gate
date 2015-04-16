@@ -22,7 +22,7 @@ See GATE/LICENSE.txt for further details
 #include "G4AffineTransform.hh"
 #include "G4VSolid.hh"
 #include "G4ThreeVector.hh"
-#include "G4RunManager.hh"
+#include "GateRunManager.hh"
 #include "G4Run.hh"
 
 #include <sys/types.h> 

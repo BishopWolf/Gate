@@ -7,6 +7,7 @@ See GATE/LICENSE.txt for further details
 ----------------------*/
 
 #include "GateConfiguration.h"
+#include "GateMessageManager.hh"
 
 #ifdef G4ANALYSIS_USE_ROOT
 

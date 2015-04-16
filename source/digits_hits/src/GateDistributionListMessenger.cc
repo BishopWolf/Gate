@@ -29,6 +29,7 @@ See GATE/LICENSE.txt for further details
 #include "G4UImanager.hh"
 
 #include "GateListManager.hh"
+#include "GateMessageManager.hh"
 
 std::map<G4String,GateDistributionListMessenger::distType_t> GateDistributionListMessenger::fgkTypes;
 // constructor

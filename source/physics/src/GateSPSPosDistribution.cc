@@ -13,6 +13,7 @@
 #include "G4TransportationManager.hh"
 #include "G4VPhysicalVolume.hh"
 #include "G4PhysicalVolumeStore.hh"
+
 #include "GateSPSPosDistribution.hh"
 #include "GateMessageManager.hh"
 

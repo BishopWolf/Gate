@@ -35,7 +35,6 @@
 #include "G4VProcess.hh"
 #include "G4ios.hh"
 #include "G4UImanager.hh"
-#include "G4RunManager.hh"
 #include "G4ParticleDefinition.hh"
 #include "G4Positron.hh"
 #include "G4GenericIon.hh"
@@ -283,7 +282,7 @@ void GateToRoot::RecordBeginOfAcquisition()
     G4cout << "GateToRoot::RecordBeginOfAcquisition" << Gateendl;
 
   GateSteppingAction* myAction = ( (GateSteppingAction *)(GateRunManager::GetRunManager()->GetUserSteppingAction() ) );  
-  
+
   TrackingMode theMode = myAction->GetMode();
   if (nVerboseLevel > 1) G4cout << " GateToRoot::RecordBeginOfAcquisition()  Tracking Mode " << theMode << Gateendl;
 
@@ -1476,7 +1475,6 @@ void GateToRoot::GetCurrentRecStepData( const G4Event* evt )
 
   if ( m_RSEventID != evt->GetEventID() )
     {
-
       const G4Run* currentRun =  GateRunManager::GetRunManager()->GetCurrentRun() ;      
 
       G4int RunID = currentRun->GetRunID();

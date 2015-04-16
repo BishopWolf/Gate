@@ -20,6 +20,7 @@ See GATE/LICENSE.txt for further details
 
 #include "G4ProcessManager.hh"
 #include "G4ParticleTypes.hh"
+#include "GateMessageManager.hh"
 
 
 void GateFakePhysicsList::ConstructParticle()

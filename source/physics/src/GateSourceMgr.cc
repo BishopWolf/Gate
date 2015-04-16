@@ -28,7 +28,6 @@
 #include <vector>
 #include <cmath>
 #include "GateActions.hh"
-#include "G4RunManager.hh"
 
 
 //----------------------------------------------------------------------------------------
@@ -526,7 +525,6 @@ G4int GateSourceMgr::PrepareNextEvent( G4Event* event )
 {
   // GateDebugMessage("Acquisition", 0, "PrepareNextEvent "  << event->GetEventID()
   //                    << " at time " << m_time/s << " sec." << Gateendl);
-
   GateSteppingAction* myAction = (GateSteppingAction *) ( GateRunManager::GetRunManager()->GetUserSteppingAction() );
 
   TrackingMode theMode =myAction->GetMode();

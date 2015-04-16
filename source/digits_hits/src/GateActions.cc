@@ -165,6 +165,7 @@ inline void GateEventAction::EndOfEventAction(const G4Event* anEvent)
 #endif
 
   /* PY Descourt 08/09/2009 */
+
   GateSteppingAction* myAction = ( (GateSteppingAction *)(GateRunManager::GetRunManager()->GetUserSteppingAction() ) );
   TrackingMode theMode = myAction->GetMode();
 
@@ -221,7 +222,9 @@ void GateTrackingAction::PreUserTrackingAction(const G4Track* a)
   }
 
   /* PY Descourt 08/09/2009 */
+
   GateSteppingAction*  myAction = (GateSteppingAction *) (GateRunManager::GetRunManager()->GetUserSteppingAction()) ;
+
   TrackingMode theMode = myAction->GetMode();
 
   if ( theMode == kDetector )
@@ -307,6 +310,7 @@ void GateTrackingAction::PostUserTrackingAction(const G4Track* aTrack)
         delete dummy_step_vector[i];
       dummy_step_vector.clear();
     }
+
   GateSteppingAction*  myAction = (GateSteppingAction *) (GateRunManager::GetRunManager()->GetUserSteppingAction()) ;
   TrackingMode theMode = myAction->GetMode();
   if ( theMode == kDetector )

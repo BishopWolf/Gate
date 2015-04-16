@@ -709,7 +709,6 @@ void GateApplicationMgr::EnableTimeStudyForSteps(G4String filename)
 
 void GateApplicationMgr::PrintStatus()
 {
-
     const G4Run * run = GateRunManager::GetRunManager()->GetCurrentRun();
 
     const int runID = run->GetRunID() + 1;

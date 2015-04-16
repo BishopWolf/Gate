@@ -667,7 +667,6 @@ void GateVSource::GeneratePrimaryVertex( G4Event* aEvent )
   }
 
   /* PY Descourt 08/09/2009 */  
-
   TrackingMode theMode =( (GateSteppingAction *)(GateRunManager::GetRunManager()->GetUserSteppingAction() ) )->GetMode();
 
   if (  theMode == kBoth || theMode == kTracker ) 

@@ -9,6 +9,7 @@
 
 #include "GateRTVPhantomMessenger.hh"
 #include "GateRTVPhantom.hh"
+#include "GateMessageManager.hh"
 
 #include "G4UIcmdWithAString.hh"
 #include "G4UIcmdWithAnInteger.hh"

@@ -8,7 +8,6 @@
 #include <cmath>
 #include "pthread.h"
 #include <vector>
-#include "G4RunManager.hh"
 #include "GateConfiguration.h"
 #include "G4VProcess.hh"
 #include "G4UnitsTable.hh"

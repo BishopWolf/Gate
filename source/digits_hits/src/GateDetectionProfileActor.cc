@@ -7,6 +7,7 @@
   ----------------------*/
 
 #include "GateDetectionProfileActor.hh"
+#include "GateMessageManager.hh"
 
 #ifdef G4ANALYSIS_USE_ROOT
 
