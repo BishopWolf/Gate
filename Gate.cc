@@ -39,6 +39,7 @@
 #include "GateDigitizer.hh"
 #include "GateClock.hh"
 #include "GateUIcontrolMessenger.hh"
+#include "GateROGeometry.hh"
 
 #ifdef G4ANALYSIS_USE_ROOT
 #include "GateROOTBasicOutput.hh"
@@ -55,6 +56,8 @@
 #include "GateActionInitialization.hh"
 #include "G4MTRunManager.hh"
 #include "GateAnalysis.hh"
+#include "G4VModularPhysicsList.hh"
+#include "G4ParallelWorldPhysics.hh"
 #endif
 //-----------------------------------------------------------------------------
 void printHelpAndQuit( G4String msg )
@@ -302,10 +305,19 @@ int main( int argc, char* argv[] )
 
   // Set the DetectorConstruction
   GateDetectorConstruction* gateDC = new GateDetectorConstruction();
+#ifdef G4MULTITHREADED
+  G4String parallelWorldName = "ParallelWorld";
+  GateROGeometry* ParallelWorld = new GateROGeometry(parallelWorldName);       
+  gateDC->RegisterParallelWorld(ParallelWorld);
+#endif 
   runManager->SetUserInitialization( gateDC );
 
   // Set the PhysicsList
-  runManager->SetUserInitialization( GatePhysicsList::GetInstance() );
+  GatePhysicsList* physicsList = GatePhysicsList::GetInstance();
+#ifdef G4MULTITHREADED
+  physicsList->RegisterPhysics(new G4ParallelWorldPhysics(parallelWorldName));//This is for G4VModularPhysicsList only
+#endif   
+  runManager->SetUserInitialization( physicsList );
 
   // Set the users actions to handle callback for actors - before the initialisation
   GateUserActions* myActions = new GateUserActions( runManager, myRecords );

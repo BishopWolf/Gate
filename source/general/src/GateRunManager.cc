@@ -10,6 +10,7 @@
 #include "GateRunManager.hh"
 #ifdef G4MULTITHREADED
  #include "G4MTRunManager.hh"
+ #include "GateROGeometry.hh"
 #endif
 #include "GateDetectorConstruction.hh"
 #include "GateRunManagerMessenger.hh"
@@ -186,16 +187,7 @@ void GateRunManager::InitGeometryOnly()
       det = detConstruction->GateDetectorConstruction::GetGateDetectorConstruction();
       det->GateDetectorConstruction::SetGeometryStatusFlag(GateDetectorConstruction::geometry_needs_rebuild);
       det->GateDetectorConstruction::UpdateGeometry();
-#ifdef G4MULTITHREADED
-      
-      det->GateDetectorConstruction::ConstructSDandField();
-      det->GateDetectorConstruction::ConstructParallelSD();
-      nParallelWorlds = det->GateDetectorConstruction::ConstructParallelGeometries();
-      
-      GateRunManager::GetMasterRunManagerKernel()->SetNumberOfParallelWorld(nParallelWorlds);
-      GateRunManager::GetMasterRunManagerKernel()->DefineWorldVolume(det->GateDetectorConstruction::GetWorldVolume(),false);
       geometryInitialized=true;
-#endif
     }
 
 }

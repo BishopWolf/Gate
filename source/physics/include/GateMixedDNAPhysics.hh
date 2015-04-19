@@ -22,7 +22,7 @@
 
 class GateMixedDNAPhysicsMessenger;
 
-class GateMixedDNAPhysics: public G4VUserPhysicsList
+class GateMixedDNAPhysics: public G4VModularPhysicsList
 {
 public:
 
