@@ -32,6 +32,7 @@
 #include "G4VModularPhysicsList.hh"
 #include "G4ExceptionHandler.hh"
 #include "G4StateManager.hh"
+#include "G4ParallelWorldPhysics.hh"
 
 #include "G4EmStandardPhysics.hh"
 #include "G4EmStandardPhysics_option1.hh"
@@ -205,10 +206,15 @@ void GatePhysicsList::ConstructProcess()
       if (mUserPhysicListName == "") { // if a user physic list is set, transportation is already set
         AddTransportation();
       }
-
+#ifdef G4MULTITHREADED 
+  //Parallel world sensitivity
+    //
+    G4ParallelWorldPhysics* pWorld = new G4ParallelWorldPhysics("GateROGeometry");
+    pWorld->ConstructProcess();
+#endif
       for(unsigned int i=0; i<GetTheListOfProcesss()->size(); i++)
-        (*GetTheListOfProcesss())[i]->ConstructProcess();
-
+      (*GetTheListOfProcesss())[i]->ConstructProcess();
+      
       //opt->SetVerbose(2);
       if(mDEDXBinning>0)   opt->SetDEDXBinning(mDEDXBinning);
       if(mLambdaBinning>0) opt->SetLambdaBinning(mLambdaBinning);
