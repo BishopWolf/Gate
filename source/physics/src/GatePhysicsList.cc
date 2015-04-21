@@ -206,12 +206,7 @@ void GatePhysicsList::ConstructProcess()
       if (mUserPhysicListName == "") { // if a user physic list is set, transportation is already set
         AddTransportation();
       }
-#ifdef G4MULTITHREADED 
-  //Parallel world sensitivity
-    //
-    G4ParallelWorldPhysics* pWorld = new G4ParallelWorldPhysics("GateROGeometry");
-    pWorld->ConstructProcess();
-#endif
+
       for(unsigned int i=0; i<GetTheListOfProcesss()->size(); i++)
       (*GetTheListOfProcesss())[i]->ConstructProcess();
       
@@ -290,7 +285,7 @@ void GatePhysicsList::ConstructPhysicsList(G4String name)
   }
 
   mUserPhysicListName = name;
-
+  
   // First, try to create EM only Physic lists
   G4VPhysicsConstructor * pl = NULL;
   if (mUserPhysicListName == "emstandard") {

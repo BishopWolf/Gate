@@ -29,7 +29,6 @@
 #include "G4Navigator.hh"
 #include "G4SDManager.hh"
 #include "G4Material.hh"
-#include "G4Material.hh"
 
 #ifdef GATE_USE_OPTICAL
 #include "GateSurfaceList.hh"
@@ -40,14 +39,10 @@ GateDetectorConstruction* GateDetectorConstruction::pTheGateDetectorConstruction
 //---------------------------------------------------------------------------------
 GateDetectorConstruction::GateDetectorConstruction()
   :  pworld(0),
-     pworldPhysicalVolume(0),
      nGeometryStatus(geometry_needs_rebuild),
      flagAutoUpdate(false),
-     m_crystalSD(0),
-     m_phantomSD(0),
      pdetectorMessenger(0),
-     moveFlag(0),
-     m_magField(0), m_magFieldValue(0)
+     moveFlag(0)
 {
 
   GateMessage("Geometry", 1, "GateDetectorConstruction instantiating...\n");
@@ -56,42 +51,19 @@ GateDetectorConstruction::GateDetectorConstruction()
 
   pTheGateDetectorConstruction = this;
 
-  pcreatorStore = GateObjectStore::GetInstance();
   psystemStore=GateSystemListManager::GetInstance();
 
   pdetectorMessenger = new GateDetectorMessenger(this);
 
-  m_magFieldValue = G4ThreeVector(0.,0.,0. * tesla);
+  G4ThreeVector magFieldValue = G4ThreeVector(0.,0.,0. * tesla);
 
   G4double pworld_x = 50.*cm;
   G4double pworld_y = 50.*cm;
   G4double pworld_z = 50.*cm;
+  
+  pworld = new GateROGeometry("world");
+  pworld->Initialize(pworld_x, pworld_y, pworld_z, magFieldValue);
 
-  //-------------------------------------------------------------------------
-  // Create default material (air) for the world
-  G4Element* N  = new G4Element("worldDefaultN","N" , 7., 14.01*g/mole );
-  G4Element* O  = new G4Element("worldDefaultO"  ,"O" , 8., 16.00*g/mole);
-  G4Material* Air = new G4Material("worldDefaultAir"  , 1.290*mg/cm3, 2);
-  Air->AddElement(N, 0.7);
-  Air->AddElement(O, 0.3);
-  //-------------------------------------------------------------------------
-
-  pworld = new GateBox("world", "worldDefaultAir",  pworld_x, pworld_y, pworld_z, true);
-  pworld->SetMaterialName("worldDefaultAir");
-
-  G4SDManager* SDman = G4SDManager::GetSDMpointer();
-
-  if(!m_crystalSD) {
-    G4String crystalSDname = "/gate/crystal";
-    m_crystalSD = new GateCrystalSD(crystalSDname);
-    SDman->AddNewDetector(m_crystalSD);
-  }
-
-  if(!m_phantomSD) {
-    G4String phantomSDname = "/gate/phantom";
-    m_phantomSD = new GatePhantomSD(phantomSDname);
-    SDman->AddNewDetector(m_phantomSD);
-  }
   GateMessage("Geometry", 5, "  GateDetectorConstruction constructor -- end ");
 
 
@@ -105,11 +77,6 @@ GateDetectorConstruction::GateDetectorConstruction()
 //---------------------------------------------------------------------------------
 GateDetectorConstruction::~GateDetectorConstruction()
 {
-  if (pworld) {
-    DestroyGeometry();
-    delete pworld;
-    pworld = 0;
-  }
   delete pdetectorMessenger;
 }
 //---------------------------------------------------------------------------------
@@ -117,104 +84,31 @@ GateDetectorConstruction::~GateDetectorConstruction()
 //---------------------------------------------------------------------------------
 G4VPhysicalVolume* GateDetectorConstruction::Construct()
 {
-  GateMessage("Geometry", 3, "Geometry construction starts. \n");
+  GateMessage("Geometry", 3, "Geometry construction starts. " << Gateendl);
 
-  pworldPhysicalVolume = pworld->GateVVolume::Construct();
+  pworld->Construct();
+  pworld->ConstructSD();
   SetGeometryStatusFlag(geometry_is_uptodate);
 
-  GateMessage("Physic", 1, " "<<Gateendl);
-  GateMessage("Physic", 1, "----------------------------------------------------------"<<Gateendl);
-  GateMessage("Physic", 1, "                    Ionization potential "<<Gateendl);
+  GateMessage("Geometry", 3, "Geometry has been constructed (status = " << nGeometryStatus << ")." << Gateendl);
 
-  const G4MaterialTable * theTable = G4Material::GetMaterialTable();
-  for(unsigned int i =0;i<(*theTable).size();i++){
-    if(theListOfIonisationPotential[(*theTable)[i]->GetName()]){
-      (*theTable)[i]->GetIonisation()->SetMeanExcitationEnergy(theListOfIonisationPotential[(*theTable)[i]->GetName()]);
-      GateMessage("Physic", 1, " - " << (*theTable)[i]->GetName() << "\t defaut value: I = " <<
-                  G4BestUnit((*theTable)[i]->GetIonisation()->GetMeanExcitationEnergy(),"Energy") <<
-                  "\t-->  new value: I = " <<
-                  G4BestUnit((*theTable)[i]->GetIonisation()->GetMeanExcitationEnergy(),"Energy") << Gateendl);
-    }
-    else {
-      GateMessage("Physic", 1, " - " << (*theTable)[i]->GetName() << "\t defaut value: I = " <<
-                  G4BestUnit((*theTable)[i]->GetIonisation()->GetMeanExcitationEnergy(),"Energy") << Gateendl);
-    }
-  }
-  GateMessage("Physic", 1, "----------------------------------------------------------"<<Gateendl);
-
-  GateMessage("Geometry", 3, "Geometry has been constructed (status = " << nGeometryStatus << ").\n");
-
-#ifdef GATE_USE_OPTICAL
-  BuildSurfaces();
-#endif
-  BuildMagField();
-
-  return pworldPhysicalVolume;
+  return pworld->GetWorldVolume();
 }
-//---------------------------------------------------------------------------------
-
-//---------------------------------------------------------------------------------
-// Adds a Material Database
-void GateDetectorConstruction::AddFileToMaterialDatabase(const G4String& f)
-{
-  mMaterialDatabase.AddMDBFile(f);
-}
-//---------------------------------------------------------------------------------
-
-//---------------------------------------------------------------------------------
-void GateDetectorConstruction::SetMagField(G4ThreeVector fieldValue)
-{
-  m_magFieldValue = fieldValue;
-}
-//---------------------------------------------------------------------------------
-
-//---------------------------------------------------------------------------------
-void GateDetectorConstruction::BuildMagField()
-{
-  //apply a global uniform magnetic field along Z axis
-  G4FieldManager* fieldMgr
-    = G4TransportationManager::GetTransportationManager()->GetFieldManager();
-
-  if(m_magField) delete m_magField;             //delete the existing magn field
-
-  if(m_magFieldValue.mag()!=0.)                 // create a new one if non nul
-    { m_magField = new G4UniformMagField(m_magFieldValue);
-      fieldMgr->SetDetectorField(m_magField);
-      fieldMgr->CreateChordFinder(m_magField);
-    } else {
-    m_magField = NULL;
-    fieldMgr->SetDetectorField(m_magField);
-  }
-}
-//---------------------------------------------------------------------------------
-
-//---------------------------------------------------------------------------------
-#ifdef GATE_USE_OPTICAL
-void GateDetectorConstruction::BuildSurfaces()
-{
-  GateObjectStore* store = GateObjectStore::GetInstance();
-  for (GateObjectStore::iterator p = store->begin(); p != store->end(); p++)
-    {
-      p->second->GetSurfaceList()->BuildSurfaces();
-    }
-
-}
-#endif
 //---------------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------------
 void GateDetectorConstruction::UpdateGeometry()
 {
-  GateMessage("Geometry", 3,"UpdateGeometry starts (status = " << nGeometryStatus << "). \n");
+  GateMessage("Geometry", 3,"UpdateGeometry starts (status = " << nGeometryStatus << "). " << Gateendl);
 
   if (nGeometryStatus == geometry_is_uptodate){
-    GateMessage("Geometry", 3,"Geometry is uptodate.\n");
+    GateMessage("Geometry", 3,"Geometry is uptodate." << Gateendl);
     return;
   }
 
   switch (nGeometryStatus){
   case geometry_needs_update:
-    pworld->Construct(true);
+    pworld->Construct();
     break;
 
   case geometry_needs_rebuild:
@@ -223,25 +117,26 @@ void GateDetectorConstruction::UpdateGeometry()
     Construct();
     break;
   }
-  GateRunManager::GetRunManager()->DefineWorldVolume(pworldPhysicalVolume);
+  this->RegisterParallelWorld(pworld);
+  GateRunManager::GetRunManager()->DefineWorldVolume(pworld->GetWorldVolume());
 
   nGeometryStatus = geometry_is_uptodate;
 
-  GateMessage("Geometry", 3, "nGeometryStatus = geometry_is_uptodate \n");
-  GateMessage("Geometry", 3, "UpdateGeometry finished. \n");
+  GateMessage("Geometry", 3, "nGeometryStatus = geometry_is_uptodate " << Gateendl);
+  GateMessage("Geometry", 3, "UpdateGeometry finished. " << Gateendl);
 }
 //---------------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------------
 void GateDetectorConstruction::DestroyGeometry()
 {
-  GateMessage("Geometry", 4,"Geometry is going to be destroyed. \n");
+  GateMessage("Geometry", 4,"Geometry is going to be destroyed. " << Gateendl);
 
   pworld->DestroyGeometry();
   nGeometryStatus = geometry_needs_rebuild;
 
-  GateMessage("Geometry", 4,"nGeometryStatus = geometry_needs_rebuild     \n");
-  GateMessage("Geometry", 4,"Geometry has been destroyed.\n");
+  GateMessage("Geometry", 4,"nGeometryStatus = geometry_needs_rebuild     " << Gateendl);
+  GateMessage("Geometry", 4,"Geometry has been destroyed." << Gateendl);
 }
 //---------------------------------------------------------------------------------
 
@@ -269,7 +164,7 @@ void GateDetectorConstruction::DestroyGeometry()
   }
 
   if (flagAutoUpdate){
-  GateMessage("Geometry", 0,"The geometry is going to be updated.\n");
+  GateMessage("Geometry", 0,"The geometry is going to be updated." << Gateendl);
   UpdateGeometry();}
   }
 */
@@ -281,18 +176,18 @@ void GateDetectorConstruction::ClockHasChanged()
   GateMessage("Move", 5, "ClockHasChanged = " << GetFlagMove() << Gateendl; );
 
   if ( GetFlagMove()) {
-    GateMessage("Move", 6, "moveFlag = 1\n");
+    GateMessage("Move", 6, "moveFlag = 1" << Gateendl);
     nGeometryStatus = geometry_needs_update;
   }
   else {
-    GateMessage("Move", 6, "Geometry is uptodate.\n");
+    GateMessage("Move", 6, "Geometry is uptodate." << Gateendl);
     nGeometryStatus = geometry_is_uptodate;
   }
 
   GateMessage("Move", 6, "  Geometry status = " << nGeometryStatus << Gateendl;);
 
   UpdateGeometry();
-  GateMessage("Move", 6, "Clock has changed.\n");
+  GateMessage("Move", 6, "Clock has changed." << Gateendl);
 }
 //---------------------------------------------------------------------------------
 /*PY Descourt 08/09/2008 */

@@ -22,6 +22,7 @@
 #include "G4PhysListFactory.hh"
 #include "G4VUserPhysicsList.hh"
 #include "G4VModularPhysicsList.hh"
+#include "G4ParallelWorldPhysics.hh"
 #include "G4RegionStore.hh"
 #include "G4Region.hh"
 #include "G4LossTableManager.hh"
@@ -189,7 +190,12 @@ void GateRunManager::InitGeometryOnly()
       det->GateDetectorConstruction::UpdateGeometry();
       geometryInitialized=true;
 #ifdef G4MULTITHREADED      
-      GateROGeometry* RO = (GateROGeometry*) det->GetParallelWorld(0);
+      GateROGeometry* RO = (GateROGeometry*) det->GetParallelWorld(0); 
+      det->GateDetectorConstruction::RegisterParallelWorld(RO);
+  //Parallel world sensitivity
+    //
+    G4ParallelWorldPhysics* pWorld = new G4ParallelWorldPhysics("GateROGeometry");
+    pWorld->ConstructProcess();
 #endif
     }
 

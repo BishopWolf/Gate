@@ -19,6 +19,7 @@
 #include "GateObjectMoveListMessenger.hh"
 #include "GatePhysicsList.hh"
 #include "GateRTPhantomMgr.hh"
+#include "GateROGeometry.hh"
 
 class G4UniformMagField;
 class GateObjectStore;
@@ -32,8 +33,6 @@ class GateBox;
 class GateSystemListManager;
 class GateARFSD;
 
-#define theMaterialDatabase GateDetectorConstruction::GetGateDetectorConstruction()->mMaterialDatabase
-
 class GateDetectorConstruction : public G4VUserDetectorConstruction
 {
 
@@ -44,22 +43,16 @@ public:
 
   virtual G4VPhysicalVolume* Construct();
   virtual void UpdateGeometry();
-  virtual void SetMagField (G4ThreeVector);
-  virtual void BuildMagField ();
 
   /* PY Descourt 08/09/2009 */
   GateARFSD* GetARFSD(){ return m_ARFSD;};
   void insertARFSD( G4String , G4int );
   /* PY Descourt 08/09/2009 */
 
-
-#ifdef GATE_USE_OPTICAL
-  virtual void BuildSurfaces();
-#endif
-
   // Material DB
   /// Mandatory : Adds a Material Database to use (filename, callback for Messenger)
-  void AddFileToMaterialDatabase(const G4String& f);
+  inline void AddFileToMaterialDatabase(const G4String& f) 
+  { pworld->AddFileToMaterialDatabase(f); }
 
   static GateDetectorConstruction* GetGateDetectorConstruction()
   {
@@ -67,10 +60,12 @@ public:
   };
 
   inline G4VPhysicalVolume*   GetWorldVolume()
-  { return pworldPhysicalVolume; }
+  { return pworld->GetWorldVolume(); }
 
   inline GateObjectStore* GetObjectStore()
-  { return pcreatorStore; }
+  { return pworld->GetObjectStore(); }
+  
+  inline void SetMagField (G4ThreeVector theVector){pworld->SetMagField(theVector);}
 
   enum GeometryStatus {
     geometry_is_uptodate = 0,
@@ -112,16 +107,13 @@ public:
   virtual void DestroyGeometry();
 
   //void SetIonisationPotential(G4String n, G4double v){mMaterialDatabase.SetMaterialIoniPotential(n,v);}
-
-  void SetMaterialIoniPotential(G4String n,G4double v){theListOfIonisationPotential[n]=v;}
-  G4double GetMaterialIoniPotential(G4String n){ return theListOfIonisationPotential[n];}
-
+  void SetMaterialIoniPotential(G4String n,G4double v){pworld->SetMaterialIoniPotential(n,v);}
+  G4double GetMaterialIoniPotential(G4String n){ return pworld->GetMaterialIoniPotential(n);}
 
 
 private :
 
-  GateBox* pworld;
-  G4VPhysicalVolume* pworldPhysicalVolume;
+  GateROGeometry* pworld;
 
   GeometryStatus nGeometryStatus;
   G4bool flagAutoUpdate;
@@ -129,25 +121,18 @@ private :
   GateCrystalSD*   m_crystalSD;
   GatePhantomSD*   m_phantomSD;
 
-  GateObjectStore* pcreatorStore;
   GateSystemListManager*  psystemStore;
 
   // Pour utiliser le DetectorMessenger
   GateDetectorMessenger* pdetectorMessenger;  //pointer to the Messenger
 
   static GateDetectorConstruction* pTheGateDetectorConstruction;
-
+  
 protected :
   //!< List of movements
   G4bool moveFlag;
 
-  std::map<G4String,G4double> theListOfIonisationPotential;
-
-
 private:
-  //! Magnetic field
-  G4UniformMagField* m_magField;
-  G4ThreeVector      m_magFieldValue;
 
   GateARFSD* m_ARFSD; // PY Descourt 8/09/2009
   GateRTPhantomMgr* m_RTPhantomMgr; // PY Descourt 08/09/2009
