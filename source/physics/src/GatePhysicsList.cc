@@ -319,6 +319,12 @@ void GatePhysicsList::ConstructPhysicsList(G4String name)
   if (pl != NULL) {
     pl->ConstructParticle();
     pl->ConstructProcess();
+#ifdef G4MULTITHREADED
+    //Parallel world sensitivity
+    //
+    G4ParallelWorldPhysics* pWorld = new G4ParallelWorldPhysics(mUserPhysicListName);
+    pWorld->ConstructProcess();
+#endif
     //pl->SetVerboseLevel(2);
     AddTransportation(); // don't forget transportation process.
     GateRunManager::GetRunManager()->SetUserPhysicListName("");
@@ -327,6 +333,7 @@ void GatePhysicsList::ConstructPhysicsList(G4String name)
     // Set the phys list name. It will be build in GateRunManager.
     GateRunManager::GetRunManager()->SetUserPhysicListName(mUserPhysicListName);
   }
+  //GateRunManager::GetRunManager() -> PhysicsHasBeenModified();
 
   // Fluorescence processes
   // - default activation of deexcitation process
@@ -352,6 +359,7 @@ void GatePhysicsList::ConstructPhysicsListDNAMixed(G4String name)
       GateError("The mixed Physics List "<<name<<" does not exist!");
     }
   }
+  //GateRunManager::GetRunManager() -> PhysicsHasBeenModified();
 }
 //-----------------------------------------------------------------------------------------
 
