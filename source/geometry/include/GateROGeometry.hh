@@ -46,7 +46,7 @@ public:
   virtual void Construct();
   virtual void ConstructSD();
   void Initialize(G4double, G4double, G4double, G4ThreeVector);
-  inline G4VPhysicalVolume* GetWorldVolume() {return this->GetWorld();}
+  inline G4VPhysicalVolume* GetWorldVolume() {return pworldPhysicalVolume;}
   inline GateObjectStore* GetObjectStore()  { return pcreatorStore; }
   inline virtual void SetGeometryStatusFlag(GeometryStatus val)  { nGeometryStatus = val; }
   inline virtual G4bool GetGeometryStatusFlag()  { return nGeometryStatus; }
@@ -95,6 +95,7 @@ private:
   G4ThreeVector      m_magFieldValue;
   
   static GateROGeometry* pTheGateROGeometry;
+  G4VPhysicalVolume*  pworldPhysicalVolume;
   G4LogicalVolume* sensitiveLogicalVolume;
   
 protected:

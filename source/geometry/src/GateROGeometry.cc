@@ -114,6 +114,7 @@ void GateROGeometry::Construct()
   pworld = new GateBox(GetName(), "worldDefaultAir",  pworld_x, pworld_y, pworld_z, true);
   pworld->SetMaterialName("worldDefaultAir");
   
+  pworldPhysicalVolume = pworld->GateVVolume::Construct();
   sensitiveLogicalVolume = GetWorldVolume()->GetLogicalVolume();
   
   GateMessage("Physic", 1, " "<<Gateendl);

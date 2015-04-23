@@ -62,7 +62,7 @@ GateDetectorConstruction::GateDetectorConstruction()
   G4double pworld_z = 50.*cm;
   
   pworld = new GateROGeometry("world");
-  pworld->Initialize(pworld_x, pworld_y, pworld_z, magFieldValue);
+  pworld->GateROGeometry::Initialize(pworld_x, pworld_y, pworld_z, magFieldValue);
 
   GateMessage("Geometry", 5, "  GateDetectorConstruction constructor -- end ");
 
