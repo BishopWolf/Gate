@@ -96,11 +96,11 @@ public:
   GateMaterialDatabase mMaterialDatabase;
 
   inline GateCrystalSD* GetCrystalSD()
-  { return m_crystalSD; }
+  { return pworld->GetCrystalSD(); }
 
 
   inline GatePhantomSD*   GetPhantomSD()
-  { return m_phantomSD; }
+  { return pworld->GetPhantomSD(); }
 
   //private:
 
@@ -117,9 +117,6 @@ private :
 
   GeometryStatus nGeometryStatus;
   G4bool flagAutoUpdate;
-
-  GateCrystalSD*   m_crystalSD;
-  GatePhantomSD*   m_phantomSD;
 
   GateSystemListManager*  psystemStore;
 
