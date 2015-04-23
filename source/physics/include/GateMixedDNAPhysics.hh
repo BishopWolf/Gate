@@ -11,7 +11,7 @@
 #ifndef GateMixedDNAPhysics_h
 #define GateMixedDNAPhysics_h 1
 
-#include "G4VUserPhysicsList.hh"
+#include "G4VModularPhysicsList.hh"
 #include "G4VModularPhysicsList.hh"
 #include "G4ProcessManager.hh"
 #include "G4ParticleTypes.hh"
