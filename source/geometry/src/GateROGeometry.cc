@@ -97,9 +97,18 @@ void GateROGeometry::Construct()
   
   if (!isInitialized)
     {
-      GateError("GateROGeometry::Construct() error" << Gateendl <<
-		"Parameters of the RO geometry are not initialized");
-      return;
+      //GateError("GateROGeometry::Construct() error" << Gateendl <<
+	//	"Parameters of the RO geometry are not initialized");
+      //return;
+      
+      //Default Initialization
+      G4ThreeVector magFieldValue = G4ThreeVector(0.,0.,0. * tesla);
+
+      G4double pworld_x = 50.*cm;
+      G4double pworld_y = 50.*cm;
+      G4double pworld_z = 50.*cm;
+      
+      Initialize(pworld_x, pworld_y, pworld_z, magFieldValue);
     }
   
   pcreatorStore = GateObjectStore::GetInstance();

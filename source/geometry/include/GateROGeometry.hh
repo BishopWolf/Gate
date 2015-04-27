@@ -77,7 +77,7 @@ public:
   G4double GetMaterialIoniPotential(G4String n){ return theListOfIonisationPotential[n];}
   
   virtual void DestroyGeometry();
-
+  
 private:
   GateBox* pworld;
   GeometryStatus nGeometryStatus;

@@ -54,15 +54,8 @@ GateDetectorConstruction::GateDetectorConstruction()
   psystemStore=GateSystemListManager::GetInstance();
 
   pdetectorMessenger = new GateDetectorMessenger(this);
-
-  G4ThreeVector magFieldValue = G4ThreeVector(0.,0.,0. * tesla);
-
-  G4double pworld_x = 50.*cm;
-  G4double pworld_y = 50.*cm;
-  G4double pworld_z = 50.*cm;
   
-  pworld = new GateROGeometry("world");
-  pworld->GateROGeometry::Initialize(pworld_x, pworld_y, pworld_z, magFieldValue);
+  SetGeometryStatusFlag(geometry_needs_update);
 
   GateMessage("Geometry", 5, "  GateDetectorConstruction constructor -- end ");
 
@@ -86,8 +79,20 @@ G4VPhysicalVolume* GateDetectorConstruction::Construct()
 {
   GateMessage("Geometry", 3, "Geometry construction starts. " << Gateendl);
 
+  G4ThreeVector magFieldValue = G4ThreeVector(0.,0.,0. * tesla);
+
+  G4double pworld_x = 50.*cm;
+  G4double pworld_y = 50.*cm;
+  G4double pworld_z = 50.*cm;
+  
+  pworld = new GateROGeometry("world");
+  pworld->Initialize(pworld_x, pworld_y, pworld_z, magFieldValue);
+
   pworld->Construct();
   pworld->ConstructSD();
+  
+  this->RegisterParallelWorld(pworld);
+  GateRunManager::GetRunManager()->DefineWorldVolume(pworld->GetWorldVolume());
   SetGeometryStatusFlag(geometry_is_uptodate);
 
   GateMessage("Geometry", 3, "Geometry has been constructed (status = " << nGeometryStatus << ")." << Gateendl);
@@ -101,24 +106,23 @@ void GateDetectorConstruction::UpdateGeometry()
 {
   GateMessage("Geometry", 3,"UpdateGeometry starts (status = " << nGeometryStatus << "). " << Gateendl);
 
-  if (nGeometryStatus == geometry_is_uptodate){
-    GateMessage("Geometry", 3,"Geometry is uptodate." << Gateendl);
-    return;
-  }
-
   switch (nGeometryStatus){
+  case geometry_is_uptodate:  
+    GateMessage("Geometry", 3,"Geometry is uptodate." << Gateendl);
+    break;
+    
   case geometry_needs_update:
-    pworld->Construct();
+    Construct();
     break;
 
   case geometry_needs_rebuild:
-  default:
     DestroyGeometry();
     Construct();
     break;
+    
+  default:
+    break;
   }
-  this->RegisterParallelWorld(pworld);
-  GateRunManager::GetRunManager()->DefineWorldVolume(pworld->GetWorldVolume());
 
   nGeometryStatus = geometry_is_uptodate;
 
