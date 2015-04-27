@@ -47,6 +47,7 @@ public:
   virtual void ConstructSD();
   void Initialize(G4double, G4double, G4double, G4ThreeVector);
   inline G4VPhysicalVolume* GetWorldVolume() {return pworldPhysicalVolume;}
+  //inline G4VPhysicalVolume* GetWorldVolume() {return this->GetWorld();}
   inline GateObjectStore* GetObjectStore()  { return pcreatorStore; }
   inline virtual void SetGeometryStatusFlag(GeometryStatus val)  { nGeometryStatus = val; }
   inline virtual G4bool GetGeometryStatusFlag()  { return nGeometryStatus; }
