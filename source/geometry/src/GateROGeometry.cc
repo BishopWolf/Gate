@@ -62,6 +62,18 @@ GateROGeometry::GateROGeometry(G4String parallelWorldName)
 { 
   pTheGateROGeometry = this;
   
+  pcreatorStore = GateObjectStore::GetInstance();
+  //-------------------------------------------------------------------------
+  // Create default material (air) for the world
+  G4Element* N  = new G4Element("worldDefaultN","N" , 7., 14.01*g/mole );
+  G4Element* O  = new G4Element("worldDefaultO"  ,"O" , 8., 16.00*g/mole);
+  G4Material* Air = new G4Material("worldDefaultAir"  , 1.290*mg/cm3, 2);
+  Air->AddElement(N, 0.7);
+  Air->AddElement(O, 0.3);
+  //-------------------------------------------------------------------------
+  pworld = new GateBox(GetName(), "worldDefaultAir",  pworld_x, pworld_y, pworld_z, true);
+  pworld->SetMaterialName("worldDefaultAir");
+  
   isBuilt = false;
   isInitialized = false;
 }
@@ -111,19 +123,9 @@ void GateROGeometry::Construct()
       Initialize(pworld_x, pworld_y, pworld_z, magFieldValue);
     }
   
-  pcreatorStore = GateObjectStore::GetInstance();
-  //-------------------------------------------------------------------------
-  // Create default material (air) for the world
-  G4Element* N  = new G4Element("worldDefaultN","N" , 7., 14.01*g/mole );
-  G4Element* O  = new G4Element("worldDefaultO"  ,"O" , 8., 16.00*g/mole);
-  G4Material* Air = new G4Material("worldDefaultAir"  , 1.290*mg/cm3, 2);
-  Air->AddElement(N, 0.7);
-  Air->AddElement(O, 0.3);
-  //-------------------------------------------------------------------------
-  pworld = new GateBox(GetName(), "worldDefaultAir",  pworld_x, pworld_y, pworld_z, true);
-  pworld->SetMaterialName("worldDefaultAir");
-  
   pworldPhysicalVolume = pworld->GateVVolume::Construct();
+  SetGeometryStatusFlag(geometry_is_uptodate);
+  
   G4TransportationManager::GetTransportationManager()->RegisterWorld(pworldPhysicalVolume);
   sensitiveLogicalVolume = GetWorldVolume()->GetLogicalVolume();
   

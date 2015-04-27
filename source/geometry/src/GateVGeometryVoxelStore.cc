@@ -42,7 +42,7 @@ GateVGeometryVoxelStore::~GateVGeometryVoxelStore()
 
 void GateVGeometryVoxelStore::SetDefaultMaterial(G4String materialName) 
 { 
-  SetDefaultMaterial( GateDetectorConstruction::GetGateDetectorConstruction()->mMaterialDatabase.GetMaterial(materialName) );
+  SetDefaultMaterial( GateDetectorConstruction::GetGateDetectorConstruction()->GetMaterialDatabase().GetMaterial(materialName) );
 }
 
 void GateVGeometryVoxelStore::Describe(G4int ) 

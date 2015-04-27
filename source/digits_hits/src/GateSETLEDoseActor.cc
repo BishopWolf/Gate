@@ -204,7 +204,7 @@ void GateSETLEDoseActor::InitializeMaterialAndMuTable()
 	for(int z=0; z<mResolution.z(); z++)
 	{
 	  voxelIndex = x+y*lineSize+z*planeSize;
-	  G4Material *material = detectorConstruction->mMaterialDatabase.GetMaterial(volume->GetMaterialNameFromLabel(volume->GetImage()->GetValue(x,y,z)));
+	  G4Material *material = detectorConstruction->GetMaterialDatabase().GetMaterial(volume->GetMaterialNameFromLabel(volume->GetImage()->GetValue(x,y,z)));
 	  mListOfMuTable[voxelIndex] = mMaterialHandler->GetMuTable(region->FindCouple(material));
 	}
       }

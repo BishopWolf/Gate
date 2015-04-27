@@ -53,6 +53,8 @@ public:
   /// Mandatory : Adds a Material Database to use (filename, callback for Messenger)
   inline void AddFileToMaterialDatabase(const G4String& f) 
   { pworld->AddFileToMaterialDatabase(f); }
+  
+  inline GateMaterialDatabase GetMaterialDatabase() { return pworld->mMaterialDatabase; };
 
   static GateDetectorConstruction* GetGateDetectorConstruction()
   {
@@ -91,10 +93,7 @@ public:
   virtual inline void SetFlagMove(G4bool val)  { moveFlag = val; };
 
   virtual inline G4bool GetFlagMove() const { return moveFlag; };
-
-  /// The Material database
-  GateMaterialDatabase mMaterialDatabase;
-
+  
   inline GateCrystalSD* GetCrystalSD()
   { return pworld->GetCrystalSD(); }
 
