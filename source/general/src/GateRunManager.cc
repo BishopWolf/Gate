@@ -189,14 +189,6 @@ void GateRunManager::InitGeometryOnly()
       det->GateDetectorConstruction::SetGeometryStatusFlag(GateDetectorConstruction::geometry_needs_rebuild);
       det->GateDetectorConstruction::UpdateGeometry();
       geometryInitialized=true;
-#ifdef G4MULTITHREADED      
-      GateROGeometry* RO = (GateROGeometry*) det->GetParallelWorld(0); 
-      det->GateDetectorConstruction::RegisterParallelWorld(RO);
-  //Parallel world sensitivity
-    //
-    G4ParallelWorldPhysics* pWorld = new G4ParallelWorldPhysics("GateROGeometry");
-    pWorld->ConstructProcess();
-#endif
     }
 
 }

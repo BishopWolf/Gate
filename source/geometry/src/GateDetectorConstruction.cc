@@ -79,14 +79,17 @@ G4VPhysicalVolume* GateDetectorConstruction::Construct()
   G4double pworld_y = 50.*cm;
   G4double pworld_z = 50.*cm;
   
-  pworld = new GateROGeometry("world");
+  G4RunManager::GetRunManager()->GetUserDetectorConstruction();
+  
+  pworld = (GateROGeometry*) this->GetParallelWorld(0);
+  //new GateROGeometry("world");
   pworld->Initialize(pworld_x, pworld_y, pworld_z, magFieldValue);
 
   pworld->Construct();
   pworld->ConstructSD();
   
-  this->RegisterParallelWorld(pworld);
-  GateRunManager::GetRunManager()->DefineWorldVolume(pworld->GetWorldVolume());
+  //this->RegisterParallelWorld(pworld);
+  //GateRunManager::GetRunManager()->DefineWorldVolume(pworld->GetWorldVolume());
   SetGeometryStatusFlag(geometry_is_uptodate);
 
   GateMessage("Geometry", 3, "Geometry has been constructed (status = " << nGeometryStatus << ")." << Gateendl);
