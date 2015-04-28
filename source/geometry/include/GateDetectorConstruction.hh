@@ -18,20 +18,15 @@
 #include "GatePhantomSD.hh"
 #include "GateObjectMoveListMessenger.hh"
 #include "GatePhysicsList.hh"
-#include "GateRTPhantomMgr.hh"
 #include "GateROGeometry.hh"
 
-class G4UniformMagField;
 class GateObjectStore;
-class G4Box;
-class G4LogicalVolume;
-class G4VPhysicalVolume;
-class G4Material;
 class GateDetectorMessenger;
-class GateVVolume;
-class GateBox;
 class GateSystemListManager;
-class GateARFSD;
+class G4VPhysicalVolume;
+
+#define theROGeometry GateDetectorConstruction::GetGateDetectorConstruction()->GetGateROGeometry()
+#define theMaterialDatabase theROGeometry->mMaterialDatabase
 
 class GateDetectorConstruction : public G4VUserDetectorConstruction
 {
@@ -44,18 +39,6 @@ public:
   virtual G4VPhysicalVolume* Construct();
   virtual void UpdateGeometry();
 
-  /* PY Descourt 08/09/2009 */
-  GateARFSD* GetARFSD(){ return m_ARFSD;};
-  void insertARFSD( G4String , G4int );
-  /* PY Descourt 08/09/2009 */
-
-  // Material DB
-  /// Mandatory : Adds a Material Database to use (filename, callback for Messenger)
-  inline void AddFileToMaterialDatabase(const G4String& f) 
-  { pworld->AddFileToMaterialDatabase(f); }
-  
-  inline GateMaterialDatabase GetMaterialDatabase() { return pworld->mMaterialDatabase; };
-
   static GateDetectorConstruction* GetGateDetectorConstruction()
   {
     return pTheGateDetectorConstruction;
@@ -66,6 +49,9 @@ public:
 
   inline GateObjectStore* GetObjectStore()
   { return pworld->GetObjectStore(); }
+  
+  inline GateROGeometry* GetGateROGeometry()
+  { return pworld; }
   
   inline void SetMagField (G4ThreeVector theVector){pworld->SetMagField(theVector);}
 
@@ -94,21 +80,9 @@ public:
 
   virtual inline G4bool GetFlagMove() const { return moveFlag; };
   
-  inline GateCrystalSD* GetCrystalSD()
-  { return pworld->GetCrystalSD(); }
-
-
-  inline GatePhantomSD*   GetPhantomSD()
-  { return pworld->GetPhantomSD(); }
-
   //private:
 
   virtual void DestroyGeometry();
-
-  //void SetIonisationPotential(G4String n, G4double v){mMaterialDatabase.SetMaterialIoniPotential(n,v);}
-  void SetMaterialIoniPotential(G4String n,G4double v){pworld->SetMaterialIoniPotential(n,v);}
-  G4double GetMaterialIoniPotential(G4String n){ return pworld->GetMaterialIoniPotential(n);}
-
 
 private :
 
@@ -128,10 +102,6 @@ protected :
   //!< List of movements
   G4bool moveFlag;
 
-private:
-
-  GateARFSD* m_ARFSD; // PY Descourt 8/09/2009
-  GateRTPhantomMgr* m_RTPhantomMgr; // PY Descourt 08/09/2009
 };
 
 #endif

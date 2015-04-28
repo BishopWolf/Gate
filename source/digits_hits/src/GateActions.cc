@@ -815,7 +815,7 @@ void GateSteppingAction::UserSteppingAction(const G4Step* theStep)
                   //
                   //// get the pointer to the Phantom SD instanciated in GateDetectorConstruction
                   //
-                  G4VSensitiveDetector* GPhantomSD = (G4VSensitiveDetector*) ( GateDetectorConstruction::GetGateDetectorConstruction()->GetPhantomSD() );
+                  G4VSensitiveDetector* GPhantomSD = (G4VSensitiveDetector*) ( theROGeometry->GetPhantomSD() );
                   if ( SDetector == GPhantomSD ){ fStartVolumeIsPhantomSD = true; }  // the volume where the particle was created is indeed a phantom !
                 }
             }
@@ -836,7 +836,7 @@ void GateSteppingAction::UserSteppingAction(const G4Step* theStep)
                       //
                       //// get the pointer to the Phantom SD instanciated in GateDetectorConstruction
                       //
-                      G4VSensitiveDetector* GPhantomSD = (G4VSensitiveDetector*) ( GateDetectorConstruction::GetGateDetectorConstruction()->GetPhantomSD() );
+                      G4VSensitiveDetector* GPhantomSD = (G4VSensitiveDetector*) ( theROGeometry->GetPhantomSD() );
                       if ( SDetector == GPhantomSD ){ fStartVolumeIsPhantomSD = true; }  // the volume where the particle was created is indeed a phantom !
                     }
                 }
@@ -1277,7 +1277,7 @@ void GateSteppingAction::UserSteppingAction(const GateVVolume *v, const G4Step* 
                   //
                   //// get the pointer to the Phantom SD instanciated in GateDetectorConstruction
                   //
-                  G4VSensitiveDetector* GPhantomSD = (G4VSensitiveDetector*) ( GateDetectorConstruction::GetGateDetectorConstruction()->GetPhantomSD() );
+                  G4VSensitiveDetector* GPhantomSD = (G4VSensitiveDetector*) ( theROGeometry->GetPhantomSD() );
                   if ( SDetector == GPhantomSD ){ fStartVolumeIsPhantomSD = true; }  // the volume where the particle was created is indeed a phantom !
                 }
             }
@@ -1298,7 +1298,7 @@ void GateSteppingAction::UserSteppingAction(const GateVVolume *v, const G4Step* 
                       //
                       //// get the pointer to the Phantom SD instanciated in GateDetectorConstruction
                       //
-                      G4VSensitiveDetector* GPhantomSD = (G4VSensitiveDetector*) ( GateDetectorConstruction::GetGateDetectorConstruction()->GetPhantomSD() );
+                      G4VSensitiveDetector* GPhantomSD = (G4VSensitiveDetector*) ( theROGeometry->GetPhantomSD() );
                       if ( SDetector == GPhantomSD ){ fStartVolumeIsPhantomSD = true; }  // the volume where the particle was created is indeed a phantom !
                     }
                 }

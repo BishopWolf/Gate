@@ -475,7 +475,7 @@ void GateApplicationMgr::StartDAQ()
     theClock->SetTime(m_time);
 
     //GateMessage("Geometry", 0, "Change geom status !!!" << Gateendl);
-    //GateDetectorConstruction::GetGateDetectorConstruction()->SetGeometryStatusFlag(GateDetectorConstruction::geometry_needs_rebuild);
+    //theROGeometry->SetGeometryStatusFlag(GateDetectorConstruction::geometry_needs_rebuild);
   }
   
   if (mOutputMode) GateOutputMgr::GetInstance()->RecordEndOfAcquisition();

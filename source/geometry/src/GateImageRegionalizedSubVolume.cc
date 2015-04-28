@@ -74,7 +74,7 @@ G4LogicalVolume* GateImageRegionalizedSubVolume::ConstructOwnSolidAndLogicalVolu
 void GateImageRegionalizedSubVolume::PropagateGlobalSensitiveDetector()
 {
   if (m_sensitiveDetector) {
-    GatePhantomSD* phantomSD = GateDetectorConstruction::GetGateDetectorConstruction()->GetPhantomSD();
+    GatePhantomSD* phantomSD = theROGeometry->GetPhantomSD();
     pBoxLog->SetSensitiveDetector(phantomSD);
   }
 }

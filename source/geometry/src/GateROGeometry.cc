@@ -26,6 +26,7 @@
 #include "GateVVolume.hh"
 #include "GateMessageManager.hh"
 #include "GateObjectMoveListMessenger.hh"
+#include "GateARFSD.hh"
 
 #include "G4LogicalVolume.hh"
 #include "G4VPhysicalVolume.hh"
@@ -49,8 +50,6 @@
 #include "GateSurfaceList.hh"
 #endif
 
-GateROGeometry* GateROGeometry::pTheGateROGeometry=0;
-
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 GateROGeometry::GateROGeometry(G4String parallelWorldName)
@@ -58,21 +57,13 @@ GateROGeometry::GateROGeometry(G4String parallelWorldName)
     pworld(0), nGeometryStatus(geometry_needs_rebuild), 
     m_crystalSD(0), m_phantomSD(0),
     pcreatorStore(0), m_magField(0), m_magFieldValue(0),
-    sensitiveLogicalVolume(0)
+    sensitiveLogicalVolume(0), m_ARFSD(0)
 { 
-  pTheGateROGeometry = this;
-  
   pcreatorStore = GateObjectStore::GetInstance();
-  //-------------------------------------------------------------------------
-  // Create default material (air) for the world
-  G4Element* N  = new G4Element("worldDefaultN","N" , 7., 14.01*g/mole );
-  G4Element* O  = new G4Element("worldDefaultO"  ,"O" , 8., 16.00*g/mole);
-  G4Material* Air = new G4Material("worldDefaultAir"  , 1.290*mg/cm3, 2);
-  Air->AddElement(N, 0.7);
-  Air->AddElement(O, 0.3);
-  //-------------------------------------------------------------------------
-  pworld = new GateBox(GetName(), "worldDefaultAir",  pworld_x, pworld_y, pworld_z, true);
-  pworld->SetMaterialName("worldDefaultAir");
+  
+  /* instantiate the singleton RTPhantom Manager  - PY Descourt 08/09/2008 */
+
+  m_RTPhantomMgr = GateRTPhantomMgr::GetInstance();
   
   isBuilt = false;
   isInitialized = false;
@@ -93,11 +84,30 @@ GateROGeometry::~GateROGeometry()
 
 void GateROGeometry::Initialize(G4double sizeX, G4double sizeY, G4double sizeZ, G4ThreeVector magFieldValue)
 {
-  pworld_x = sizeX;
-  pworld_y = sizeY;
-  pworld_z = sizeZ;
-  m_magFieldValue = magFieldValue;
-  isInitialized = true;
+  //if (isInitialized)
+    //{
+      pworld_x = sizeX;
+      pworld_y = sizeY;
+      pworld_z = sizeZ;
+      m_magFieldValue = magFieldValue;
+    //-------------------------------------------------------------------------
+    // Create default material (air) for the world
+      G4Element* N  = new G4Element("worldDefaultN","N" , 7., 14.01*g/mole );
+      G4Element* O  = new G4Element("worldDefaultO"  ,"O" , 8., 16.00*g/mole);
+      G4Material* Air = new G4Material("worldDefaultAir"  , 1.290*mg/cm3, 2);
+      Air->AddElement(N, 0.7);
+      Air->AddElement(O, 0.3);
+    //-------------------------------------------------------------------------
+      pworld = new GateBox(GetName(), "worldDefaultAir",  pworld_x, pworld_y, pworld_z, true);
+      pworld->SetMaterialName("worldDefaultAir");
+  
+      isInitialized = true;
+    //}
+    //else {
+      //GateError("GateROGeometry::Initialize() error" << Gateendl <<
+	//	"Parameters of the RO geometry are already initialized");
+      //return;
+    //}
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -126,7 +136,7 @@ void GateROGeometry::Construct()
   pworldPhysicalVolume = pworld->GateVVolume::Construct();
   SetGeometryStatusFlag(geometry_is_uptodate);
   
-  G4TransportationManager::GetTransportationManager()->RegisterWorld(pworldPhysicalVolume);
+  G4TransportationManager::GetTransportationManager()->RegisterWorld(GetWorldVolume());
   sensitiveLogicalVolume = GetWorldVolume()->GetLogicalVolume();
   
   GateMessage("Physic", 1, " "<<Gateendl);
@@ -232,4 +242,19 @@ void GateROGeometry::BuildSurfaces()
 }
 #endif
 //---------------------------------------------------------------------------------
-  
+//---------------------------------------------------------------------------------
+/*PY Descourt 08/09/2008 */
+void GateROGeometry::insertARFSD( G4String aName , G4int stage )
+{
+  G4cout << " GateROGeometry::insertARFSD  entered " << Gateendl;
+
+  if ( m_ARFSD == 0 )
+    {
+      m_ARFSD = new GateARFSD("/gate/arf", aName );
+      SetSensitiveDetector(sensitiveLogicalVolume, m_ARFSD);
+      //G4SDManager* SDMan = G4SDManager::GetSDMpointer();
+      //SDMan->AddNewDetector( m_ARFSD );
+    }
+  m_ARFSD->SetStage( stage );
+}
+/*PY Descourt 08/09/2008 */  

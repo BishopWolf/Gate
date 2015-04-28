@@ -124,19 +124,19 @@ void GateDetectorMessenger::SetNewValue(G4UIcommand* command, G4String newValue)
 {   
    
   if (command == pMaterialDatabaseFilenameCmd ) {
-      pDetectorConstruction->AddFileToMaterialDatabase(newValue);
+      theROGeometry->AddFileToMaterialDatabase(newValue);
   }
   else if( command == pMagFieldCmd )
-    { pDetectorConstruction->SetMagField(pMagFieldCmd->GetNew3VectorValue(newValue));}
+    { theROGeometry->SetMagField(pMagFieldCmd->GetNew3VectorValue(newValue));}
  
   else if( command == pListCreatorsCmd )
-    { pDetectorConstruction->GetObjectStore()->ListCreators(); }
+    { theROGeometry->GetObjectStore()->ListCreators(); }
   else if( command == IoniCmd )
     {
       G4String matName;
       double value;
       GetStringAndValueFromCommand(command, newValue, matName, value);
-      pDetectorConstruction->SetMaterialIoniPotential(matName,value);
+      theROGeometry->SetMaterialIoniPotential(matName,value);
     }
   else
     G4UImessenger::SetNewValue(command,newValue);

@@ -196,7 +196,6 @@ void GateSETLEDoseActor::InitializeMaterialAndMuTable()
 
     GateVImageVolume* volume = dynamic_cast<GateVImageVolume*>(GetVolume());
     G4Region *region = G4RegionStore::GetInstance()->GetRegion(volume->GetObjectName());
-    GateDetectorConstruction *detectorConstruction = GateDetectorConstruction::GetGateDetectorConstruction();
     for(int x=0; x<mResolution.x(); x++)
     {
       for(int y=0; y<mResolution.y(); y++)
@@ -204,7 +203,7 @@ void GateSETLEDoseActor::InitializeMaterialAndMuTable()
 	for(int z=0; z<mResolution.z(); z++)
 	{
 	  voxelIndex = x+y*lineSize+z*planeSize;
-	  G4Material *material = detectorConstruction->GetMaterialDatabase().GetMaterial(volume->GetMaterialNameFromLabel(volume->GetImage()->GetValue(x,y,z)));
+	  G4Material *material = theMaterialDatabase.GetMaterial(volume->GetMaterialNameFromLabel(volume->GetImage()->GetValue(x,y,z)));
 	  mListOfMuTable[voxelIndex] = mMaterialHandler->GetMuTable(region->FindCouple(material));
 	}
       }

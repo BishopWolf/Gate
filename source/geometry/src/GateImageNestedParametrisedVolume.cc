@@ -119,7 +119,7 @@ G4LogicalVolume* GateImageNestedParametrisedVolume::ConstructOwnSolidAndLogicalV
   // G4LogicalVolume*
   logYRep =
     new G4LogicalVolume(voxelYSolid,
-			GateDetectorConstruction::GetGateDetectorConstruction()->GetMaterialDatabase().GetMaterial("Air"),
+			theMaterialDatabase.GetMaterial("Air"),
 			voxelYLogName);
   G4String voxelYPVname = GetObjectName() + "_voxel_phys_Y";
 
@@ -146,7 +146,7 @@ G4LogicalVolume* GateImageNestedParametrisedVolume::ConstructOwnSolidAndLogicalV
   // G4LogicalVolume*
   logXRep =
     new G4LogicalVolume(voxelXSolid,
-			GateDetectorConstruction::GetGateDetectorConstruction()->GetMaterialDatabase().GetMaterial("Air"),
+			theMaterialDatabase.GetMaterial("Air"),
 			voxelXLogName);
   G4String voxelXPVname = GetObjectName() + "_voxel_phys_X";
 
@@ -177,7 +177,7 @@ G4LogicalVolume* GateImageNestedParametrisedVolume::ConstructOwnSolidAndLogicalV
   // G4LogicalVolume*
   logZRep = 
     new G4LogicalVolume(voxelZSolid,
-                        GateDetectorConstruction::GetGateDetectorConstruction()->GetMaterialDatabase().GetMaterial("Air"),
+                        theMaterialDatabase.GetMaterial("Air"),
 			voxelZLogName);
   
   G4VPVParameterisation * voxelParam = 
@@ -285,7 +285,7 @@ void GateImageNestedParametrisedVolume::GetPhysVolForAVoxel(const G4int index,
 void GateImageNestedParametrisedVolume::PropagateGlobalSensitiveDetector()
 {
   if (m_sensitiveDetector) {
-    GatePhantomSD* phantomSD = GateDetectorConstruction::GetGateDetectorConstruction()->GetPhantomSD();
+    GatePhantomSD* phantomSD = theROGeometry->GetPhantomSD();
     logYRep->SetSensitiveDetector(phantomSD);
     logXRep->SetSensitiveDetector(phantomSD);
     logZRep->SetSensitiveDetector(phantomSD);

@@ -116,7 +116,7 @@ G4LogicalVolume* GateImageRegularParametrisedVolume::ConstructOwnSolidAndLogical
                           GetImage()->GetVoxelSize().y()/2.0,
                           GetImage()->GetVoxelSize().z()/2.0);
   G4Material * Vacuum =
-    GateDetectorConstruction::GetGateDetectorConstruction()->GetMaterialDatabase().GetMaterial("Vacuum");
+    theMaterialDatabase.GetMaterial("Vacuum");
   mVoxelLog = new G4LogicalVolume(mVoxelSolid, Vacuum, GetObjectName()+"_voxelLog", 0,0,0);
 
   // Create the main Parametrisation
@@ -167,7 +167,7 @@ void GateImageRegularParametrisedVolume::PrintInfo()
 void GateImageRegularParametrisedVolume::PropagateGlobalSensitiveDetector()
 {
   if (m_sensitiveDetector) {
-    GatePhantomSD* phantomSD = GateDetectorConstruction::GetGateDetectorConstruction()->GetPhantomSD();
+    GatePhantomSD* phantomSD = theROGeometry->GetPhantomSD();
     mVoxelLog->SetSensitiveDetector(phantomSD);
   }
 }

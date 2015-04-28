@@ -379,7 +379,7 @@ void GateVVolume::AttachCrystalSD()
     AttachOutputToVolume();
   */
   // Retrieve the crystal-SD pointer from the detector-construction
-  GateCrystalSD* crystalSD = GateDetectorConstruction::GetGateDetectorConstruction()->GetCrystalSD();
+  GateCrystalSD* crystalSD = theROGeometry->GetCrystalSD();
 
 
   // Check whether this attachement is allowed or forbidden
@@ -410,7 +410,7 @@ void GateVVolume::AttachPhantomSD()
   AttachOutputToVolume();
   */
   // Retrieve the phantom-SD pointer from the detector-construction, and store this pointer //
-  GatePhantomSD* phantomSD = GateDetectorConstruction::GetGateDetectorConstruction()->GetPhantomSD();
+  GatePhantomSD* phantomSD = theROGeometry->GetPhantomSD();
 
   // If the attachement is allowed, store the crystal-SD pointer
   m_sensitiveDetector = phantomSD;
@@ -536,7 +536,7 @@ void GateVVolume::DefineOwnMaterials()
 {
 
   // Retrieve the material pointer from the material database
-  pOwnMaterial = GateDetectorConstruction::GetGateDetectorConstruction()->GetMaterialDatabase().GetMaterial(mMaterialName);
+  pOwnMaterial = theMaterialDatabase.GetMaterial(mMaterialName);
   // If we could not get the material, it is unsafe to proceed: abort!
   if (!pOwnMaterial)
     G4Exception( "GateVVolume::DefineOwnMaterials", "DefineOwnMaterials", FatalException, "GateVVolume::DefineOwnMaterials: \n"
@@ -622,7 +622,7 @@ void GateVVolume::Describe(size_t indent)
 void GateVVolume::AttachARFSD()
 {
   // Retrieve the crystal-SD pointer from the detector-construction
-  GateARFSD* arfSD = GateDetectorConstruction::GetGateDetectorConstruction()->GetARFSD();
+  GateARFSD* arfSD = theROGeometry->GetARFSD();
 
   // Check whether this attachement is allowed or forbidden
   if (arfSD->PrepareCreatorAttachment(this)) {

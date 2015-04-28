@@ -187,8 +187,7 @@ void GateGPUSPECTActor::ResetData() {
   std::vector<G4Material*> m;
   m.push_back((G4Material*)vol->GetMaterial());
 
-  G4Material* colli_mat = GateDetectorConstruction::GetGateDetectorConstruction()
-  								->GetMaterialDatabase().GetMaterial(mHoleHexaMat);
+  G4Material* colli_mat = theMaterialDatabase.GetMaterial(mHoleHexaMat);
 
   m.push_back((G4Material*)colli_mat);
 

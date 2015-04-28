@@ -21,15 +21,19 @@
 #include "GateMaterialDatabase.hh"
 #include "GateCrystalSD.hh"
 #include "GatePhantomSD.hh"
+#include "GateRTPhantomMgr.hh"
 
 #include "globals.hh"
 
 class G4UniformMagField;
+class G4Box;
+class G4LogicalVolume;
+class G4VPhysicalVolume;
+class G4Material;
 class GateObjectStore;
 class GateVVolume;
 class GateBox;
-
-#define theMaterialDatabase GateROGeometry::GetGateROGeometry()->mMaterialDatabase
+class GateARFSD;
 
 class GateROGeometry : public G4VUserParallelWorld
 {
@@ -51,10 +55,12 @@ public:
   inline GateObjectStore* GetObjectStore()  { return pcreatorStore; }
   inline virtual void SetGeometryStatusFlag(GeometryStatus val)  { nGeometryStatus = val; }
   inline virtual G4bool GetGeometryStatusFlag()  { return nGeometryStatus; }
-  static GateROGeometry* GetGateROGeometry()
-  {
-    return pTheGateROGeometry;
-  };
+  
+  /* PY Descourt 08/09/2009 */
+  GateARFSD* GetARFSD(){ return m_ARFSD;};
+  void insertARFSD( G4String , G4int );
+  /* PY Descourt 08/09/2009 */
+
   virtual void SetMagField (G4ThreeVector);
   virtual void BuildMagField ();
     /// The Material database
@@ -84,7 +90,7 @@ private:
   GateCrystalSD*   m_crystalSD;
   GatePhantomSD*   m_phantomSD;
   GateObjectStore* pcreatorStore;
-  //GateDetectorConstruction * pdet;
+
   G4double pworld_x;
   G4double pworld_y;
   G4double pworld_z;
@@ -95,12 +101,16 @@ private:
   G4UniformMagField* m_magField;
   G4ThreeVector      m_magFieldValue;
   
-  static GateROGeometry* pTheGateROGeometry;
   G4VPhysicalVolume*  pworldPhysicalVolume;
   G4LogicalVolume* sensitiveLogicalVolume;
   
 protected:
   std::map<G4String,G4double> theListOfIonisationPotential;
+  
+private:
+
+  GateARFSD* m_ARFSD; // PY Descourt 8/09/2009
+  GateRTPhantomMgr* m_RTPhantomMgr; // PY Descourt 08/09/2009
 };
 
 #endif
