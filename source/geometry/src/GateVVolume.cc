@@ -379,7 +379,7 @@ void GateVVolume::AttachCrystalSD()
     AttachOutputToVolume();
   */
   // Retrieve the crystal-SD pointer from the detector-construction
-  GateCrystalSD* crystalSD = theROGeometry->GetCrystalSD();
+  GateCrystalSD* crystalSD = theDetectorConstruction->GetCrystalSD();
 
 
   // Check whether this attachement is allowed or forbidden
@@ -410,7 +410,7 @@ void GateVVolume::AttachPhantomSD()
   AttachOutputToVolume();
   */
   // Retrieve the phantom-SD pointer from the detector-construction, and store this pointer //
-  GatePhantomSD* phantomSD = theROGeometry->GetPhantomSD();
+  GatePhantomSD* phantomSD = theDetectorConstruction->GetPhantomSD();
 
   // If the attachement is allowed, store the crystal-SD pointer
   m_sensitiveDetector = phantomSD;
@@ -622,7 +622,7 @@ void GateVVolume::Describe(size_t indent)
 void GateVVolume::AttachARFSD()
 {
   // Retrieve the crystal-SD pointer from the detector-construction
-  GateARFSD* arfSD = theROGeometry->GetARFSD();
+  GateARFSD* arfSD = theDetectorConstruction->GetARFSD();
 
   // Check whether this attachement is allowed or forbidden
   if (arfSD->PrepareCreatorAttachment(this)) {

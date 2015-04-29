@@ -285,7 +285,7 @@ void GateImageNestedParametrisedVolume::GetPhysVolForAVoxel(const G4int index,
 void GateImageNestedParametrisedVolume::PropagateGlobalSensitiveDetector()
 {
   if (m_sensitiveDetector) {
-    GatePhantomSD* phantomSD = theROGeometry->GetPhantomSD();
+    GatePhantomSD* phantomSD = theDetectorConstruction->GetPhantomSD();
     logYRep->SetSensitiveDetector(phantomSD);
     logXRep->SetSensitiveDetector(phantomSD);
     logZRep->SetSensitiveDetector(phantomSD);

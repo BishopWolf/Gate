@@ -25,7 +25,7 @@ GateSPECTHeadSystem::GateSPECTHeadSystem(const G4String& itsName)
   m_gateToInterfile(0)
 {
   m_ARFStage = -2;
-  theROGeometry->insertARFSD(GetObjectName(),m_ARFStage);
+  theDetectorConstruction->insertARFSD(GetObjectName(),m_ARFStage);
   
   // Setup a messenger
   m_messenger = new GateClockDependentMessenger(this);
@@ -73,7 +73,7 @@ void GateSPECTHeadSystem::setARFStage(G4String thestage)
  else if ( thestage == "computeTables" ) m_ARFStage = 1;			 
  else if ( thestage == "useTables" )  m_ARFStage = 2;
 
- GateARFSD* ARFSD = theROGeometry->GetARFSD();
+ GateARFSD* ARFSD = theDetectorConstruction->GetARFSD();
  
 if ( ARFSD != 0 ) ARFSD->SetStage( m_ARFStage );
 

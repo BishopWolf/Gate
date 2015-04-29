@@ -91,12 +91,11 @@ void GateProjectionSet::Reset(size_t energyWindowNumber, size_t headNumber,size_
   if ( (!m_energyWindowNb) || (!m_headNb) || (!m_projectionNb) )
     return;
 
-GateDetectorConstruction* theDC = GateDetectorConstruction::GetGateDetectorConstruction();
-GateROGeometry* theROGeom = theDC->GetGateROGeometry();
+GateDetectorConstruction* theDC = theDetectorConstruction;
 
 G4int stage = -2;
 
-if ( theROGeom->GetARFSD() != 0  ) stage = theROGeom->GetARFSD()->GetStage();
+if ( theDC->GetARFSD() != 0  ) stage = theDC->GetARFSD()->GetStage();
 
 if ( stage == 2 )
 {
@@ -175,13 +174,12 @@ void GateProjectionSet::ClearData(size_t projectionID)
   // Store the projection ID
   m_currentProjectionID = projectionID;
 
-  GateDetectorConstruction* theDC = GateDetectorConstruction::GetGateDetectorConstruction();
-  GateROGeometry* theROGeom = theDC->GetGateROGeometry();
+  GateDetectorConstruction* theDC = theDetectorConstruction;
 G4int arfstage = -3;
 
 
   // Clear the data sets
-  if ( theROGeom->GetARFSD() != 0 ) arfstage = theROGeom->GetARFSD()->GetStage();
+  if ( theDC->GetARFSD() != 0 ) arfstage = theDC->GetARFSD()->GetStage();
 
 if ( arfstage  == 2 )
 {

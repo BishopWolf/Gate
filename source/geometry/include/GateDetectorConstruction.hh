@@ -18,15 +18,24 @@
 #include "GatePhantomSD.hh"
 #include "GateObjectMoveListMessenger.hh"
 #include "GatePhysicsList.hh"
+#include "GateRTPhantomMgr.hh"
 #include "GateROGeometry.hh"
 
+class G4UniformMagField;
 class GateObjectStore;
-class GateDetectorMessenger;
-class GateSystemListManager;
+class G4Box;
+class G4LogicalVolume;
 class G4VPhysicalVolume;
+class G4Material;
+class GateDetectorMessenger;
+class GateVVolume;
+class GateBox;
+class GateSystemListManager;
+class GateARFSD;
+class GateROGeometry;
 
-#define theROGeometry GateDetectorConstruction::GetGateDetectorConstruction()->GetGateROGeometry()
-#define theMaterialDatabase theROGeometry->mMaterialDatabase
+#define theDetectorConstruction GateDetectorConstruction::GetGateDetectorConstruction()
+#define theMaterialDatabase theDetectorConstruction->mMaterialDatabase
 
 class GateDetectorConstruction : public G4VUserDetectorConstruction
 {
@@ -38,6 +47,23 @@ public:
 
   virtual G4VPhysicalVolume* Construct();
   virtual void UpdateGeometry();
+  void InitializeROGeometry();
+  virtual void SetMagField (G4ThreeVector);
+  virtual void BuildMagField ();
+
+  /* PY Descourt 08/09/2009 */
+  GateARFSD* GetARFSD(){ return m_ARFSD;};
+  void insertARFSD( G4String , G4int );
+  /* PY Descourt 08/09/2009 */
+
+
+#ifdef GATE_USE_OPTICAL
+  virtual void BuildSurfaces();
+#endif
+
+  // Material DB
+  /// Mandatory : Adds a Material Database to use (filename, callback for Messenger)
+  void AddFileToMaterialDatabase(const G4String& f);
 
   static GateDetectorConstruction* GetGateDetectorConstruction()
   {
@@ -45,15 +71,10 @@ public:
   };
 
   inline G4VPhysicalVolume*   GetWorldVolume()
-  { return pworld->GetWorldVolume(); }
+  { return pworldPhysicalVolume; }
 
   inline GateObjectStore* GetObjectStore()
-  { return pworld->GetObjectStore(); }
-  
-  inline GateROGeometry* GetGateROGeometry()
-  { return pworld; }
-  
-  inline void SetMagField (G4ThreeVector theVector){pworld->SetMagField(theVector);}
+  { return pcreatorStore; }
 
   enum GeometryStatus {
     geometry_is_uptodate = 0,
@@ -79,29 +100,61 @@ public:
   virtual inline void SetFlagMove(G4bool val)  { moveFlag = val; };
 
   virtual inline G4bool GetFlagMove() const { return moveFlag; };
-  
+
+  /// The Material database
+  GateMaterialDatabase mMaterialDatabase;
+
+  inline GateCrystalSD* GetCrystalSD()
+  { return m_crystalSD; }
+
+
+  inline GatePhantomSD*   GetPhantomSD()
+  { return m_phantomSD; }
+
   //private:
 
   virtual void DestroyGeometry();
 
+  //void SetIonisationPotential(G4String n, G4double v){mMaterialDatabase.SetMaterialIoniPotential(n,v);}
+
+  void SetMaterialIoniPotential(G4String n,G4double v){theListOfIonisationPotential[n]=v;}
+  G4double GetMaterialIoniPotential(G4String n){ return theListOfIonisationPotential[n];}
+
 private :
 
-  GateROGeometry* pworld;
+  GateBox* pworld;
+  G4VPhysicalVolume* pworldPhysicalVolume;
+  G4LogicalVolume* pworldLogicalVolume;
+  GateROGeometry* pworldROGeometry;
 
   GeometryStatus nGeometryStatus;
   G4bool flagAutoUpdate;
 
+  GateCrystalSD*   m_crystalSD;
+  GatePhantomSD*   m_phantomSD;
+
+  GateObjectStore* pcreatorStore;
   GateSystemListManager*  psystemStore;
 
   // Pour utiliser le DetectorMessenger
   GateDetectorMessenger* pdetectorMessenger;  //pointer to the Messenger
 
   static GateDetectorConstruction* pTheGateDetectorConstruction;
-  
+
 protected :
   //!< List of movements
   G4bool moveFlag;
 
+  std::map<G4String,G4double> theListOfIonisationPotential;
+
+
+private:
+  //! Magnetic field
+  G4UniformMagField* m_magField;
+  G4ThreeVector      m_magFieldValue;
+
+  GateARFSD* m_ARFSD; // PY Descourt 8/09/2009
+  GateRTPhantomMgr* m_RTPhantomMgr; // PY Descourt 08/09/2009
 };
 
 #endif

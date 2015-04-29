@@ -305,18 +305,18 @@ int main( int argc, char* argv[] )
 
   // Set the DetectorConstruction
   GateDetectorConstruction* gateDC = new GateDetectorConstruction();
-#ifdef G4MULTITHREADED
-  G4String parallelWorldName = "ParallelWorld";
-  GateROGeometry* ParallelWorld = new GateROGeometry(parallelWorldName);       
-  gateDC->RegisterParallelWorld(ParallelWorld);
-#endif 
+//#ifdef G4MULTITHREADED
+//  G4String parallelWorldName = "ParallelWorld";
+//  GateROGeometry* ParallelWorld = new GateROGeometry(parallelWorldName);       
+//  gateDC->RegisterParallelWorld(ParallelWorld);
+//#endif 
   runManager->SetUserInitialization( gateDC );
 
   // Set the PhysicsList
   GatePhysicsList* physicsList = GatePhysicsList::GetInstance();
-#ifdef G4MULTITHREADED
-  physicsList->RegisterPhysics(new G4ParallelWorldPhysics(parallelWorldName));//This is for G4VModularPhysicsList only
-#endif   
+//#ifdef G4MULTITHREADED
+//  physicsList->RegisterPhysics(new G4ParallelWorldPhysics(parallelWorldName));//This is for G4VModularPhysicsList only
+//#endif   
   runManager->SetUserInitialization( physicsList );
 
   // Set the users actions to handle callback for actors - before the initialisation

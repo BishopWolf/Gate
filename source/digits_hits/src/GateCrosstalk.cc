@@ -225,7 +225,7 @@ GateVolumeID GateCrosstalk::CreateVolumeID(const GateVolumeID* aVolumeID, G4int 
 
 GateOutputVolumeID GateCrosstalk::CreateOutputVolumeID(const GateVolumeID aVolumeID)
 {
-  GateOutputVolumeID anOutputVolumeID = theROGeometry->GetCrystalSD()->GetSystem()->ComputeOutputVolumeID(aVolumeID);
+  GateOutputVolumeID anOutputVolumeID = theDetectorConstruction->GetCrystalSD()->GetSystem()->ComputeOutputVolumeID(aVolumeID);
   return anOutputVolumeID;
 }
 

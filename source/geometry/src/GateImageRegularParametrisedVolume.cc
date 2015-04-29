@@ -167,7 +167,7 @@ void GateImageRegularParametrisedVolume::PrintInfo()
 void GateImageRegularParametrisedVolume::PropagateGlobalSensitiveDetector()
 {
   if (m_sensitiveDetector) {
-    GatePhantomSD* phantomSD = theROGeometry->GetPhantomSD();
+    GatePhantomSD* phantomSD = theDetectorConstruction->GetPhantomSD();
     mVoxelLog->SetSensitiveDetector(phantomSD);
   }
 }

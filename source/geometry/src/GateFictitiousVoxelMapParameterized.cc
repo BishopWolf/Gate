@@ -141,7 +141,7 @@ void GateFictitiousVoxelMapParameterized::AttachPhantomSD()
 	m_voxelInserter->GetCreator()->AttachPhantomSD();
 
 	GatePETVRTSettings* settings= GatePETVRTManager::GetInstance()->GetOrCreatePETVRTSettings();
-	settings->RegisterPhantomSD ( theROGeometry->GetPhantomSD(),false );
+	settings->RegisterPhantomSD ( theDetectorConstruction->GetPhantomSD(),false );
 
 
 	if ( verboseLevel>=1 )

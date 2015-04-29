@@ -41,55 +41,11 @@ public:
   GateROGeometry(G4String);
   virtual ~GateROGeometry();
   
-  enum GeometryStatus {
-    geometry_is_uptodate = 0,
-    geometry_needs_update = 1,
-    geometry_needs_rebuild = 2
-  };
-
-  virtual void Construct();
-  virtual void ConstructSD();
-  void Initialize(G4double, G4double, G4double, G4ThreeVector);
-  inline G4VPhysicalVolume* GetWorldVolume() {return pworldPhysicalVolume;}
-  //inline G4VPhysicalVolume* GetWorldVolume() {return this->GetWorld();}
-  inline GateObjectStore* GetObjectStore()  { return pcreatorStore; }
-  inline virtual void SetGeometryStatusFlag(GeometryStatus val)  { nGeometryStatus = val; }
-  inline virtual G4bool GetGeometryStatusFlag()  { return nGeometryStatus; }
-  
-  /* PY Descourt 08/09/2009 */
-  GateARFSD* GetARFSD(){ return m_ARFSD;};
-  void insertARFSD( G4String , G4int );
-  /* PY Descourt 08/09/2009 */
-
-  virtual void SetMagField (G4ThreeVector);
-  virtual void BuildMagField ();
-    /// The Material database
-  GateMaterialDatabase mMaterialDatabase;
-  // Material DB
-  /// Mandatory : Adds a Material Database to use (filename, callback for Messenger)
-  void AddFileToMaterialDatabase(const G4String& f);
-
-  inline GateCrystalSD* GetCrystalSD()
-  { return m_crystalSD; }
-
-  inline GatePhantomSD*   GetPhantomSD()
-  { return m_phantomSD; }
-  
-#ifdef GATE_USE_OPTICAL
-  virtual void BuildSurfaces();
-#endif
-  
-  void SetMaterialIoniPotential(G4String n,G4double v){theListOfIonisationPotential[n]=v;}
-  G4double GetMaterialIoniPotential(G4String n){ return theListOfIonisationPotential[n];}
-  
-  virtual void DestroyGeometry();
+  void Initialize(GateBox*, G4VPhysicalVolume*);
+  void UpdateROGeometry();
   
 private:
   GateBox* pworld;
-  GeometryStatus nGeometryStatus;
-  GateCrystalSD*   m_crystalSD;
-  GatePhantomSD*   m_phantomSD;
-  GateObjectStore* pcreatorStore;
 
   G4double pworld_x;
   G4double pworld_y;
@@ -97,20 +53,11 @@ private:
   G4bool isBuilt;
   G4bool isInitialized;
   
-    //! Magnetic field
-  G4UniformMagField* m_magField;
-  G4ThreeVector      m_magFieldValue;
-  
   G4VPhysicalVolume*  pworldPhysicalVolume;
   G4LogicalVolume* sensitiveLogicalVolume;
   
-protected:
-  std::map<G4String,G4double> theListOfIonisationPotential;
-  
-private:
-
-  GateARFSD* m_ARFSD; // PY Descourt 8/09/2009
-  GateRTPhantomMgr* m_RTPhantomMgr; // PY Descourt 08/09/2009
+  virtual void Construct();
+  virtual void ConstructSD();
 };
 
 #endif
