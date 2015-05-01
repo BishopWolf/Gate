@@ -323,7 +323,7 @@ void GateAnalysis::RecordEndOfEvent(const G4Event* event)
           TrackingMode theMode =( (GateSteppingAction *)(GateRunManager::GetRunManager()->GetUserSteppingAction() ) )->GetMode();
 
           if (  theMode == kTracker ) // in tracker mode we store the infos about the number of compton and rayleigh
-            { // G4cout << " GateAnalysis eventID "<<eventID<<Gateendl;
+            { // G4cout << " GateAnalysis eventID "<<eventID<< Gateendl;
               GateToRoot* gateToRoot = (GateToRoot*) (GateOutputMgr::GetInstance()->GetModule("root"));
               ComptonRayleighData aCRData;
               aCRData.photon1_phantom_Rayleigh = photon1_phantom_Rayleigh;

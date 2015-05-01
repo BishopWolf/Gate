@@ -201,7 +201,7 @@ void GateVVolume::ConstructGeometry(G4LogicalVolume* mother_log, G4bool flagUpda
 
   if (GetLogicalVolumeName()  != "world_log" && GetLogicalVolumeName().find("Voxel_log") == G4String::npos) {
     // Construct and add the region
-    GateMessage("Cuts",9, "- Building associated region " <<GetObjectName() <<Gateendl);
+    GateMessage("Cuts",9, "- Building associated region " <<GetObjectName() << Gateendl);
     G4Region* aRegion = G4RegionStore::GetInstance()->FindOrCreateRegion(GetObjectName());
     //G4Region* aRegion = new G4Region(GetObjectName());
     pOwnLog->SetRegion(aRegion);
@@ -310,7 +310,7 @@ void GateVVolume::ConstructOwnPhysicalVolume(G4bool flagUpdateOnly)
     G4RotationMatrix *newRotationMatrix = (rotationMatrix.isIdentity()) ? 0 : new G4RotationMatrix(rotationMatrix);
 
     //     GateMessage("Geometry", 5, " copyNumber = " << copyNumber << " flagUpdateOnly = " << flagUpdateOnly << " pOwnPhys exists ? = "
-    //                 << pOwnPhys << " m_repeaterList = " <<m_repeaterList<<Gateendl;);
+    //                 << pOwnPhys << " m_repeaterList = " <<m_repeaterList<< Gateendl;);
 
     pOwnPhys = GetPhysicalVolume(copyNumber);
 
@@ -631,7 +631,7 @@ void GateVVolume::AttachARFSD()
     return;
   }
 
-  G4cout << " GateVObjectCreator::AttachARFSD() :::: created an attachment to ARF Sensitive Detector " << arfSD<<Gateendl;
+  G4cout << " GateVObjectCreator::AttachARFSD() :::: created an attachment to ARF Sensitive Detector " << arfSD<< Gateendl;
 
   // If the attachement is allowed, store the crystal-SD pointer
   m_sensitiveDetector = arfSD;

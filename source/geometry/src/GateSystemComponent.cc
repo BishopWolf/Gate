@@ -658,19 +658,19 @@ void GateSystemComponent::setInCoincidenceWith(G4String aRsectorName )
 {
   size_t pos = GetObjectName().rfind( "/");
   G4String thename = GetObjectName().substr( pos + 1);
-  G4cout << " my name is  " << thename<<Gateendl;
+  G4cout << " my name is  " << thename<< Gateendl;
    if ( thename ==  aRsectorName ) return;
 
 
       G4cout << " GateSystemComponent::setInCoincidenceWith  entered  for " <<GetObjectName()<< Gateendl;
-      G4cout << " rsector name parameter " << aRsectorName<<Gateendl;
+      G4cout << " rsector name parameter " << aRsectorName<< Gateendl;
 
    if ( m_coincidence_rsector.empty() != 1 )
     {
        std::vector<G4String>::iterator it;
        G4cout << " vector is not empty  looking for " << aRsectorName<< Gateendl;
-       G4cout << " it contains " <<Gateendl;
-       for (size_t i = 0; i < m_coincidence_rsector.size(); i++ ) G4cout << m_coincidence_rsector[i]<<"  ";       G4cout<<Gateendl;
+       G4cout << " it contains \n";
+       for (size_t i = 0; i < m_coincidence_rsector.size(); i++ ) G4cout << m_coincidence_rsector[i]<<"  ";       G4cout<< Gateendl;
        it = std::find( m_coincidence_rsector.begin() , m_coincidence_rsector.end
 () , aRsectorName );
        if ( it == m_coincidence_rsector.end() )        {
@@ -682,7 +682,7 @@ aRsectorName );
            for (size_t i = 0; i < m_coincidence_rsector.size(); i++ )theComponent
 ->setInCoincidenceWith( m_coincidence_rsector[i] );
            G4cout<<"GateSystemComponent::setInCoincidenceWith() :: setting " << 
-thename<< " in coincidence with " << aRsectorName <<Gateendl;
+thename<< " in coincidence with " << aRsectorName << Gateendl;
          }         else G4cout<<"GateSystemComponent::setInCoincidenceWith() :: WARNING Component named " <<aRsectorName<<" was not found. Ignored.";
         } else { G4cout << "already found  exiting \n";return; }
     }     else
@@ -693,7 +693,7 @@ thename<< " in coincidence with " << aRsectorName <<Gateendl;
              {size_t pos = GetObjectName().rfind( "/");
               G4String thename = GetObjectName().substr( pos + 1 );
              m_coincidence_rsector.push_back( aRsectorName );
-             G4cout<<"GateSystemComponent::setInCoincidenceWith() :: setting " <<thename << " in coincidence with " << aRsectorName <<Gateendl;             theComponent->setInCoincidenceWith( thename );
+             G4cout<<"GateSystemComponent::setInCoincidenceWith() :: setting " <<thename << " in coincidence with " << aRsectorName << Gateendl;             theComponent->setInCoincidenceWith( thename );
              }
              else G4cout<<"GateSystemComponent::setInCoincidenceWith() :: WARNING Component named " <<aRsectorName<<" was not found. Ignored.\n";
            }
