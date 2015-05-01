@@ -51,7 +51,7 @@ void GatePulseAdderCompton::ProcessOnePulse(const GatePulse* inputPulse,GatePuls
 
 				if (nVerboseLevel>1)
 					G4cout << "Discarded electronic pulse for volume " << inputPulse->GetVolumeID()
-					<< " with no previous photonic interaction in that Volume ID\n" << Gateendl ;
+					<< " with no previous photonic interaction in that Volume ID\n" ;
 			}
 			else
 			{

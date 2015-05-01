@@ -182,7 +182,7 @@ G4int GateARFSD::PrepareCreatorAttachment(GateVVolume* aCreator)
     G4cout  << Gateendl << Gateendl << "[GateARFSD::PrepareCreatorAttachment]:\n"
      << "Volume '" << aCreator->GetObjectName() << "' does not belong to any system.\n"
            << "Your volume must belong to a system to be used with a GeomColliSD.\n"
-     << "Attachment request ignored --> you won't have any hit output from this volume!!!\n" << Gateendl;
+     << "Attachment request ignored --> you won't have any hit output from this volume!!!\n";
     return -1;
   }
 
@@ -191,7 +191,7 @@ G4int GateARFSD::PrepareCreatorAttachment(GateVVolume* aCreator)
       G4cout  << Gateendl << Gateendl << "[GateARFSD::PrepareCreatorAttachment]:\n"
        << "Volume '" << aCreator->GetObjectName() << "' belongs to system '" << creatorSystem->GetObjectName() << "'\n"
              << "while the GeomColliSD has already been attached to a volume from another system ('" << m_system->GetObjectName()<< "').\n"
-       << "Attachment request ignored --> you won't have any hit output from this volume!!!\n" << Gateendl;
+       << "Attachment request ignored --> you won't have any hit output from this volume!!!\n";
       return -1;
     }
   }

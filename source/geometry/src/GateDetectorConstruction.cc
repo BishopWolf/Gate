@@ -244,13 +244,13 @@ void GateDetectorConstruction::UpdateGeometry()
 //---------------------------------------------------------------------------------
 void GateDetectorConstruction::DestroyGeometry()
 {
-  GateMessage("Geometry", 4,"Geometry is going to be destroyed. \n");
+  GateMessageInc("Geometry", 4,"Geometry is going to be destroyed. \n");
 
   pworld->DestroyGeometry();
   nGeometryStatus = geometry_needs_rebuild;
 
   GateMessage("Geometry", 4,"nGeometryStatus = geometry_needs_rebuild     \n");
-  GateMessage("Geometry", 4,"Geometry has been destroyed.\n");
+  GateMessageDec("Geometry", 4,"Geometry has been destroyed.\n");
 }
 //---------------------------------------------------------------------------------
 

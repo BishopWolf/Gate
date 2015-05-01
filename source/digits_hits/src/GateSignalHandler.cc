@@ -20,24 +20,24 @@ G4int GateSignalHandler::Install()
 {
   // Set the SIGQUIT signal handler to QuitSignalHandler
   if (signal(SIGQUIT,QuitSignalHandler) == SIG_ERR) {
-    G4cerr << Gateendl << "Warning! Could not install handler for CTRL-\\ (SIGQUIT)!\n" << Gateendl;
+    G4cerr << Gateendl << "Warning! Could not install handler for CTRL-\\ (SIGQUIT)!\n";
     return -1;
   }
   if (signal(SIGXCPU,QuitSignalHandler) == SIG_ERR) {
-    G4cerr << Gateendl << "Warning! Could not install handler for SIGXCPU!\n" << Gateendl;
+    G4cerr << Gateendl << "Warning! Could not install handler for SIGXCPU!\n";
     return -1;
   }
   if (signal(SIGUSR1,QuitSignalHandler) == SIG_ERR) {
-    G4cerr << Gateendl << "Warning! Could not install handler for SIGUSR1!\n" << Gateendl;
+    G4cerr << Gateendl << "Warning! Could not install handler for SIGUSR1!\n";
     return -1;
   }
   if (signal(SIGUSR2,PrintSimulationStatus) == SIG_ERR) {
-    G4cerr << Gateendl << "Warning! Could not install handler for SIGUSR2!\n" << Gateendl;
+    G4cerr << Gateendl << "Warning! Could not install handler for SIGUSR2!\n";
     return -1;
   }
 #ifdef __APPLE__
   if (signal(SIGINFO,PrintSimulationStatus) == SIG_ERR) {
-    G4cerr << Gateendl << "Warning! Could not install handler for SIGINFO!\n" << Gateendl;
+    G4cerr << Gateendl << "Warning! Could not install handler for SIGINFO!\n";
     return -1;
   }
 #endif
@@ -86,7 +86,7 @@ void GateSignalHandler::QuitSignalHandler(int sig)
     case G4State_EventProc:
 
       // If a beamOn/StartDAQ is running, launch abort sequence
-      G4cerr << "--- Aborting run/acquisition! ---\n" << Gateendl;
+      G4cerr << "--- Aborting run/acquisition! ---\n";
 
       GateRunManager::GetRunManager()->AbortRun(true);
 
@@ -102,7 +102,7 @@ void GateSignalHandler::QuitSignalHandler(int sig)
     default:
       // If no beamOn/StartDAQ is running, ignore the signal
       G4cerr << "Signal received in state '" << stateManager->GetStateString(state) << "' "
-      	     << " --> ignored!\n" << Gateendl;
+      	     << " --> ignored!\n";
       break;
   }
 }

@@ -83,12 +83,12 @@ void GateROGeometry::Initialize(GateBox* mBox, G4VPhysicalVolume* mPhysicalVolum
 
 void GateROGeometry::Construct()
 {
-  GateMessage("Geometry", 1, "GateROGeometry instantiating..." << Gateendl);
+  GateMessage("Geometry", 1, "GateROGeometry instantiating...\n");
   GateMessage("Geometry", 5, " GateROGeometry constructor -- begin ");
   
   if (!isInitialized)
     {
-      GateError("GateROGeometry::Construct() error" << Gateendl <<
+      GateError("GateROGeometry::Construct() error\n" <<
 		"Parameters of the RO geometry are not initialized");
       return;
     }

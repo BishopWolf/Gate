@@ -385,7 +385,7 @@ void GateVVolume::AttachCrystalSD()
   // Check whether this attachement is allowed or forbidden
   if (crystalSD->PrepareCreatorAttachment(this)) {
     G4cout  << "[GateVVolume::AttachCrystalSD]:\n"
-	    << "Can not attach crystalSD!\n" << Gateendl;
+	    << "Can not attach crystalSD!\n";
     return;
   }
 
@@ -627,7 +627,7 @@ void GateVVolume::AttachARFSD()
   // Check whether this attachement is allowed or forbidden
   if (arfSD->PrepareCreatorAttachment(this)) {
     G4cout  << "[GateVObjectCreator::AttachARFSD]:\n"
-	    << "Can not attach ARFSD!\n" << Gateendl;
+	    << "Can not attach ARFSD!\n";
     return;
   }
 

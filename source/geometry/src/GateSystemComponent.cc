@@ -153,7 +153,7 @@ void GateSystemComponent::SetCreator(GateVVolume* anCreator)
   
   if (!creatorInserter) {
        G4cerr   << "[" << GetObjectName() << "::IsValidAttachmentRequest]:\n"
-                << "\tThe creator is not a valid creator creator!\n" << Gateendl;
+                << "\tThe creator is not a valid creator creator!\n";
       return;
   }
 
@@ -167,7 +167,7 @@ void GateSystemComponent::SetCreator(GateVVolume* anCreator)
  
   if (!IsValidAttachmentRequest(creatorInserter))  {
        G4cerr   << "[" << GetObjectName() << "::SetInserter]:\n"
-                << "\tIgnoring attachment request\n" << Gateendl;
+                << "\tIgnoring attachment request\n";
       return;
   }
 
@@ -203,7 +203,7 @@ G4bool GateSystemComponent::IsValidAttachmentRequest(GateVVolume* anCreator) con
   // Check that the creator pointer is valid
   if (!anCreator) {
        G4cerr   << "[" << GetObjectName() << "::IsValidAttachmentRequest]:\n"
-                << "\tThe creator is null!\n" << Gateendl;
+                << "\tThe creator is null!\n";
       return false;
   }
 
@@ -212,7 +212,7 @@ G4bool GateSystemComponent::IsValidAttachmentRequest(GateVVolume* anCreator) con
   // Disrecard the request if an creator is already attached to us
   if (m_creator ) {
       G4cerr << "[" << GetObjectName() << "::IsValidAttachmentRequest]:\n"
-      	     << "\tA volume creator ('" << m_creator->GetObjectName() << "') is already attached to this system component\n" << Gateendl;
+      	     << "\tA volume creator ('" << m_creator->GetObjectName() << "') is already attached to this system component\n";
       return false;
   }
 
@@ -227,7 +227,7 @@ G4bool GateSystemComponent::IsValidAttachmentRequest(GateVVolume* anCreator) con
     if ( creatorSystem != GetSystem() ) {
       G4cerr  << "[" << GetObjectName() << "::IsValidAttachmentRequest]:\n"
       	      << "\tThe volume creator '" << anCreator->GetObjectName() << "' or one of its ancestors is already attached to another system ('" 
-	      << creatorSystem->GetObjectName() << "')\n" << Gateendl;
+	      << creatorSystem->GetObjectName() << "')\n";
     return false;
   }
 //G4cout << " Test3\n";
@@ -235,7 +235,7 @@ G4bool GateSystemComponent::IsValidAttachmentRequest(GateVVolume* anCreator) con
   GateObjectRepeaterList* moveList = anCreator->GetMoveList();
   if (!moveList) {
        G4cerr   << "[" << GetObjectName() << "::IsValidAttachmentRequest]:\n"
-                << "\tThe creator '" << anCreator->GetObjectName() << "' can not be displaced!\n" << Gateendl;
+                << "\tThe creator '" << anCreator->GetObjectName() << "' can not be displaced!\n";
       return false;
   }
 //G4cout << " Test4\n";
@@ -243,7 +243,7 @@ G4bool GateSystemComponent::IsValidAttachmentRequest(GateVVolume* anCreator) con
   GateObjectRepeaterList* repeaterList = anCreator->GetRepeaterList();
   if (!repeaterList) {
        G4cerr   << "[" << GetObjectName() << "::IsValidAttachmentRequest]:\n"
-                << "\tThe creator '" << anCreator->GetObjectName() << "' can not be repeated!\n" << Gateendl;
+                << "\tThe creator '" << anCreator->GetObjectName() << "' can not be repeated!\n";
       return false;
   }
   //G4cout << " FIN GateSystemComponent::IsValidAttachmentRequest\n";
