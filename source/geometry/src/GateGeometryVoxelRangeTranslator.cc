@@ -23,11 +23,11 @@ See GATE/LICENSE.txt for further details
 GateGeometryVoxelRangeTranslator::GateGeometryVoxelRangeTranslator(GateVGeometryVoxelReader* voxelReader) 
   : GateVGeometryVoxelTranslator(voxelReader)
 {
-//  G4cout << " Constructor GateGeometryVoxelRangeTranslator" << Gateendl;
+//  G4cout << " Constructor GateGeometryVoxelRangeTranslator\n";
   m_name = G4String("rangeTranslator");
   m_messenger = new GateGeometryVoxelRangeTranslatorMessenger(this);
   
-//  G4cout << " FIN Constructor GateGeometryVoxelRangeTranslator" << Gateendl;
+//  G4cout << " FIN Constructor GateGeometryVoxelRangeTranslator\n";
 }
 
 GateGeometryVoxelRangeTranslator::~GateGeometryVoxelRangeTranslator() 
@@ -40,13 +40,14 @@ G4String GateGeometryVoxelRangeTranslator::TranslateToMaterial(G4double voxelVal
   G4String material = G4String("NULL");
 
 //    G4cout << "GateGeometryVoxelRangeTranslator::TranslateToMaterial: voxelValue " << voxelValue << Gateendl;
+  GateVoxelMaterialTranslationRangeVector::iterator anIterator;
 
-  for (G4int iRange = 0; iRange< (G4int)m_voxelMaterialTranslation.size(); iRange++) {
-    G4double range1 = (m_voxelMaterialTranslation[iRange].first).first;
-    G4double range2 = (m_voxelMaterialTranslation[iRange].first).second;
+  for (anIterator = m_voxelMaterialTranslation.begin(); anIterator != m_voxelMaterialTranslation.end(); anIterator++) {
+    G4double range1 = ((*anIterator).first).first;
+    G4double range2 = ((*anIterator).first).second;
     //    G4cout << "iRange range1 range2 " << iRange << " " << range1 << " " << range2 << Gateendl;
     if ((range1 <= voxelValue) && (voxelValue <= range2)) {
-      material = (m_voxelMaterialTranslation[iRange].second);
+      material = ((*anIterator).second);
       break;
     }
   }
@@ -57,7 +58,7 @@ G4String GateGeometryVoxelRangeTranslator::TranslateToMaterial(G4double voxelVal
 void GateGeometryVoxelRangeTranslator::ReadTranslationTable(G4String fileName)
 {
 
-//  G4cout << " DEBUT GateGeometryVoxelRangeTranslator::ReadTranslationTable " << Gateendl;
+//  G4cout << " DEBUT GateGeometryVoxelRangeTranslator::ReadTranslationTable \n";
   m_voxelMaterialTranslation.clear();
 
   std::ifstream inFile;
@@ -119,7 +120,7 @@ void GateGeometryVoxelRangeTranslator::ReadTranslationTable(G4String fileName)
   }
 
   }
-  else {G4cout << "Error opening file." << Gateendl;}
+  else {G4cout << "Error opening file.\n";}
   
   inFile.close();
 
@@ -127,7 +128,7 @@ void GateGeometryVoxelRangeTranslator::ReadTranslationTable(G4String fileName)
 
 void GateGeometryVoxelRangeTranslator::Describe(G4int) 
 {
-  G4cout << " Range Translator" << Gateendl;
+  G4cout << " Range Translator\n";
   for (G4int iRange = 0; iRange< (G4int)m_voxelMaterialTranslation.size(); iRange++) {
     G4double    xmin      = (m_voxelMaterialTranslation[iRange].first).first;
     G4double    xmax      = (m_voxelMaterialTranslation[iRange].first).second;
@@ -142,14 +143,11 @@ void GateGeometryVoxelRangeTranslator::Describe(G4int)
 	   << " , "   
 	   << xmax 
 	   << " ]  ---> material " << material 
-	   << ", visibility " << GetMaterialAttributes(   theMaterialDatabase.GetMaterial(material)  )->IsVisible()
-	   << ", coulour "    << GetMaterialAttributes(   theMaterialDatabase.GetMaterial(material)  )->GetColour()
+	   << ", visibility " << GetMaterialAttributes( theMaterialDatabase.GetMaterial(material) )->IsVisible()
+	   << ", coulour "    << GetMaterialAttributes( theMaterialDatabase.GetMaterial(material) )->GetColour()
 	   << Gateendl;
   }
 }
-
-
-
 
 G4String GateGeometryVoxelRangeTranslator::GetNextMaterial(G4bool doReset)
 {
@@ -168,7 +166,9 @@ G4String GateGeometryVoxelRangeTranslator::GetNextMaterial(G4bool doReset)
 //! Used by GateRegularParameterization to get the different materials
 void GateGeometryVoxelRangeTranslator::GetCompleteListOfMaterials(std::vector<G4String>& mat)
 {
-  for (G4int nbMat = 0; nbMat< (G4int)m_voxelMaterialTranslation.size(); nbMat++) {
-    mat.push_back(m_voxelMaterialTranslation[nbMat].second);
+  GateVoxelMaterialTranslationRangeVector::iterator anIterator;
+
+  for (anIterator = m_voxelMaterialTranslation.begin(); anIterator != m_voxelMaterialTranslation.end(); anIterator++) {
+    mat.push_back((*anIterator).second);
   }
 }

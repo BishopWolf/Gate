@@ -55,7 +55,7 @@ GateAnalysis::~GateAnalysis()
   //modifs seb 3/3/2009
   delete m_trajectoryNavigator;
   if (nVerboseLevel > 0)
-    G4cout << "GateAnalysis deleting...m_analysisMessenger - m_trajectoryNavigator" << Gateendl;
+    G4cout << "GateAnalysis deleting...m_analysisMessenger - m_trajectoryNavigator\n";
 }
 //--------------------------------------------------------------------------------------------------
 
@@ -71,7 +71,7 @@ const G4String& GateAnalysis::GiveNameOfFile()
 void GateAnalysis::RecordBeginOfAcquisition()
 {
   if (nVerboseLevel > 2)
-    G4cout << "GateAnalysis::RecordBeginOfAcquisition" << Gateendl;
+    G4cout << "GateAnalysis::RecordBeginOfAcquisition\n";
 }
 //--------------------------------------------------------------------------------------------------
 
@@ -81,7 +81,7 @@ void GateAnalysis::RecordBeginOfAcquisition()
 void GateAnalysis::RecordEndOfAcquisition()
 {
   if (nVerboseLevel > 2)
-    G4cout << "GateAnalysis::RecordEndOfAcquisition" << Gateendl;
+    G4cout << "GateAnalysis::RecordEndOfAcquisition\n";
 }
 //--------------------------------------------------------------------------------------------------
 
@@ -90,7 +90,7 @@ void GateAnalysis::RecordEndOfAcquisition()
 void GateAnalysis::RecordBeginOfRun(const G4Run * )
 {
   if (nVerboseLevel > 2)
-    G4cout << "GateAnalysis::RecordBeginOfRun" << Gateendl;
+    G4cout << "GateAnalysis::RecordBeginOfRun\n";
 }
 //--------------------------------------------------------------------------------------------------
 
@@ -99,7 +99,7 @@ void GateAnalysis::RecordBeginOfRun(const G4Run * )
 void GateAnalysis::RecordEndOfRun(const G4Run * )
 {
   if (nVerboseLevel > 2)
-    G4cout << "GateAnalysis::RecordEndOfRun" << Gateendl;
+    G4cout << "GateAnalysis::RecordEndOfRun\n";
 }
 //--------------------------------------------------------------------------------------------------
 
@@ -108,7 +108,7 @@ void GateAnalysis::RecordEndOfRun(const G4Run * )
 void GateAnalysis::RecordBeginOfEvent(const G4Event* )
 {
   if (nVerboseLevel > 2)
-    G4cout << "GateAnalysis::RecordBeginOfEvent" << Gateendl;
+    G4cout << "GateAnalysis::RecordBeginOfEvent\n";
 }
 //--------------------------------------------------------------------------------------------------
 
@@ -135,7 +135,7 @@ void GateAnalysis::RecordEndOfEvent(const G4Event* event)
   if (!trajectoryContainer)
     {
       if (nVerboseLevel > 0)
-        G4cout << "GateAnalysis::RecordEndOfEvent : WARNING : G4TrajectoryContainer not found" << Gateendl;
+        G4cout << "GateAnalysis::RecordEndOfEvent : WARNING : G4TrajectoryContainer not found\n";
     }
   else
     {
@@ -147,7 +147,7 @@ void GateAnalysis::RecordEndOfEvent(const G4Event* event)
       if (CHC)
         {
           NbHits = CHC->entries();
-          //G4cout << "     " << NbHits << " hits are stored in essaiCrystalHitsCollection." << Gateendl;
+          //G4cout << "     " << NbHits << " hits are stored in essaiCrystalHitsCollection.\n";
 
           //G4int ionID      = 1; // the primary vertex particle
           //G4int positronID = 0; // no more needed
@@ -177,7 +177,7 @@ void GateAnalysis::RecordEndOfEvent(const G4Event* event)
 
           /*if (positronID == 0)
             {
-            if (nVerboseLevel > 0) G4cout << "GateAnalysis::RecordEndOfEvent : WARNING : positronID == 0" << Gateendl;
+            if (nVerboseLevel > 0) G4cout << "GateAnalysis::RecordEndOfEvent : WARNING : positronID == 0\n";
             }
 
             if (nVerboseLevel > 1) G4cout << "GateAnalysis::RecordEndOfEvent : positronID : " << positronID << Gateendl;
@@ -191,13 +191,13 @@ void GateAnalysis::RecordEndOfEvent(const G4Event* event)
             {
               // no gamma coming from a positron or an ion, or shooted as primary
               if (nVerboseLevel > 0) G4cout
-                                       << "GateAnalysis::RecordEndOfEvent : WARNING : photonIDs not found" << Gateendl;
+                                       << "GateAnalysis::RecordEndOfEvent : WARNING : photonIDs not found\n";
             }
           else
             {
               //  This warning is somewhat irrelevant with 124I
               if (nVerboseLevel > 0 && photonIDVec.size() > 2)
-                G4cout << "GateAnalysis::RecordEndOfEvent : WARNING : photonID vector size > 2" << Gateendl;
+                G4cout << "GateAnalysis::RecordEndOfEvent : WARNING : photonID vector size > 2\n";
 
               photon1ID = photonIDVec[0];
               photon2ID = (photonIDVec.size() >= 2) ? photonIDVec[1] : 0;
@@ -206,11 +206,11 @@ void GateAnalysis::RecordEndOfEvent(const G4Event* event)
           if (photon1ID == 0)
             {
               if (nVerboseLevel > 0) G4cout
-                                       << "GateAnalysis::RecordEndOfEvent : WARNING : photon1ID == 0" << Gateendl;
+                                       << "GateAnalysis::RecordEndOfEvent : WARNING : photon1ID == 0\n";
             }
           if (photon2ID == 0) {
             if (nVerboseLevel > 1) G4cout
-                                     << "GateAnalysis::RecordEndOfEvent : WARNING : photon2ID == 0" << Gateendl;
+                                     << "GateAnalysis::RecordEndOfEvent : WARNING : photon2ID == 0\n";
           }
           if (nVerboseLevel > 1) G4cout
                                    << "GateAnalysis::RecordEndOfEvent : photon1ID : " << photon1ID
@@ -248,12 +248,12 @@ void GateAnalysis::RecordEndOfEvent(const G4Event* event)
 
               if (nVerboseLevel > 2)
                 G4cout << "GateAnalysis::RecordEndOfEvent : GatePhantomHitsCollection : trackID : " << std::setw(5) << phantomTrackID
-                       << "    PDG code : " << std::setw(5) << PDGcode << "  processName : <" << processName << ">" << Gateendl;
+                       << "    PDG code : " << std::setw(5) << PDGcode << "  processName : <" << processName << ">\n";
               theComptonVolumeName = G4String("NULL");
 
               if (nVerboseLevel > 2) G4cout
                                        << "GateAnalysis::RecordEndOfEvent : GatePhantomHitsCollection : trackID : " << std::setw(5) << phantomTrackID
-                                       << "    PDG code : " << std::setw(5) << PDGcode << "  processName : <" << processName << ">" << Gateendl;
+                                       << "    PDG code : " << std::setw(5) << PDGcode << "  processName : <" << processName << ">\n";
               theRayleighVolumeName = G4String("NULL");
 
               // Modif by DS and LS on Oct 4, 2002: we need to be able to recognise both 'compt'
@@ -470,7 +470,7 @@ void GateAnalysis::RecordEndOfEvent(const G4Event* event)
 void GateAnalysis::RecordStepWithVolume(const GateVVolume *, const G4Step* )
 {
   if (nVerboseLevel > 2)
-    G4cout << "GateAnalysis::RecordStep" << Gateendl;
+    G4cout << "GateAnalysis::RecordStep\n";
 }
 //--------------------------------------------------------------------------------------------------
 

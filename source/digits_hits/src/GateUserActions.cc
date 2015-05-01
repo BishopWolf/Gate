@@ -32,7 +32,7 @@ GateUserActions* GateUserActions::pUserActions=0;
 GateUserActions::GateUserActions(GateRunManager* m, GateRecorderBase* r)
   : recorder(r)
 {
-  GateMessage("Core", 4,"GateUserActions Constructor start."<<Gateendl);
+  GateMessage("Core", 4,"GateUserActions Constructor start.\n");
 
   pUserActions = this;
 
@@ -76,7 +76,7 @@ GateUserActions::GateUserActions(GateRunManager* m, GateRecorderBase* r)
 
   mTimer = new G4SliceTimer();
 
-  GateMessage("Core", 4,"GateUserActions Constructor end."<<Gateendl);
+  GateMessage("Core", 4,"GateUserActions Constructor end.\n");
 }
 //-----------------------------------------------------------------------------
 
@@ -85,7 +85,7 @@ GateUserActions::~GateUserActions()
 {
 
   delete pUserActions;
-  GateDebugMessageInc("Core", 4, "GateUserActions Destructor."<<Gateendl);
+  GateDebugMessageInc("Core", 4, "GateUserActions Destructor.\n");
 }
 //-----------------------------------------------------------------------------
 

@@ -88,7 +88,7 @@ void GatePrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
        << " pos.=" << m_particleGun->GetParticlePosition()
        << " energy=" <<  m_particleGun->GetParticleEnergy() 
        << " dir.=" << m_particleGun->GetParticleMomentumDirection()
-       << ")" << Gateendl); */ 
+       << ")\n"); */ 
   }
 }
 //---------------------------------------------------------------------------
@@ -117,7 +117,7 @@ void GatePrimaryGeneratorAction::GenerateSimulationPrimaries(G4Event* event)
 #endif
 
     runManager->AbortRun(true);
-    if (m_nVerboseLevel>1) G4cout << "GatePrimaryGeneratorAction::GeneratePrimaries: numVertices == 0, run aborted " << Gateendl;  
+    if (m_nVerboseLevel>1) G4cout << "GatePrimaryGeneratorAction::GeneratePrimaries: numVertices == 0, run aborted \n";  
   } 
   else {
     m_nEvents++;
@@ -150,7 +150,7 @@ if (numEvent == 0) {
 GateRunManager* runManager = GateRunManager::GetRunManager();
 
 runManager->AbortRun(true);
-if (m_nVerboseLevel>1) G4cout << "GatePrimaryGeneratorAction::GeneratePrimaries: numVertices == 0, run aborted " << Gateendl;  
+if (m_nVerboseLevel>1) G4cout << "GatePrimaryGeneratorAction::GeneratePrimaries: numVertices == 0, run aborted \n";  
 } else {
 m_nEvents++;
 if (m_nVerboseLevel>0) {

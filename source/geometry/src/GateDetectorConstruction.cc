@@ -273,13 +273,13 @@ void GateDetectorConstruction::InitializeROGeometry()
   nGeometryStatus = changeLevel;
 
   if (nGeometryStatus == 0){
-  GateMessage("Geometry", 3, "   The geometry is uptodate." << G4endl;);
+  GateMessage("Geometry", 3, "   The geometry is uptodate.\n";);
   }
   else if (nGeometryStatus == 1){
-  GateMessage("Geometry", 3, "   The geometry needs to be uptodated." << G4endl;);
+  GateMessage("Geometry", 3, "   The geometry needs to be uptodated.\n";);
   }
   else if (nGeometryStatus == 2){
-  GateMessage("Geometry", 3, "   The geometry needs to be rebuilt." << G4endl;);
+  GateMessage("Geometry", 3, "   The geometry needs to be rebuilt.\n";);
   }
 
   if (flagAutoUpdate){

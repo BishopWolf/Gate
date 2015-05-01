@@ -125,7 +125,7 @@ void Get2StringsFromCommand(const G4UIcommand * /*command*/,
     //	   << Gateendl);
   }
   string1 = newValues.substr(0,i);
-  //G4cout << "$K2 stringName= |" << stringName << "|" << Gateendl);
+  //G4cout << "$K2 stringName= |" << stringName << "|\n");
   string2 = newValues.substr(i+1,newValues.length());
 }
 //-----------------------------------------------------------------------------
@@ -145,7 +145,7 @@ void GetStringAndValueFromCommand(const G4UIcommand * /*command*/,
     //	   << Gateendl);
   }
   stringName = newValues.substr(0,i);
-  //G4cout << "$K2 stringName= |" << stringName << "|" << Gateendl);
+  //G4cout << "$K2 stringName= |" << stringName << "|\n");
   valueString = newValues.substr(i+1,newValues.length());
   //G4cout << "$K2 val =  " << valueString << Gateendl);
   value = G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(valueString.c_str());	
@@ -174,7 +174,7 @@ void GetStringAndValueWithUnitFromCommand(const G4UIcommand * /*command*/,
     //	       << Gateendl);
   }
   stringName = newValues.substr(0,i);
-  //G4cout << "$K2 stringName= |" << stringName << "|" << Gateendl);
+  //G4cout << "$K2 stringName= |" << stringName << "|\n");
   valueString = newValues.substr(i+1,newValues.length());
   //G4cout << "$K2 val =  " << valueString << Gateendl);
   value = G4UIcmdWithADoubleAndUnit::GetNewDoubleValue(valueString.c_str());	
@@ -182,7 +182,7 @@ void GetStringAndValueWithUnitFromCommand(const G4UIcommand * /*command*/,
     //  GateError( "Could not convert the second arg ('" 
     //	       << valueString << "') of the command '"
     //	       << command->GetCommandPath() 
-    //	       << "' to a 'double with unit' value. Try something like '2.0 mm' ..." << Gateendl);
+    //	       << "' to a 'double with unit' value. Try something like '2.0 mm' ...\n");
   }
 }
 //-----------------------------------------------------------------------------
@@ -202,7 +202,7 @@ void GetStringAnd3ValuesFromCommand(const G4UIcommand * /*command*/,
     //	       << Gateendl);
   }
   stringName = newValues.substr(0,i);
-  //G4cout << "$K2 stringName= |" << stringName << "|" << Gateendl);
+  //G4cout << "$K2 stringName= |" << stringName << "|\n");
   valueString = newValues.substr(i+1,newValues.length());
   //G4cout << "$K2 val =  " << valueString << Gateendl);
   value = G4UIcmdWith3Vector::GetNew3VectorValue(valueString.c_str());	
@@ -210,7 +210,7 @@ void GetStringAnd3ValuesFromCommand(const G4UIcommand * /*command*/,
     //  GateError( "Could not convert the second arg ('" 
     //	       << valueString << "') of the command '"
     //	       << command->GetCommandPath() 
-    //	       << "' to a 'three vector' value. Try something like '1.0 1.0 1.0' ..." << Gateendl);
+    //	       << "' to a 'three vector' value. Try something like '1.0 1.0 1.0' ...\n");
   //}
 }
 //-----------------------------------------------------------------------------
@@ -295,7 +295,7 @@ G4ThreeVector ComputeBoundingBox(G4VSolid * solid)
 //-----------------------------------------------------------------------------
 G4ThreeVector GetExtendHalfBoundingBox(GateSolidExtend & ex)
 {
-  //GateDebugMessage("Manager",6, "GetExtendBoundingBox" << Gateendl);
+  //GateDebugMessage("Manager",6, "GetExtendBoundingBox\n");
   G4ThreeVector v;
   v.setX((ex.pMax.x()-ex.pMin.x())/2.0);
   v.setY((ex.pMax.y()-ex.pMin.y())/2.0);
@@ -320,7 +320,7 @@ void MoveExtend(const G4ThreeVector & position, GateSolidExtend & ex)
 //-----------------------------------------------------------------------------
 GateSolidExtend GetMaxExtend(GateSolidExtend & ex1, GateSolidExtend & ex2)
 {
-  //GateDebugMessage("Manager",6, "GetMaxExtend" << Gateendl);
+  //GateDebugMessage("Manager",6, "GetMaxExtend\n");
   GateSolidExtend ex;
 
   ex.pMax.setX(std::max(ex1.pMax.x(),ex2.pMax.x()));
@@ -437,7 +437,7 @@ double ReadDouble(std::istream & is) {
   const char *nptr = s.c_str();
   double n = strtod(nptr, &endptr);
   if ((n==0) && (nptr == endptr)) {
-    GateError("Error I should read a double and I read '" << nptr << "'" << Gateendl);
+    GateError("Error I should read a double and I read '" << nptr << "'\n");
   }
   skipComment(is);
   return n;
@@ -647,7 +647,7 @@ int GetIndexFromTime(std::vector<double> & mTimeList, double aTime) {
 
   if ((i < 0) && (aTime < mTimeList[0])) {
     GateError("The time list for  begin with " << mTimeList[0]/s
-              << " sec, so I cannot find the time" << aTime/s << " sec." << Gateendl);
+              << " sec, so I cannot find the time" << aTime/s << " sec.\n");
   }
   return i;
 }

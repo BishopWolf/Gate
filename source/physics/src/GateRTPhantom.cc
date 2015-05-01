@@ -50,7 +50,7 @@ void GateRTPhantom::AttachToSource(G4String aname)
 {
 if ( IsEnabled == 0 )
 {
-G4cout << " The Object RTPhantom " << m_name << " is NOT enabled. You cannot attach it to a Source. IGNORED" << Gateendl;
+G4cout << " The Object RTPhantom " << m_name << " is NOT enabled. You cannot attach it to a Source. IGNORED\n";
 return;
 }
 GateVSource *Source = GateSourceMgr::GetInstance()->GetSourceByName(aname);
@@ -61,14 +61,14 @@ if ( Source !=0 && IsVoxellized == 1 )
      if ( SourceVoxl  != 0 ) 
      {itsSReader = SourceVoxl->GetReader();}  
      else 
-           {G4cout << " GateRTPhantom::AttachToSource WARNING : The Source " << Source->GetName() << " is NOT Voxellized. IGNORED."<<Gateendl;}
+           {G4cout << " GateRTPhantom::AttachToSource WARNING : The Source " << Source->GetName() << " is NOT Voxellized. IGNORED.\n";}
      
    }
 else
-{  G4cout <<   " GateRTPhantom::AttachToSource WARNING : The Source " << Source->GetName() << " does NOT exist. IGNORED." << Gateendl;
+{  G4cout <<   " GateRTPhantom::AttachToSource WARNING : The Source " << Source->GetName() << " does NOT exist. IGNORED.\n";
 
 if ( IsVoxellized == 0 ) {
-G4cout <<"GateRTPhantom::AttachToSource WARNING : The RTPhantom Object " << m_name << " is not of Voxellized Type. You cannot attach it to a Voxellized Source" << Gateendl;}
+G4cout <<"GateRTPhantom::AttachToSource WARNING : The RTPhantom Object " << m_name << " is not of Voxellized Type. You cannot attach it to a Voxellized Source\n";}
 }
 
 G4cout <<"GateRTPhantom::AttachToSource : The RTPhantom Object " << m_name << " has a Source Reader " << itsSReader << " from source " << Source->GetName()<<Gateendl;
@@ -86,12 +86,12 @@ if ( m_inserter !=0 ){G4cout << " GateRTPhantom::AttachToGeometry : WARNING : Th
 
 if ( IsEnabled == 0 )
 {
-G4cout << " The Object RTPhantom " << m_name << " is NOT enabled. You cannot attach it to a Geometric Object. IGNORED" << Gateendl;
+G4cout << " The Object RTPhantom " << m_name << " is NOT enabled. You cannot attach it to a Geometric Object. IGNORED\n";
 return;
 } else { G4cout << " The Object RTPhantom " << m_name << " is enabled."<< Gateendl;}
 
   if (m_VerboseLevel > 2)
-    G4cout << "GateRTPhantom::AttachToGeometry" << Gateendl;
+    G4cout << "GateRTPhantom::AttachToGeometry\n";
 
 //Describe();
 
@@ -114,11 +114,11 @@ if ( GReader ==0 )G4cout << " GateRTPhantom::AttachTo ERROR : No Geometry Reader
 
    }
     
-else { G4cout << " GateRTPhantom::AttachToGeometry ERROR : Inserter Object "<< aname <<" does not exist ! IGNORED !!!!" << Gateendl;}
+else { G4cout << " GateRTPhantom::AttachToGeometry ERROR : Inserter Object "<< aname <<" does not exist ! IGNORED !!!!\n";}
 
 if( m_inserter != 0 )
 {
-G4cout << " GateRTPhantom::AttachToGeometry : The RTPhantom "<<m_name<<" is now ATTACHED to Inserter Object "<< m_inserter->GetObjectName() <<" : OK !!!" << Gateendl;
+G4cout << " GateRTPhantom::AttachToGeometry : The RTPhantom "<<m_name<<" is now ATTACHED to Inserter Object "<< m_inserter->GetObjectName() <<" : OK !!!\n";
 }
 
 

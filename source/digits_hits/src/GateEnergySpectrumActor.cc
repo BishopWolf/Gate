@@ -16,7 +16,7 @@ See GATE/LICENSE.txt for further details
 GateEnergySpectrumActor::GateEnergySpectrumActor(G4String name, G4int depth):
   GateVActor(name,depth)
 {
-  GateDebugMessageInc("Actor",4,"GateEnergySpectrumActor() -- begin"<<Gateendl);
+  GateDebugMessageInc("Actor",4,"GateEnergySpectrumActor() -- begin\n");
 
   mEmin = 0.;
   mEmax = 50.;
@@ -39,7 +39,7 @@ GateEnergySpectrumActor::GateEnergySpectrumActor(G4String name, G4int depth):
 
   pMessenger = new GateEnergySpectrumActorMessenger(this);
 
-  GateDebugMessageDec("Actor",4,"GateEnergySpectrumActor() -- end"<<Gateendl);
+  GateDebugMessageDec("Actor",4,"GateEnergySpectrumActor() -- end\n");
 }
 //-----------------------------------------------------------------------------
 
@@ -48,11 +48,11 @@ GateEnergySpectrumActor::GateEnergySpectrumActor(G4String name, G4int depth):
 /// Destructor
 GateEnergySpectrumActor::~GateEnergySpectrumActor()
 {
-  GateDebugMessageInc("Actor",4,"~GateEnergySpectrumActor() -- begin"<<Gateendl);
+  GateDebugMessageInc("Actor",4,"~GateEnergySpectrumActor() -- begin\n");
 
 
 
-  GateDebugMessageDec("Actor",4,"~GateEnergySpectrumActor() -- end"<<Gateendl);
+  GateDebugMessageDec("Actor",4,"~GateEnergySpectrumActor() -- end\n");
 }
 //-----------------------------------------------------------------------------
 
@@ -119,7 +119,7 @@ void GateEnergySpectrumActor::ResetData()
 //-----------------------------------------------------------------------------
 void GateEnergySpectrumActor::BeginOfRunAction(const G4Run *)
 {
-  GateDebugMessage("Actor", 3, "GateEnergySpectrumActor -- Begin of Run" << Gateendl);
+  GateDebugMessage("Actor", 3, "GateEnergySpectrumActor -- Begin of Run\n");
   ResetData();
 }
 //-----------------------------------------------------------------------------
@@ -127,7 +127,7 @@ void GateEnergySpectrumActor::BeginOfRunAction(const G4Run *)
 //-----------------------------------------------------------------------------
 void GateEnergySpectrumActor::BeginOfEventAction(const G4Event*)
 {
-  GateDebugMessage("Actor", 3, "GateEnergySpectrumActor -- Begin of Event" << Gateendl);
+  GateDebugMessage("Actor", 3, "GateEnergySpectrumActor -- Begin of Event\n");
   newEvt = true;
   edep = 0.;
   tof  = 0;
@@ -137,10 +137,10 @@ void GateEnergySpectrumActor::BeginOfEventAction(const G4Event*)
 //-----------------------------------------------------------------------------
 void GateEnergySpectrumActor::EndOfEventAction(const G4Event*)
 {
-  GateDebugMessage("Actor", 3, "GateEnergySpectrumActor -- End of Event" << Gateendl);
+  GateDebugMessage("Actor", 3, "GateEnergySpectrumActor -- End of Event\n");
   if (edep > 0)
   {
-	  //G4cout << "hitted " << edep/MeV << "MeV " << tof/MeV << "ns" << Gateendl;
+	  //G4cout << "hitted " << edep/MeV << "MeV " << tof/MeV << "ns\n";
 	  pEdep->Fill(edep/MeV);
 	  pEdepTime->Fill(tof/ns,edep/MeV);
   }
@@ -150,7 +150,7 @@ void GateEnergySpectrumActor::EndOfEventAction(const G4Event*)
 //-----------------------------------------------------------------------------
 void GateEnergySpectrumActor::PreUserTrackingAction(const GateVVolume *, const G4Track* t)
 {
-  GateDebugMessage("Actor", 3, "GateEnergySpectrumActor -- Begin of Track" << Gateendl);
+  GateDebugMessage("Actor", 3, "GateEnergySpectrumActor -- Begin of Track\n");
   newTrack = true; //nTrack++;
   if(t->GetParentID()==1) nTrack++;
   edepTrack = 0.;
@@ -160,7 +160,7 @@ void GateEnergySpectrumActor::PreUserTrackingAction(const GateVVolume *, const G
 //-----------------------------------------------------------------------------
 void GateEnergySpectrumActor::PostUserTrackingAction(const GateVVolume *, const G4Track* t)
 {
-  GateDebugMessage("Actor", 3, "GateEnergySpectrumActor -- End of Track" << Gateendl);
+  GateDebugMessage("Actor", 3, "GateEnergySpectrumActor -- End of Track\n");
 
   double eloss = Ei-Ef;
   if (eloss > 0) pDeltaEc->Fill(eloss/MeV,t->GetWeight() );

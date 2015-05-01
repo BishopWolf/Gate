@@ -25,7 +25,7 @@ GateVImageVolumeMessenger::GateVImageVolumeMessenger(GateVImageVolume* volume)
   pVImageVolume(volume)
 {
 
-  GateMessage("Volume",5,"GateVImageVolumeMessenger("<<Gateendl);
+  GateMessage("Volume",5,"GateVImageVolumeMessenger()\n");
   G4String dir = GetDirectoryName() + "geometry";
   //  G4cout<<dir<<Gateendl;
 
@@ -89,7 +89,7 @@ GateVImageVolumeMessenger::GateVImageVolumeMessenger(GateVImageVolume* volume)
 //---------------------------------------------------------------------------
 GateVImageVolumeMessenger::~GateVImageVolumeMessenger()
 {
-  GateMessage("Volume",5,"~GateVImageVolumeMessenger("<<Gateendl);
+  GateMessage("Volume",5,"~GateVImageVolumeMessenger()\n");
 
   delete pImageFileNameCmd;
   delete pImageFileNameCmdDeprecated;
@@ -114,14 +114,14 @@ void GateVImageVolumeMessenger::SetNewValue(G4UIcommand* command,
 
   if (command == pImageFileNameCmd || command == pImageFileNameCmdDeprecated) {
     pVImageVolume->SetImageFilename(newValue);
-    if (command == pImageFileNameCmdDeprecated) G4cout << "### WARNING ### SetImage is obsolete and will be removed from the next release. Please use setImage" << Gateendl;
+    if (command == pImageFileNameCmdDeprecated) G4cout << "### WARNING ### SetImage is obsolete and will be removed from the next release. Please use setImage\n";
   }
   else if (command == pLabelToMaterialFileNameCmd) {
     pVImageVolume->SetLabelToMaterialTableFilename(newValue);
   }
   else if (command == pHUToMaterialFileNameCmd || command == pHUToMaterialFileNameCmdDeprecated) {
     pVImageVolume->SetHUToMaterialTableFilename(newValue);
-    if (command == pHUToMaterialFileNameCmdDeprecated) G4cout << "### WARNING ### SetHUToMaterialFile is obsolete and will be removed from the next release. Please use setHUToMaterialFile" << Gateendl;
+    if (command == pHUToMaterialFileNameCmdDeprecated) G4cout << "### WARNING ### SetHUToMaterialFile is obsolete and will be removed from the next release. Please use setHUToMaterialFile\n";
   }
   else if (command == pRangeMaterialFileNameCmd) {
     pVImageVolume->SetRangeMaterialTableFilename(newValue);

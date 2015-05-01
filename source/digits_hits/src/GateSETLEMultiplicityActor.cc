@@ -31,9 +31,9 @@
 GateSETLEMultiplicityActor::GateSETLEMultiplicityActor(G4String name, G4int depth):
   GateVActor(name,depth)
 {
-  GateDebugMessageInc("Actor",4,"GateSETLEMultiplicityActor() -- begin"<<Gateendl);
+  GateDebugMessageInc("Actor",4,"GateSETLEMultiplicityActor() -- begin\n");
   mMaterialHandler = GateMaterialMuHandler::GetInstance();
-  GateDebugMessageDec("Actor",4,"GateSETLEMultiplicityActor() -- end"<<Gateendl);
+  GateDebugMessageDec("Actor",4,"GateSETLEMultiplicityActor() -- end\n");
 
   mIsHybridinoEnabled = false;
   mDefaultPrimaryMultiplicity = 0;
@@ -55,7 +55,7 @@ GateSETLEMultiplicityActor::~GateSETLEMultiplicityActor() {}
 /// Construct
 void GateSETLEMultiplicityActor::Construct()
 {
-  GateMessage("Actor", 0, " SETLEMultiplicityActor auto-construction" << Gateendl);
+  GateMessage("Actor", 0, " SETLEMultiplicityActor auto-construction\n");
   
   GateVActor::Construct();
   // Enable callbacks
@@ -182,7 +182,7 @@ void GateSETLEMultiplicityActor::PostUserTrackingAction(const GateVVolume *, con
   }
 
 //   for(unsigned int i=0; i<mListOfHybridTrack.size(); i++) { GateMessage("Actor", 0, "track = " << mListOfHybridTrack[i] << " weight = " << mListOfHybridWeight[i] << Gateendl); }
-//   GateMessage("Actor", 0, " " << Gateendl);
+//   GateMessage("Actor", 0, " \n");
 }
 //-----------------------------------------------------------------------------
 
