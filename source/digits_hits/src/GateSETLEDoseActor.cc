@@ -499,7 +499,7 @@ double GateSETLEDoseActor::RayCast(bool isPrimary, double energy, double weight,
     currentLastHitImage = &mSecondaryLastHitEventImage;
   }
 
-  while(L < mTotalLength-0.00001)
+  while(L < mTotalLength-0.00001)  // what is 0.00001? Shouldn't it be better define a common tiny value?
   {
 //     GateMessage("Actor", 0, " index " << x << " " << y << " " << z << " | Rest " << Rx << " " << Ry << " " << Rz << " | L " << L << " mTotalLength " << mTotalLength << Gateendl);
 //     GateMessage("Actor", 0, " Rest  " << Rx << " " << Ry << " " << Rz << Gateendl);

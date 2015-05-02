@@ -41,8 +41,19 @@ public:
   GateROGeometry(G4String);
   virtual ~GateROGeometry();
   
-  void Initialize(GateBox*, G4VPhysicalVolume*);
+  void Initialize(GateBox*);
   void UpdateROGeometry();
+  
+  inline GateCrystalSD* GetCrystalSD()
+  { return m_crystalSD; }
+
+  inline GatePhantomSD*   GetPhantomSD()
+  { return m_phantomSD; }
+  
+  /* PY Descourt 08/09/2009 */
+  inline GateARFSD* GetARFSD(){ return m_ARFSD;};
+  void insertARFSD( G4String , G4int );
+  /* PY Descourt 08/09/2009 */
   
 private:
   GateBox* pworld;
@@ -52,6 +63,14 @@ private:
   G4double pworld_z;
   G4bool isBuilt;
   G4bool isInitialized;
+    
+  GateCrystalSD*   m_crystalSD;
+  GatePhantomSD*   m_phantomSD;
+  GateARFSD* m_ARFSD; // PY Descourt 8/09/2009
+  
+  G4Box* RODetector;
+  G4LogicalVolume* worldLogical;
+  G4LogicalVolume* RODetectorLog;
   
   G4VPhysicalVolume*  pworldPhysicalVolume;
   G4LogicalVolume* sensitiveLogicalVolume;

@@ -51,12 +51,6 @@ public:
   virtual void SetMagField (G4ThreeVector);
   virtual void BuildMagField ();
 
-  /* PY Descourt 08/09/2009 */
-  GateARFSD* GetARFSD(){ return m_ARFSD;};
-  void insertARFSD( G4String , G4int );
-  /* PY Descourt 08/09/2009 */
-
-
 #ifdef GATE_USE_OPTICAL
   virtual void BuildSurfaces();
 #endif
@@ -105,12 +99,19 @@ public:
   GateMaterialDatabase mMaterialDatabase;
 
   inline GateCrystalSD* GetCrystalSD()
-  { return m_crystalSD; }
-
+  { return pworldROGeometry->GetCrystalSD(); }
 
   inline GatePhantomSD*   GetPhantomSD()
-  { return m_phantomSD; }
+  { return pworldROGeometry->GetPhantomSD(); }
+  
+  inline GateARFSD* GetARFSD()
+  { return pworldROGeometry->GetARFSD();}
+  
+  inline void insertARFSD( G4String val_str, G4int val_int)
+  { pworldROGeometry->insertARFSD(val_str, val_int);}
 
+  inline GateROGeometry* GetROGeometry()
+  { return pworldROGeometry; }
   //private:
 
   virtual void DestroyGeometry();
@@ -129,9 +130,6 @@ private :
 
   GeometryStatus nGeometryStatus;
   G4bool flagAutoUpdate;
-
-  GateCrystalSD*   m_crystalSD;
-  GatePhantomSD*   m_phantomSD;
 
   GateObjectStore* pcreatorStore;
   GateSystemListManager*  psystemStore;
@@ -153,7 +151,6 @@ private:
   G4UniformMagField* m_magField;
   G4ThreeVector      m_magFieldValue;
 
-  GateARFSD* m_ARFSD; // PY Descourt 8/09/2009
   GateRTPhantomMgr* m_RTPhantomMgr; // PY Descourt 08/09/2009
 };
 
