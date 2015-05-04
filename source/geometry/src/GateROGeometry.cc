@@ -98,7 +98,8 @@ void GateROGeometry::Construct()
       return;
     }
   
-  pworldPhysicalVolume = GetWorld();
+  //pworldPhysicalVolume = GetWorld();
+  pworldPhysicalVolume = pworld->GateVVolume::Construct();
   worldLogical = pworldPhysicalVolume->GetLogicalVolume();
   
   // World volume of ROGeometry ... SERVE SOLO PER LA ROG
@@ -158,6 +159,7 @@ void GateROGeometry::UpdateROGeometry()
 {
   Construct();
   ConstructSD();
+  GateRunManager::GetRunManager()->DefineWorldVolume(pworldPhysicalVolume);
 }
 
 //---------------------------------------------------------------------------------

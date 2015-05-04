@@ -109,9 +109,12 @@ G4VPhysicalVolume* GateDetectorConstruction::Construct()
 {
   GateMessage("Geometry", 3, "Geometry construction starts. \n");
 
-  pworldPhysicalVolume = pworld->GateVVolume::Construct();
-  pworldLogicalVolume = pworldPhysicalVolume->GetLogicalVolume();
+  //pworldPhysicalVolume = pworld->GateVVolume::Construct();
+  //pworldLogicalVolume = pworldPhysicalVolume->GetLogicalVolume();
   InitializeROGeometry();
+  pworldROGeometry->UpdateROGeometry();
+  pworldPhysicalVolume = pworld->Construct(true);
+  pworldLogicalVolume = pworldPhysicalVolume->GetLogicalVolume();
   SetGeometryStatusFlag(geometry_is_uptodate);
 
   GateMessage("Physic", 1, " \n");
@@ -215,13 +218,13 @@ void GateDetectorConstruction::UpdateGeometry()
     Construct();
     break;
   }
-  GateRunManager::GetRunManager()->DefineWorldVolume(pworldPhysicalVolume);
+  //GateRunManager::GetRunManager()->DefineWorldVolume(pworldPhysicalVolume);
   
-  GateRunManager::GetRunManager()->GetUserDetectorConstruction();
+  //GateRunManager::GetRunManager()->GetUserDetectorConstruction();
   
-  pworldROGeometry = (GateROGeometry*) this->GetParallelWorld(0);
-  InitializeROGeometry();
-  pworldROGeometry->UpdateROGeometry();
+  //pworldROGeometry = (GateROGeometry*) this->GetParallelWorld(0);
+  //InitializeROGeometry();
+  //pworldROGeometry->UpdateROGeometry();
 
   nGeometryStatus = geometry_is_uptodate;
 
