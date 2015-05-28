@@ -373,6 +373,7 @@ void GateVImageVolume::LoadImageMaterialsFromHounsfieldTable() {
 	// Dump label image if needed
 	mImageMaterialsFromHounsfieldTableDone = true;
 	DumpHLabelImage();
+
 }
 //--------------------------------------------------------------------
 
@@ -583,6 +584,7 @@ void GateVImageVolume::LoadImageMaterialsFromRangeTable() {
 	GateMessageDec("Volume", 5,
 			"End GateVImageVolume::LoadImageMaterialsFromRangeTable(" <<mRangeToImageMaterialTableFilename<<")\n");
 	DumpHLabelImage();
+
 }
 //--------------------------------------------------------------------
 

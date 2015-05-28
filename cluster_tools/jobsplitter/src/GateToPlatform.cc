@@ -65,6 +65,7 @@ int GateToPlatform::GenerateOpenPBSScriptfile() {
 				<< endl;
 		cout << "Please check your environment variables!" << endl;
 		cout << "Generated submit file may be invalid..." << endl;
+
 		return 1;
 	}
 	dirstream.close();
@@ -137,11 +138,10 @@ int GateToPlatform::GenerateOpenPBSSubmitfile() {
 
 	//check if we have an existing director
 	std::ifstream dirstream(dir.c_str());
-	if (!dirstream) {
-		cout << "Error : Failed to detect the Gate executable directory"
-				<< endl;
-		cout << "Please check your environment variables!" << endl;
-		cout << "Generated submit file may be invalid..." << endl;
+	if (!dirstream) { 
+		cout<<"Error : Failed to detect the Gate executable directory"<<endl;
+		cout<<"Please check your environment variables!"<<endl; 
+		cout<<"Generated submit file may be invalid..."<<endl;  
 		return 1;
 	}
 	dirstream.close();
@@ -169,12 +169,11 @@ int GateToPlatform::GenerateOpenMosixSubmitfile() {
 
 	//check if we have an existing directory
 	std::ifstream dirstream(dir.c_str());
-	if (!dirstream) {
-		cout << "Error : Failed to detect the Gate executable directory"
-				<< endl;
-		cout << "Please check your environment variables!" << endl;
-		cout << "Generated submit file may be invalid..." << endl;
-		return (1);
+	if (!dirstream) { 
+		cout<<"Error : Failed to detect the Gate executable directory"<<endl;
+		cout<<"Please check your environment variables!"<<endl; 
+		cout<<"Generated submit file may be invalid..."<<endl;  
+		return(1);
 	}
 	dirstream.close();
 
@@ -208,12 +207,11 @@ int GateToPlatform::GenerateCondorSubmitfile() {
 
 	//check if we have an existing directory
 	std::ifstream dirstream(dir.c_str());
-	if (!dirstream) {
-		cout << "Error : Failed to detect the Gate executable directory"
-				<< endl;
-		cout << "Please check your environment variables!" << endl;
-		cout << "Generated submit file may be invalid..." << endl;
-		return (1);
+	if (!dirstream) { 
+		cout<<"Error : Failed to detect the Gate executable directory"<<endl;
+		cout<<"Please check your environment variables!"<<endl; 
+		cout<<"Generated submit file may be invalid..."<<endl;  
+		return(1);
 	}
 	dirstream.close();
 
@@ -262,12 +260,11 @@ int GateToPlatform::GenerateXgridSubmitfile() {
 
 	//check if we have an existing directory
 	std::ifstream dirstream(dir.c_str());
-	if (!dirstream) {
-		cout << "Error : Failed to detect the Gate executable directory"
-				<< endl;
-		cout << "Please check your environment variables!" << endl;
-		cout << "Generated submit file may be invalid..." << endl;
-		return (1);
+	if (!dirstream) { 
+		cout<<"Error : Failed to detect the Gate executable directory"<<endl;
+		cout<<"Please check your environment variables!"<<endl; 
+		cout<<"Generated submit file may be invalid..."<<endl;  
+		return(1);
 	}
 	dirstream.close();
 	G4String submitXgridFilename = outputMacfilename + ".plist";
