@@ -322,7 +322,7 @@ void GateVImageVolume::LoadImageMaterialsFromHounsfieldTable()
   mHounsfieldMaterialTable.Reset();
   // mHounsfieldMaterialTable.AddMaterial(pImage->GetOutsideValue(), pImage->GetOutsideValue()+1,"worldDefaultAir");
   G4String parentMat = GetParentVolume()->GetMaterialName();
-  mHounsfieldMaterialTable.AddMaterial(pImage->GetOutsideValue(),pImage->GetOutsideValue()+1,parentMat);
+  mHounsfieldMaterialTable.AddMaterial(pImage->GetOutsideValue(),pImage->GetOutsideValue(),parentMat);
 
   while (is) {
     skipComment(is);
@@ -333,13 +333,13 @@ void GateVImageVolume::LoadImageMaterialsFromHounsfieldTable()
     G4String n;
     is >> n;
     if (is) {
-      if(h2> pImage->GetOutsideValue()+1){
+      if(h2> pImage->GetOutsideValue()){
         if(h1<pImage->GetOutsideValue()+1) h1=pImage->GetOutsideValue()+1;
         mHounsfieldMaterialTable.AddMaterial(h1,h2,n);
       }
     }
   }
-//  if (mHounsfieldMaterialTable.GetNumberOfMaterials() == 0) {
+  //  if (mHounsfieldMaterialTable.GetNumberOfMaterials() == 0) {
   if (mHounsfieldMaterialTable.GetNumberOfMaterials() == 1 ) {//there is a default mat = worldDefaultAir
     GateError("No Hounsfield material defined in the file "
 	      << mHounsfieldToImageMaterialTableFilename << ". Abort\n");
@@ -356,12 +356,12 @@ void GateVImageVolume::LoadImageMaterialsFromHounsfieldTable()
     if (label<0) {
       GateError(" I find H=" << *iter
 		<< " in the image, while Hounsfield range start at "
-		<< mHounsfieldMaterialTable.GetH1Vector()[0] << Gateendl);
+		<< mHounsfieldMaterialTable[0].mH1 << Gateendl);
     }
     if (label>=mHounsfieldMaterialTable.GetNumberOfMaterials()) {
       GateError(" I find H=" << *iter
 		<< " in the image, while Hounsfield range stop at "
-		<< mHounsfieldMaterialTable.GetH2Vector()[mHounsfieldMaterialTable.GetH2Vector().size()-1]
+		<< mHounsfieldMaterialTable[mHounsfieldMaterialTable.GetNumberOfMaterials()-1].mH2
 		<< Gateendl);
     }
     //GateMessage("Core", 0, " pix = " << (*iter) << " lab = " << label << Gateendl);
@@ -371,10 +371,10 @@ void GateVImageVolume::LoadImageMaterialsFromHounsfieldTable()
 
   // Debug
   // for(uint i=0; i<mHounsfieldMaterialTable.GetH1Vector().size(); i++) {
-//     double h = mHounsfieldMaterialTable.GetH1Vector()[i];
-//     GateMessage("Volume", 4, "H=" << h << " label = " << mHounsfieldMaterialTable.GetLabelFromH(h) << Gateendl);
-//     GateMessage("Volume", 4, " => H mean" << mHounsfieldMaterialTable.GetHMeanFromLabel(mHounsfieldMaterialTable.GetLabelFromH(h)) << Gateendl);
-//   }
+  //     double h = mHounsfieldMaterialTable.GetH1Vector()[i];
+  //     GateMessage("Volume", 4, "H=" << h << " label = " << mHounsfieldMaterialTable.GetLabelFromH(h) << Gateendl);
+  //     GateMessage("Volume", 4, " => H mean" << mHounsfieldMaterialTable.GetHMeanFromLabel(mHounsfieldMaterialTable.GetLabelFromH(h)) << Gateendl);
+  //   }
 
   // Dump label image if needed
   mImageMaterialsFromHounsfieldTableDone = true;
@@ -391,8 +391,8 @@ void GateVImageVolume::DumpHLabelImage() {
     output.SetOrigin(pImage->GetOrigin());
     output.Allocate();
 
-   //  GateHounsfieldMaterialTable::LabelToMaterialNameType lab2mat;
-//     mHounsfieldMaterialTable.MapLabelToMaterial(lab2mat);
+    //  GateHounsfieldMaterialTable::LabelToMaterialNameType lab2mat;
+    //     mHounsfieldMaterialTable.MapLabelToMaterial(lab2mat);
 
     ImageType::const_iterator pi;
     ImageType::iterator po;
@@ -473,6 +473,7 @@ void GateVImageVolume::LoadImageMaterialsFromLabelTable()
 //--------------------------------------------------------------------
 void GateVImageVolume::LoadImageMaterialsFromRangeTable()
 {
+  DD("LoadImageMaterialsFromRangeTable");
   m_voxelMaterialTranslation.clear();
 
   std::ifstream inFile;
@@ -480,70 +481,75 @@ void GateVImageVolume::LoadImageMaterialsFromRangeTable()
   inFile.open(mRangeToImageMaterialTableFilename.c_str(),std::ios::in);
   mRangeMaterialTable.Reset();
   G4String parentMat = GetParentVolume()->GetMaterialName();
-  mRangeMaterialTable.AddMaterial(pImage->GetOutsideValue(),pImage->GetOutsideValue()+1,parentMat);
+  mRangeMaterialTable.AddMaterial(pImage->GetOutsideValue(),pImage->GetOutsideValue(),parentMat);
 
   if (inFile.is_open()){
-  G4String material;
-  G4double r1;
-  G4double r2;
-  G4int firstline;
+    G4String material;
+    G4double r1;
+    G4double r2;
+    G4int firstline;
 
-  G4double red, green, blue, alpha;
-  G4bool visible;
-  char buffer [200];
+    G4double red, green, blue, alpha;
+    G4bool visible;
+    char buffer [200];
 
-  inFile.getline(buffer,200);
-  std::istringstream is(buffer);
-
-  is >> firstline;
-
-  if (is.eof()){
-
-  for (G4int iCol=0; iCol<firstline; iCol++) {
     inFile.getline(buffer,200);
-    is.clear();
-    is.str(buffer);
+    std::istringstream is(buffer);
 
-    is >> r1 >> r2;
-    is >> material;
+    is >> firstline;
 
     if (is.eof()){
-      visible=true;
-      red=0.5;
-      green=blue=0.0;
-      alpha=1;
-    }else{
-      is >> std::boolalpha >> visible >> red >> green >> blue >> alpha;
-    }
 
-    G4cout << " min max " << r1 << " " << r2 << "  material: " << material
-    << std::boolalpha << ", visible " << visible << ", rgba(" << red<<',' << green << ',' << blue << ')' << Gateendl;
+      for (G4int iCol=0; iCol<firstline; iCol++) {
+        inFile.getline(buffer,200);
+        is.clear();
+        is.str(buffer);
 
-    if(r2> pImage->GetOutsideValue()+1){
+        is >> r1 >> r2;
+        is >> material;
+
+        if (is.eof()){
+          visible=true;
+          red=0.5;
+          green=blue=0.0;
+          alpha=1;
+        }else{
+          is >> std::boolalpha >> visible >> red >> green >> blue >> alpha;
+        }
+
+        G4cout << " min max " << r1 << " " << r2 << "  material: " << material
+               << std::boolalpha << ", visible " << visible << ", rgba(" << red<<',' << green << ',' << blue << ')' << Gateendl;
+
+    if(r2> pImage->GetOutsideValue()){
       if(r1<pImage->GetOutsideValue()+1) r1=pImage->GetOutsideValue()+1;
         mRangeMaterialTable.AddMaterial(r1,r2,material);
     }
+    else
+    {
+    	GateMessage("Materials",0,"Failed to add material "<< material << " to Database" << Gateendl);
+    }
 
-  mRangeMaterialTable.MapLabelToMaterial(mLabelToMaterialName);
+        mRangeMaterialTable.MapLabelToMaterial(mLabelToMaterialName);
 
 
-  m_voxelAttributesTranslation[theMaterialDatabase.GetMaterial(material) ] =
-      new G4VisAttributes(visible, G4Colour(red, green, blue, alpha));
-  }
+        m_voxelAttributesTranslation[theMaterialDatabase.GetMaterial(material) ] =
+          new G4VisAttributes(visible, G4Colour(red, green, blue, alpha));
+      }
 
-  }else{
+    }else{
 
-  inFile.close();
-  std::ifstream is;
-  OpenFileInput(mRangeToImageMaterialTableFilename, is);
-  mRangeMaterialTable.Reset();
+      inFile.close();
+      std::ifstream is;
+      OpenFileInput(mRangeToImageMaterialTableFilename, is);
+      mRangeMaterialTable.Reset();
 
-  while (is){
+      while (is){
 
-  is >> r1 >> r2;
-  is >> material;
+        is >> r1 >> r2;
+        is >> material;
 
-  if(r2> pImage->GetOutsideValue()+1){
+
+  if(r2> pImage->GetOutsideValue()){
     if(r1<pImage->GetOutsideValue()+1) r1=pImage->GetOutsideValue()+1;
       mRangeMaterialTable.AddMaterial(r1,r2,material);
   }
@@ -561,12 +567,12 @@ void GateVImageVolume::LoadImageMaterialsFromRangeTable()
     if (label<0) {
       GateError(" I find R=" << *iter
 		<< " in the image, while range start at "
-		<< mRangeMaterialTable.GetR1Vector()[0] << Gateendl);
+		<< mRangeMaterialTable[0].mR1 << Gateendl);
     }
     if (label>=mRangeMaterialTable.GetNumberOfMaterials()) {
       GateError(" I find R=" << *iter
 		<< " in the image, while range stop at "
-		<< mRangeMaterialTable.GetR2Vector()[mRangeMaterialTable.GetR2Vector().size()-1]
+		<< mRangeMaterialTable[mRangeMaterialTable.GetNumberOfMaterials()-1].mR1
 		<< Gateendl);
     }
     //GateMessage("Core", 0, " pix = " << (*iter) << " lab = " << label << Gateendl);
@@ -637,7 +643,7 @@ void GateVImageVolume::RemapLabelsContiguously( std::vector<LabelType>& labels, 
   /*if (marginAdded) {
     lmap[-1] = 0;
     cur++;
-  }*/
+    }*/
 
   std::vector<LabelType>::iterator i;
   for (i=labels.begin(); i!=labels.end(); ++i, ++cur) {
@@ -666,35 +672,23 @@ void GateVImageVolume::RemapLabelsContiguously( std::vector<LabelType>& labels, 
   mLabelToMaterialName = mmap;
 
   // Update GateHounsfieldMaterialTable if needed
-  if (mHounsfieldMaterialTable.GetNumberOfMaterials() != 0) {
-    std::vector<double> & h1 = mHounsfieldMaterialTable.GetH1Vector();
-    std::vector<double> tmp(h1.size());
-   for(uint i=0; i<h1.size(); i++) {
-      if(lmap[i]!=0 || ( i==0 && lmap[i]==0) )  tmp[lmap[i]] = h1[i];
+  // Is really no need to update name and material also??
+  std::vector<GateHounsfieldMaterialTable::mMaterials> tmp(mHounsfieldMaterialTable.GetNumberOfMaterials());
+  for(int i=0; i<mHounsfieldMaterialTable.GetNumberOfMaterials(); i++)
+    {
+      if(lmap[i]!=0 || ( i==0 && lmap[i]==0) )
+        {
+          tmp[lmap[i]].mH1 = mHounsfieldMaterialTable[i].mH1;
+          tmp[lmap[i]].mH2 = mHounsfieldMaterialTable[i].mH2;
+          tmp[lmap[i]].md1 = mHounsfieldMaterialTable[i].md1;
+        }
     }
-    for(uint i=0; i<h1.size(); i++) {
-      //GateMessage("Core", 0, "i = " << i
-      //             << " h1 = " << h1[i]
-      //             << " new h1 = " << tmp[i] << Gateendl);
-       h1[i] = tmp[i];
+  for(int i=0; i<mHounsfieldMaterialTable.GetNumberOfMaterials(); i++)
+    {
+      mHounsfieldMaterialTable[i].mH1 = tmp[i].mH1;
+      mHounsfieldMaterialTable[i].mH2 = tmp[i].mH2;
+      mHounsfieldMaterialTable[i].md1 = tmp[i].md1;
     }
-    std::vector<double> & h2 = mHounsfieldMaterialTable.GetH2Vector();
-    for(uint i=0; i<h2.size(); i++) {
-       if(lmap[i]!=0 || ( i==0 && lmap[i]==0) )  tmp[lmap[i]] = h2[i];
-    }
-    for(uint i=0; i<h2.size(); i++) {
-      h2[i] = tmp[i];
-    }
-
-    std::vector<double> & d1 = mHounsfieldMaterialTable.GetDVector();
-    for(uint i=0; i<d1.size(); i++) {
-     if(lmap[i]!=0 || ( i==0 && lmap[i]==0) )   tmp[lmap[i]] = d1[i];
-    }
-    for(uint i=0; i<d1.size(); i++) {
-     d1[i] = tmp[i];
-    }
-
-  }
 }
 //--------------------------------------------------------------------
 
@@ -762,9 +756,9 @@ void GateVImageVolume::BuildDistanceTransfo()
   GateImage::const_iterator iter = pImage->begin();
   while (iter != pImage->end()) {
     /*
-    if ((*iter < 0) || (*iter > 255)) //FIXME
+      if ((*iter < 0) || (*iter > 255)) //FIXME
       {
-	GateError("Error image value not uchar =" << *iter << Gateendl);
+      GateError("Error image value not uchar =" << *iter << Gateendl);
       }
     */
     *p = static_cast<voxel>(lrint(*iter));

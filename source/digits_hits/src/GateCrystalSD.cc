@@ -57,7 +57,7 @@ GateCrystalSD::~GateCrystalSD()
 void GateCrystalSD::Initialize(G4HCofThisEvent*HCE)
 {
   static int HCID = -1; // Static variable storing the hit collection ID
-
+// Not thread safe but moving to local variable doesn't work
   // Creation of a new hit collection
   crystalCollection = new GateCrystalHitsCollection
                    (SensitiveDetectorName,theCrystalCollectionName);
@@ -252,12 +252,13 @@ GateVSystem* GateCrystalSD::FindSystem(GateVolumeID volumeID)
 //------------------------------------------------------------------------------
 GateVSystem* GateCrystalSD::FindSystem(G4String& systemName)
 {
-   G4int index = -1;
-   for(size_t i=0; i<m_systemList->size(); i++)
+   for(GateSystemIterator itr=m_systemList->begin(); itr!=m_systemList->end(); itr++)
    {
-      if(systemName.compare(m_systemList->at(i)->GetOwnName()) == 0)
-         index = i;
+      if(systemName.compare((*itr)->GetOwnName()) == 0)
+      {
+         return *itr;
+      }
    }
 
-   return m_systemList->at(index);
+   return m_systemList->at(-1);
 }

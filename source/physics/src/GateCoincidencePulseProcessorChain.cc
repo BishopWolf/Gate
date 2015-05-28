@@ -118,8 +118,12 @@ void GateCoincidencePulseProcessorChain::ProcessCoincidencePulses()
 
   //mhadi_add[
   for (size_t processorID = 0 ; processorID < GetProcessorNumber(); processorID++) 
-     if (GetProcessor(processorID)->IsEnabled() && GetProcessor(processorID)->IsTriCoincProcessor())
-        GetProcessor(processorID)->CollectSingles();
+  {
+    GateVCoincidencePulseProcessor* processor =  GetProcessor(processorID);
+    if (processor->IsEnabled() && processor->IsTriCoincProcessor())
+        processor->CollectSingles();
+    
+  }
   //mhadi_add]
         
   if (pulseList.empty())
@@ -132,10 +136,11 @@ void GateCoincidencePulseProcessorChain::ProcessCoincidencePulses()
      GateCoincidencePulse* pulse = *it;
      if (pulse->empty()) continue;
      for (size_t processorID = 0 ; processorID < GetProcessorNumber(); processorID++) {
-       if (GetProcessor(processorID)->IsEnabled()) {
-	 pulse = GetProcessor(processorID)->ProcessPulse(pulse,i);
+       GateVCoincidencePulseProcessor* processor =  GetProcessor(processorID);
+       if (processor->IsEnabled()) {
+	 pulse = processor->ProcessPulse(pulse,i);
 	 if (pulse){
-      	   pulse->SetName(GetProcessor(processorID)->GetObjectName());
+      	   pulse->SetName(processor->GetObjectName());
       	   GateDigitizer::GetInstance()->StoreCoincidencePulse(pulse);
 	 } else break;
        }
@@ -154,7 +159,7 @@ GateVSystem* GateCoincidencePulseProcessorChain::FindSystem(G4String& inputName)
    GateDigitizer* digitizer = GateDigitizer::GetInstance();
    std::vector<GateCoincidenceSorter*> CoincidenceSorterList = digitizer->GetCoinSorterList();
 
-   G4int index = -1;
+   /*G4int index = -1;
 
    for(size_t i=0; i<CoincidenceSorterList.size(); i++)
    {
@@ -170,6 +175,13 @@ GateVSystem* GateCoincidencePulseProcessorChain::FindSystem(G4String& inputName)
    if(index != -1)
       system = CoincidenceSorterList[index]->GetSystem();
    
-   return system;
+   return system;*/
+   
+   //faster!!
+   for (std::vector<GateCoincidenceSorter*>::iterator itr=CoincidenceSorterList.begin(); itr!=CoincidenceSorterList.end(); itr++)
+     if (inputName.compare((*itr)->GetOutputName()) == 0)
+       return (*itr)->GetSystem();
+   
+   return 0;
 }
 //mhadi_add]
