@@ -17,15 +17,14 @@
 #include "GateHounsfieldDensityTable.hh"
 
 //-------------------------------------------------------------------------------------------------
-GateHounsfieldToMaterialsBuilder::GateHounsfieldToMaterialsBuilder() :
-		mDensityTol(0.1 * g / cm3) // If user doesn't define tolerance assign a default value
+GateHounsfieldToMaterialsBuilder::GateHounsfieldToMaterialsBuilder()
+: mDensityTol(0.1*g/cm3)
 {
-	pMessenger = new GateHounsfieldToMaterialsBuilderMessenger(this);
-	mMaterialTableFilename = "undefined_mMaterialTableFilename";
-	mDensityTableFilename = "undefined_mDensityTableFilename";
-	mOutputMaterialDatabaseFilename =
-			"undefined_mOutputMaterialDatabaseFilename";
-	mOutputHUMaterialFilename = "undefined_mOutputHUMaterialFilename";
+  pMessenger = new GateHounsfieldToMaterialsBuilderMessenger(this);
+  mMaterialTableFilename = "undefined_mMaterialTableFilename";
+  mDensityTableFilename= "undefined_mDensityTableFilename";
+  mOutputMaterialDatabaseFilename= "undefined_mOutputMaterialDatabaseFilename";
+  mOutputHUMaterialFilename= "undefined_mOutputHUMaterialFilename";
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -120,8 +119,7 @@ void GateHounsfieldToMaterialsBuilder::BuildAndWriteMaterials() {
 		double dDiffMax = mDensityTable->FindMaxDensityDifference(HMin, HMax);
 
 		//if difference is small or material is air then split into 1 material only
-		double n = (dDiffMax) / dTol;
-		n = n < 1 || (*it)->GetName() == "Air" ? 1 : n;
+		double n = std::max(1.,dDiffMax/dTol);
 		GateMessage("Geometry", 4, "n = " << n << Gateendl);
 
 		double HTol = (HMax - HMin) / n;

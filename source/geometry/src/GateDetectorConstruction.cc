@@ -65,11 +65,10 @@ GateDetectorConstruction::GateDetectorConstruction() :
 
 	//-------------------------------------------------------------------------
 	// Create default material (air) for the world
-	G4String AirName = "Air";
-	G4Material* Air = G4NistManager::Instance()->FindOrBuildMaterial(AirName);
+	G4String AirName = "worldDefaultAir";
+	G4Material* Air = G4NistManager::Instance()->FindOrBuildMaterial("Air");
 	if (Air == NULL)  //will never enter here
 	{
-		AirName = "worldDefaultAir";
 		G4Element* N = new G4Element("worldDefaultN", "N", 7.,
 				14.01 * g / mole);
 		G4Element* O = new G4Element("worldDefaultO", "O", 8.,
@@ -78,6 +77,7 @@ GateDetectorConstruction::GateDetectorConstruction() :
 		Air->AddElement(N, 0.7);
 		Air->AddElement(O, 0.3);
 	}
+	else Air->SetName(AirName);//For compatibility put name of this Air material to "worldDefaultAir"
 	//-------------------------------------------------------------------------
 
 	pworld = new GateBox("world", AirName, pworld_x, pworld_y, pworld_z, true);
