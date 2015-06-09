@@ -168,6 +168,7 @@ public:
 
 	void SetBuildDistanceTransfoFilename(G4String filename);
 	void SetLabeledImageFilename(G4String filename);
+	void SetDensityImageFilename(G4String filename);
 	void EnableBoundingBoxOnly(bool b);
 
 protected:
@@ -209,6 +210,11 @@ protected:
 	bool mWriteHLabelImage;
 	G4String mHLabelImageFilename;
 	void DumpHLabelImage();
+	bool mWriteDensityImage;
+	G4String mDensityImageFilename;
+	void DumpDensityImage();
+	bool mImageMaterialsFromHounsfieldTableDone;
+	bool mImageMaterialsFromRangeTableDone;
 	bool mImageMaterialsFromHounsfieldTableDone;
 
 	//-----------------------------------------------------------------------------
@@ -246,6 +252,7 @@ protected:
 
 	//-----------------------------------------------------------------------------
 	bool mIsBoundingBoxOnlyModeEnabled;
+
 };
 // EO class GateVImageVolume
 //-----------------------------------------------------------------------------
