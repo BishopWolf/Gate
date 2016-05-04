@@ -38,6 +38,7 @@
 #include "G4EmStandardPhysics_option1.hh"
 #include "G4EmStandardPhysics_option2.hh"
 #include "G4EmStandardPhysics_option3.hh"
+#include "G4EmStandardPhysics_option4.hh"
 #include "G4EmLivermorePolarizedPhysics.hh"
 #include "G4EmLivermorePhysics.hh"
 #include "G4EmPenelopePhysics.hh"
@@ -301,6 +302,9 @@ void GatePhysicsList::ConstructPhysicsList(G4String name)
   if (mUserPhysicListName == "emstandard_opt3") {
     pl = new G4EmStandardPhysics_option3();
   }
+  if (mUserPhysicListName == "emstandard_opt4") {
+    pl = new G4EmStandardPhysics_option4();
+  }
   if (mUserPhysicListName == "emlivermore") {
     pl = new G4EmLivermorePhysics();
   }
@@ -399,9 +403,9 @@ void GatePhysicsList::ConstructParticle()
 
   //  Construct  resonaces and quarks
   G4ShortLivedConstructor slive;
-  slive.ConstructParticle(); 
-  
-  //  Construct hybridino 
+  slive.ConstructParticle();
+
+  //  Construct hybridino
   G4Hybridino::HybridinoDefinition();
 
 
@@ -419,7 +423,7 @@ void GatePhysicsList::ConstructParticle()
   dnagenericIonsManager->GetIon("nitrogen");
   dnagenericIonsManager->GetIon("iron");
   dnagenericIonsManager->GetIon("oxygen");
-  
+
 }
 //-----------------------------------------------------------------------------------------
 
