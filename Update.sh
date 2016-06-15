@@ -1,1 +1,0 @@
-git pull https://github.com/OpenGATE/Gate.git

@@ -1,3 +1,0 @@
-/home/alex/Gate/git/build/CMakeFiles/Gate.dir
-/home/alex/Gate/git/build/itk-mhd/MetaIO/CMakeFiles/MetaIO.dir
-/home/alex/Gate/git/build/itk-mhd/itkzlib/CMakeFiles/itkzlib.dir
