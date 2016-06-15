@@ -1,0 +1,46 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^(itk|deflate|inf|trees|zconf|zlib|zutil).*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/alex/Gate/git/source/externals/itk-mhd/itkzlib/crc32.c
+zutil.h
+/home/alex/Gate/git/source/externals/itk-mhd/itkzlib/zutil.h
+
+/home/alex/Gate/git/source/externals/itk-mhd/itkzlib/deflate.h
+zutil.h
+/home/alex/Gate/git/source/externals/itk-mhd/itkzlib/zutil.h
+
+/home/alex/Gate/git/source/externals/itk-mhd/itkzlib/itk_zlib_mangle.h
+
+/home/alex/Gate/git/source/externals/itk-mhd/itkzlib/trees.c
+deflate.h
+/home/alex/Gate/git/source/externals/itk-mhd/itkzlib/deflate.h
+trees.h
+/home/alex/Gate/git/source/externals/itk-mhd/itkzlib/trees.h
+
+/home/alex/Gate/git/source/externals/itk-mhd/itkzlib/trees.h
+
+/home/alex/Gate/git/source/externals/itk-mhd/itkzlib/zconf.h
+itk_zlib_mangle.h
+/home/alex/Gate/git/source/externals/itk-mhd/itkzlib/itk_zlib_mangle.h
+itkzlib/zlibDllConfig.h
+/home/alex/Gate/git/source/externals/itk-mhd/itkzlib/itkzlib/zlibDllConfig.h
+
+/home/alex/Gate/git/source/externals/itk-mhd/itkzlib/zlib.h
+zconf.h
+/home/alex/Gate/git/source/externals/itk-mhd/itkzlib/zconf.h
+
+/home/alex/Gate/git/source/externals/itk-mhd/itkzlib/zutil.c
+zutil.h
+/home/alex/Gate/git/source/externals/itk-mhd/itkzlib/zutil.h
+
+/home/alex/Gate/git/source/externals/itk-mhd/itkzlib/zutil.h
+zlib.h
+/home/alex/Gate/git/source/externals/itk-mhd/itkzlib/zlib.h
+
+itk-mhd/itkzlib/zlibDllConfig.h
+

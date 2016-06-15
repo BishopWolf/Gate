@@ -1,0 +1,2181 @@
+diff --git a/Gate.cc b/Gate.cc
+index a1b0545..4e43496 100644
+--- a/Gate.cc
++++ b/Gate.cc
+@@ -39,7 +39,6 @@
+ #include "GateDigitizer.hh"
+ #include "GateClock.hh"
+ #include "GateUIcontrolMessenger.hh"
+-#include "GateROGeometry.hh"
+ 
+ #ifdef G4ANALYSIS_USE_ROOT
+ #include "GateROOTBasicOutput.hh"
+@@ -52,13 +51,7 @@
+ #ifdef G4UI_USE
+ #include "G4UIExecutive.hh"
+ #endif
+-#ifdef G4MULTITHREADED
+-#include "GateActionInitialization.hh"
+-#include "G4MTRunManager.hh"
+-#include "GateAnalysis.hh"
+-#include "G4VModularPhysicsList.hh"
+-#include "G4ParallelWorldPhysics.hh"
+-#endif
++
+ //-----------------------------------------------------------------------------
+ void printHelpAndQuit( G4String msg )
+ {
+@@ -145,8 +138,7 @@ void executeCommandQueue( std::queue< G4String > commandQueue, G4UImanager* UIma
+ {
+   while( commandQueue.size() )
+     {
+-      //G4cout << commandQueue.front() << G4endl;
+-      GateMessage("G4", 0, commandQueue.front() << G4endl);
++      G4cout << commandQueue.front() << G4endl;
+       UImanager->ApplyCommand( commandQueue.front() );
+       commandQueue.pop();
+     }
+@@ -168,9 +160,6 @@ void welcome()
+ #ifdef GATE_USE_GPU
+   GateMessage("Core", 0, "GPU support activated" << G4endl );
+ #endif
+-#ifdef G4MULTITHREADED
+-  GateMessage("Core", 0, "Multi Thread support activated" << G4endl );
+-#endif
+   GateMessage("Core", 0, G4endl);
+ }
+ //-----------------------------------------------------------------------------
+@@ -279,48 +268,22 @@ int main( int argc, char* argv[] )
+ 
+   // Construct the default run manager
+   GateRunManager* runManager = new GateRunManager;
+-#ifdef G4MULTITHREADED
+-  G4int nThreads = G4Threading::G4GetNumberOfCores();
+-  runManager->SetNumberOfThreads(nThreads); // Is equal to 2 by default
+-#endif
+-  
+-  // Create various singleton objets
+-#ifdef G4ANALYSIS_USE_GENERAL
+-  GateOutputMgr::SetDigiMode( aDigiMode );
+-  GateOutputMgr* outputMgr = GateOutputMgr::GetInstance();
+-  GateDigitizer* digitizer = GateDigitizer::GetInstance();
+-  GatePulseProcessorChain* singleChain = new GatePulseProcessorChain( digitizer, "Singles" );
+-  digitizer->StoreNewPulseProcessorChain( singleChain );
+-#endif
+ 
+-#ifdef G4MULTITHREADED
+-  GateAnalysis* myRecords = new GateAnalysis("analysis", outputMgr, aDigiMode);
+-#else
+   // Set the Basic ROOT Output
+   GateRecorderBase* myRecords = 0;
+ #ifdef G4ANALYSIS_USE_ROOT
+   myRecords = new GateROOTBasicOutput;
+-#endif  
+ #endif
+ 
+   // Set the DetectorConstruction
+   GateDetectorConstruction* gateDC = new GateDetectorConstruction();
+-#ifdef G4MULTITHREADED
+-  G4String parallelWorldName = "ParallelWorld";
+-  GateROGeometry* ParallelWorld = new GateROGeometry(parallelWorldName);       
+-  gateDC->RegisterParallelWorld(ParallelWorld);
+-#endif 
+   runManager->SetUserInitialization( gateDC );
+ 
+   // Set the PhysicsList
+-  GatePhysicsList* physicsList = GatePhysicsList::GetInstance();
+-#ifdef G4MULTITHREADED
+-  physicsList->RegisterPhysics(new G4ParallelWorldPhysics(parallelWorldName));//This is for G4VModularPhysicsList only
+-#endif   
+-  runManager->SetUserInitialization( physicsList );
++  runManager->SetUserInitialization( GatePhysicsList::GetInstance() );
+ 
+   // Set the users actions to handle callback for actors - before the initialisation
+-  GateUserActions* myActions = new GateUserActions( runManager, myRecords );
++  new GateUserActions( runManager, myRecords );
+ 
+   // Set the Visualization Manager
+ #ifdef G4VIS_USE
+@@ -334,11 +297,15 @@ int main( int argc, char* argv[] )
+   runManager->InitializeAll();
+ 
+   // Incorporate the user actions, set the particles generator
+-#ifdef G4MULTITHREADED
+-   // User action initialization  
+-   runManager->SetUserInitialization( new GateActionInitialization( myActions, myRecords ) );
+-#else
+-   runManager->SetUserAction( new GatePrimaryGeneratorAction() );
++  runManager->SetUserAction( new GatePrimaryGeneratorAction() );
++
++  // Create various singleton objets
++#ifdef G4ANALYSIS_USE_GENERAL
++  GateOutputMgr::SetDigiMode( aDigiMode );
++  GateOutputMgr* outputMgr = GateOutputMgr::GetInstance();
++  GateDigitizer* digitizer = GateDigitizer::GetInstance();
++  GatePulseProcessorChain* singleChain = new GatePulseProcessorChain( digitizer, "Singles" );
++  digitizer->StoreNewPulseProcessorChain( singleChain );
+ #endif
+ 
+   if( aDigiMode == kofflineMode )
+diff --git a/benchmarks/AddExternalData.sh b/benchmarks/AddExternalData.sh
+old mode 100644
+new mode 100755
+diff --git a/examples/AddExternalData.sh b/examples/AddExternalData.sh
+old mode 100644
+new mode 100755
+diff --git a/examples/example_Radiotherapy/example1/mac/main.mac b/examples/example_Radiotherapy/example1/mac/main.mac
+index 5729b76..c4f3f63 100644
+--- a/examples/example_Radiotherapy/example1/mac/main.mac
++++ b/examples/example_Radiotherapy/example1/mac/main.mac
+@@ -25,7 +25,7 @@
+ # GEOMETRY
+ #=====================================================
+ 
+-/gate/geometry/setMaterialDatabase                 ../data/GateMaterials.db
++/gate/geometry/setMaterialDatabase                 data/GateMaterials.db
+ 
+ # WORLD
+ /gate/world/setMaterial                      Air
+diff --git a/examples/example_UserFluenceSource/data/GateMaterials.db b/examples/example_UserFluenceSource/data/GateMaterials.db
+old mode 100644
+new mode 100755
+diff --git a/examples/example_dosimetry/external-beam-therapy-photon/data/GateMaterials.db b/examples/example_dosimetry/external-beam-therapy-photon/data/GateMaterials.db
+old mode 100644
+new mode 100755
+diff --git a/examples/example_dosimetry/molecular-therapy-I131/data/GateMaterials.db b/examples/example_dosimetry/molecular-therapy-I131/data/GateMaterials.db
+old mode 100644
+new mode 100755
+diff --git a/examples/example_dosimetry/molecular-therapy-I131/mac/physic.mac b/examples/example_dosimetry/molecular-therapy-I131/mac/physic.mac
+old mode 100644
+new mode 100755
+diff --git a/examples/example_dosimetry/molecular-therapy-I131/mac/verbose.mac b/examples/example_dosimetry/molecular-therapy-I131/mac/verbose.mac
+old mode 100644
+new mode 100755
+diff --git a/examples/example_dosimetry/protontherapy/data/GateMaterials.db b/examples/example_dosimetry/protontherapy/data/GateMaterials.db
+old mode 100644
+new mode 100755
+diff --git a/source/arf/include/GateARFTable.hh b/source/arf/include/GateARFTable.hh
+index c213339..e966196 100644
+--- a/source/arf/include/GateARFTable.hh
++++ b/source/arf/include/GateARFTable.hh
+@@ -24,8 +24,6 @@ See GATE/LICENSE.txt for further details
+ #include "TTree.h"
+ #include "TBranch.h"
+ 
+-#include "GateMessageManager.hh"
+-
+ class TH2I;
+ class TH2D;
+ class TH1D;
+@@ -83,11 +81,7 @@ G4String GetName() { return m_name;};
+ void GetARFAsBinaryBuffer(G4double*&);
+ void FillTableFromBuffer(G4double*&);
+ void SetNSimuPhotons(G4double N)
+-{
+-  m_TotSimuPhotons = N;
+-  //G4cout<<" TOTAL number of photons   " <<(long unsigned int)(m_TotSimuPhotons)<<Gateendl; 
+-  GateMessage("Core", 0, " TOTAL number of photons   " <<(long unsigned int)(m_TotSimuPhotons)<<Gateendl);
+-};
++{m_TotSimuPhotons = N;G4cout<<" TOTAL number of photons   " <<(long unsigned int)(m_TotSimuPhotons)<<Gateendl; };
+ G4int GetPrimary() { return m_isprimary;};
+ void SetPrimary() { m_isprimary = 1;}
+ void SetNoPrimary() { m_isprimary = 0;}
+diff --git a/source/arf/src/GateARFDataToRoot.cc b/source/arf/src/GateARFDataToRoot.cc
+index d88599c..6dc939c 100644
+--- a/source/arf/src/GateARFDataToRoot.cc
++++ b/source/arf/src/GateARFDataToRoot.cc
+@@ -32,7 +32,6 @@ See GATE/LICENSE.txt for further details
+ #include "G4UImanager.hh"
+ #include "GatePrimaryGeneratorAction.hh"
+ #include "GateHitConvertor.hh"
+-#include "GateMessageManager.hh"
+ 
+ #include "G4ParticleDefinition.hh"
+ #include "G4Positron.hh"
+@@ -94,7 +93,8 @@ OUT_camera = 0;
+ GateARFDataToRoot::~GateARFDataToRoot() 
+ {
+   delete m_rootMessenger;
+-  if (nVerboseLevel > 0) GateMessage("GateARFDataToRoot", 6, "GateARFDataToRoot deleting..." << Gateendl);
++  if (nVerboseLevel > 0) G4cout << "GateARFDataToRoot deleting..." << Gateendl;
++
+ }
+ 
+ //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo...
+diff --git a/source/arf/src/GateARFTableMgr.cc b/source/arf/src/GateARFTableMgr.cc
+index 40f9b37..a23125d 100644
+--- a/source/arf/src/GateARFTableMgr.cc
++++ b/source/arf/src/GateARFTableMgr.cc
+@@ -26,7 +26,6 @@ See GATE/LICENSE.txt for further details
+ #include "G4ThreeVector.hh"
+ #include "G4RotationMatrix.hh"
+ #include "GateARFSD.hh"
+-#include "GateMessageManager.hh"
+ 
+ 
+ GateARFTableMgr::GateARFTableMgr( G4String aName, GateARFSD* theARFSD )
+diff --git a/source/digits_hits/include/GateActionInitialization.hh b/source/digits_hits/include/GateActionInitialization.hh
+deleted file mode 100644
+index f9cc16e..0000000
+--- a/source/digits_hits/include/GateActionInitialization.hh
++++ /dev/null
+@@ -1,33 +0,0 @@
+-/*----------------------
+-  Copyright (C): OpenGATE Collaboration
+-
+-  This software is distributed under the terms
+-  of the GNU Lesser General  Public Licence (LGPL)
+-  See GATE/LICENSE.txt for further details
+-  ----------------------*/ 
+-
+-#ifndef GateActionInitialization_H
+-#define GateActionInitialization_H
+-
+-#include "G4VUserActionInitialization.hh"
+-#include "GateUserActions.hh"
+-#include "GateRecorderBase.hh"
+-
+-class GateUserActions;
+-class GateRecorderBase;
+-
+-class GateActionInitialization: public G4VUserActionInitialization
+-{
+-  public:
+-    GateActionInitialization(GateUserActions * cbm, GateRecorderBase * r);
+-    virtual ~GateActionInitialization();
+-
+-    virtual void BuildForMaster() const;
+-    virtual void Build() const;
+-
+-private:
+-    GateUserActions* pCallbackMan;
+-    GateRecorderBase* recorder;
+-};
+-
+-#endif
+\ No newline at end of file
+diff --git a/source/digits_hits/src/GateActionInitialization.cc b/source/digits_hits/src/GateActionInitialization.cc
+deleted file mode 100644
+index 1daf343..0000000
+--- a/source/digits_hits/src/GateActionInitialization.cc
++++ /dev/null
+@@ -1,52 +0,0 @@
+-/*----------------------
+-  Copyright (C): OpenGATE Collaboration
+-
+-  This software is distributed under the terms
+-  of the GNU Lesser General  Public Licence (LGPL)
+-  See GATE/LICENSE.txt for further details
+-  ----------------------*/
+-
+-#include "GateActionInitialization.hh"
+-#include "GatePrimaryGeneratorAction.hh"
+-#include "GateActions.hh"
+-#include "GateUserActions.hh"
+-#include "GateRecorderBase.hh"
+-#include "G4RunManager.hh"
+-#ifdef G4MULTITHREADED
+-#include "G4MTRunManager.hh"
+-#endif
+-
+-GateActionInitialization::GateActionInitialization(GateUserActions * cbm, GateRecorderBase * r):
+-G4VUserActionInitialization(), pCallbackMan(cbm), recorder(r)
+-{}
+-
+-GateActionInitialization::~GateActionInitialization()
+-{}
+-
+-void GateActionInitialization::BuildForMaster() const
+-{
+-	// In MT mode, to be clearer, the RunAction class for the master thread might be
+-	// different than the one used for the workers.
+-	// This RunAction will be called before and after starting the
+-	// workers.
+-  //SetUserAction( new GateRunAction(pCallbackMan, recorder) ); 
+-}
+-
+-void GateActionInitialization::Build() const
+-{   
+- 
+-  // Initialize the primary particles
+-  GatePrimaryGeneratorAction* prim = new GatePrimaryGeneratorAction();  
+-  SetUserAction( prim ); 
+-
+-  GateRunAction* run = new GateRunAction(pCallbackMan, recorder);
+-  SetUserAction( run );
+-
+-  GateEventAction* event = new GateEventAction(pCallbackMan, recorder);
+-  SetUserAction( event );
+-  
+-  SetUserAction( new GateTrackingAction(pCallbackMan, recorder));
+-  SetUserAction( new GateSteppingAction(pCallbackMan, recorder));
+-//SetUserAction( new GateStackingAction(pCallbackMan, recorder));
+-	
+-} 
+\ No newline at end of file
+diff --git a/source/digits_hits/src/GateActions.cc b/source/digits_hits/src/GateActions.cc
+index 831c819..9d42e4b 100644
+--- a/source/digits_hits/src/GateActions.cc
++++ b/source/digits_hits/src/GateActions.cc
+@@ -124,8 +124,8 @@ GateEventAction::GateEventAction(GateUserActions * cbm, GateRecorderBase* r)
+ inline void GateEventAction::BeginOfEventAction(const G4Event* anEvent)
+ {
+   GateMessage("Core", 2, "Begin Of Event " << anEvent->GetEventID() << "\n");
+-  TrackingMode theMode =( (GateSteppingAction *)(GateRunManager::GetRunManager()->GetUserSteppingAction() ) )->GetMode();
+ 
++  TrackingMode theMode =( (GateSteppingAction *)(GateRunManager::GetRunManager()->GetUserSteppingAction() ) )->GetMode();
+   if ( theMode != kTracker )
+     {
+       if (GetFlagBasicOutput()){
+@@ -777,7 +777,6 @@ void GateSteppingAction::UserSteppingAction(const G4Step* theStep)
+     {
+       G4int EventID = G4EventManager::GetEventManager()->GetNonconstCurrentEvent()->GetEventID();
+       G4int RunID   = GateRunManager::GetRunManager()->GetCurrentRun()->GetRunID();
+-
+       G4Track * fTrack = theStep->GetTrack();
+       G4int ParentID  =  fTrack->GetParentID();
+       G4int TrackID = fTrack->GetTrackID();
+diff --git a/source/digits_hits/src/GateAnalysis.cc b/source/digits_hits/src/GateAnalysis.cc
+index 09229fc..a908b13 100644
+--- a/source/digits_hits/src/GateAnalysis.cc
++++ b/source/digits_hits/src/GateAnalysis.cc
+@@ -34,7 +34,6 @@
+ #include "GateVVolume.hh"
+ #include "GateActions.hh"
+ #include "GateToRoot.hh"
+-
+ //--------------------------------------------------------------------------------------------------
+ GateAnalysis::GateAnalysis(const G4String& name, GateOutputMgr* outputMgr,DigiMode digiMode)
+   : GateVOutputModule(name,outputMgr,digiMode)
+@@ -125,9 +124,7 @@ void GateAnalysis::RecordEndOfEvent(const G4Event* event)
+     m_trajectoryNavigator->SetTrajectoryContainer(trajectoryContainer);
+ 
+   G4int eventID = event->GetEventID();
+-
+   G4int runID   = GateRunManager::GetRunManager()->GetCurrentRun()->GetRunID();
+-
+   //G4cout << "GateAnalysis::EventID et RunID :  " <<eventID<<" - "<<runID<< Gateendl;
+ 
+   //G4int i;
+@@ -322,6 +319,7 @@ void GateAnalysis::RecordEndOfEvent(const G4Event* event)
+ 
+           TrackingMode theMode =( (GateSteppingAction *)(GateRunManager::GetRunManager()->GetUserSteppingAction() ) )->GetMode();
+ 
++
+           if (  theMode == kTracker ) // in tracker mode we store the infos about the number of compton and rayleigh
+             { // G4cout << " GateAnalysis eventID "<<eventID<<Gateendl;
+               GateToRoot* gateToRoot = (GateToRoot*) (GateOutputMgr::GetInstance()->GetModule("root"));
+diff --git a/source/digits_hits/src/GateDistributionExponential.cc b/source/digits_hits/src/GateDistributionExponential.cc
+index 7220864..ffeacad 100644
+--- a/source/digits_hits/src/GateDistributionExponential.cc
++++ b/source/digits_hits/src/GateDistributionExponential.cc
+@@ -15,7 +15,6 @@ See GATE/LICENSE.txt for further details
+ #include <CLHEP/Random/RandExponential.h>
+ #include "Randomize.hh"
+ #include "GateTools.hh"
+-#include "GateMessageManager.hh"
+ 
+ 
+ GateDistributionExponential::GateDistributionExponential(const G4String& itsName)
+diff --git a/source/digits_hits/src/GateDistributionFile.cc b/source/digits_hits/src/GateDistributionFile.cc
+index 359a5a6..aa0500c 100644
+--- a/source/digits_hits/src/GateDistributionFile.cc
++++ b/source/digits_hits/src/GateDistributionFile.cc
+@@ -13,7 +13,6 @@ See GATE/LICENSE.txt for further details
+ #include <math.h>
+ #include <CLHEP/Random/RandFlat.h>
+ #include "GateTools.hh"
+-#include "GateMessageManager.hh"
+ 
+ 
+ GateDistributionFile::GateDistributionFile(const G4String& itsName)
+diff --git a/source/digits_hits/src/GateDistributionFlat.cc b/source/digits_hits/src/GateDistributionFlat.cc
+index e3706b2..e4f6a32 100644
+--- a/source/digits_hits/src/GateDistributionFlat.cc
++++ b/source/digits_hits/src/GateDistributionFlat.cc
+@@ -14,7 +14,6 @@ See GATE/LICENSE.txt for further details
+ //#include <CLHEP/Random/RandFlat.h>
+ #include "Randomize.hh"
+ #include "GateTools.hh"
+-#include "GateMessageManager.hh"
+ 
+ 
+ GateDistributionFlat::GateDistributionFlat(const G4String& itsName)
+diff --git a/source/digits_hits/src/GateDistributionGauss.cc b/source/digits_hits/src/GateDistributionGauss.cc
+index 96809d1..c9854f6 100644
+--- a/source/digits_hits/src/GateDistributionGauss.cc
++++ b/source/digits_hits/src/GateDistributionGauss.cc
+@@ -15,7 +15,6 @@ See GATE/LICENSE.txt for further details
+ #include "Randomize.hh"
+ #include "GateTools.hh"
+ #include "GateConstants.hh"
+-#include "GateMessageManager.hh"
+ 
+ 
+ GateDistributionGauss::GateDistributionGauss(const G4String& itsName)
+diff --git a/source/digits_hits/src/GateDistributionListMessenger.cc b/source/digits_hits/src/GateDistributionListMessenger.cc
+index a64a26b..c08b1de 100644
+--- a/source/digits_hits/src/GateDistributionListMessenger.cc
++++ b/source/digits_hits/src/GateDistributionListMessenger.cc
+@@ -14,7 +14,6 @@ See GATE/LICENSE.txt for further details
+ #include "GateDistributionFlat.hh"
+ #include "GateDistributionFile.hh"
+ #include "GateDistributionManual.hh"
+-#include "GateMessageManager.hh"
+ 
+ #include "G4UIdirectory.hh"
+ #include "G4UIcmdWithAString.hh"
+diff --git a/source/digits_hits/src/GateDistributionManual.cc b/source/digits_hits/src/GateDistributionManual.cc
+index cbc1345..868a7db 100644
+--- a/source/digits_hits/src/GateDistributionManual.cc
++++ b/source/digits_hits/src/GateDistributionManual.cc
+@@ -13,7 +13,6 @@ See GATE/LICENSE.txt for further details
+ #include <math.h>
+ #include <CLHEP/Random/RandFlat.h>
+ #include "GateTools.hh"
+-#include "GateMessageManager.hh"
+ 
+ 
+ GateDistributionManual::GateDistributionManual(const G4String& itsName)
+diff --git a/source/digits_hits/src/GateFastAnalysis.cc b/source/digits_hits/src/GateFastAnalysis.cc
+index 0a87699..0c7dfe1 100644
+--- a/source/digits_hits/src/GateFastAnalysis.cc
++++ b/source/digits_hits/src/GateFastAnalysis.cc
+@@ -85,7 +85,6 @@ void GateFastAnalysis::RecordEndOfEvent(const G4Event* event)
+ 
+     G4int sourceID = (((GateSourceMgr::GetInstance())->GetSourcesForThisEvent())[0])->GetSourceID();
+     G4int eventID  = event->GetEventID();
+-
+     G4int runID    = GateRunManager::GetRunManager()->GetCurrentRun()->GetRunID();
+ 
+         for (G4int iHit=0;iHit<NbHits;iHit++)
+diff --git a/source/digits_hits/src/GateFluenceActor.cc b/source/digits_hits/src/GateFluenceActor.cc
+index 3fc76eb..6238c46 100644
+--- a/source/digits_hits/src/GateFluenceActor.cc
++++ b/source/digits_hits/src/GateFluenceActor.cc
+@@ -124,9 +124,7 @@ void GateFluenceActor::Construct()
+ /// Save data
+ void GateFluenceActor::SaveData()
+ {
+-
+   G4int rID = GateRunManager::GetRunManager()->GetCurrentRun()->GetRunID();
+-
+   char filename[1024];
+   // Printing all particles
+   GateVImageActor::SaveData();
+diff --git a/source/digits_hits/src/GateInverseSquareBlurringLaw.cc b/source/digits_hits/src/GateInverseSquareBlurringLaw.cc
+index 5410574..0832b28 100644
+--- a/source/digits_hits/src/GateInverseSquareBlurringLaw.cc
++++ b/source/digits_hits/src/GateInverseSquareBlurringLaw.cc
+@@ -8,7 +8,6 @@ See GATE/LICENSE.txt for further details
+ 
+ 
+ #include "GateInverseSquareBlurringLaw.hh"
+-#include "GateMessageManager.hh"
+ 
+ /*! \class  GateInverseSquareBlurringLaw
+   \brief  InverseSquare law giving the resolution in energy
+diff --git a/source/digits_hits/src/GateLinearBlurringLaw.cc b/source/digits_hits/src/GateLinearBlurringLaw.cc
+index efaeffc..322bbb8 100644
+--- a/source/digits_hits/src/GateLinearBlurringLaw.cc
++++ b/source/digits_hits/src/GateLinearBlurringLaw.cc
+@@ -9,7 +9,6 @@ See GATE/LICENSE.txt for further details
+ #include "G4SystemOfUnits.hh"
+ 
+ #include "GateLinearBlurringLaw.hh"
+-#include "GateMessageManager.hh"
+ 
+ /*! \class  GateLinearBlurringLaw
+   \brief  Linear law giving the resolution in energy
+diff --git a/source/digits_hits/src/GatePhaseSpaceActor.cc b/source/digits_hits/src/GatePhaseSpaceActor.cc
+index 1a01084..2bf34e2 100644
+--- a/source/digits_hits/src/GatePhaseSpaceActor.cc
++++ b/source/digits_hits/src/GatePhaseSpaceActor.cc
+@@ -378,12 +378,10 @@ void GatePhaseSpaceActor::UserSteppingAction(const GateVVolume *, const G4Step *
+                    << " stepPoint time proper=" << G4BestUnit(stepPoint->GetProperTime(), "Time")
+                    << " global=" << G4BestUnit(stepPoint->GetGlobalTime(), "Time")
+                    << " local=" << G4BestUnit(stepPoint->GetLocalTime(), "Time") << Gateendl);
+-
+   GateDebugMessage("Actor", 4, "trackid="
+                    << step->GetTrack()->GetParentID()
+                    << " event=" << GateRunManager::GetRunManager()->GetCurrentEvent()->GetEventID()
+                    << " run=" << GateRunManager::GetRunManager()->GetCurrentRun()->GetRunID() << Gateendl);
+-
+   GateDebugMessage("Actor", 4, "pos = " << x << " " << y  << " " << z << Gateendl);
+   GateDebugMessage("Actor", 4, "E = " << G4BestUnit(stepPoint->GetKineticEnergy(), "Energy") << Gateendl);
+ 
+diff --git a/source/digits_hits/src/GateToASCII.cc b/source/digits_hits/src/GateToASCII.cc
+index 67cf2f7..5984e4d 100644
+--- a/source/digits_hits/src/GateToASCII.cc
++++ b/source/digits_hits/src/GateToASCII.cc
+@@ -146,10 +146,8 @@ void GateToASCII::RecordEndOfRun(const G4Run * )
+   if (nVerboseLevel > 2)
+     G4cout << "GateToASCII::RecordEndOfRun" << Gateendl;
+   if (m_outFileRunsFlag) {
+-
+     G4int nEvent = ((GatePrimaryGeneratorAction*)GateRunManager::GetRunManager()->
+ 		    GetUserPrimaryGeneratorAction())->GetEventNumber();
+-
+     if (nVerboseLevel > 0) G4cout
+       << "GateToASCII::RecordEndOfRun: Events in the past run: " << nEvent << Gateendl;
+     m_outFileRun
+diff --git a/source/digits_hits/src/GateToBinary.cc b/source/digits_hits/src/GateToBinary.cc
+index 2b02ef2..77c383a 100644
+--- a/source/digits_hits/src/GateToBinary.cc
++++ b/source/digits_hits/src/GateToBinary.cc
+@@ -20,7 +20,6 @@
+ #include "GateOutputMgr.hh"
+ #include "GateVGeometryVoxelStore.hh"
+ #include "G4DigiManager.hh"
+-#include "GateRunManager.hh"
+ 
+ // 0x79000000 equivalent to 2,030,043,136 bytes
+ #define LIMIT_SIZE 0x79000000
+@@ -137,7 +136,6 @@ void GateToBinary::RecordEndOfRun( G4Run const* )
+ 
+ 	if( m_outFileRunsFlag )
+ 	{
+-
+ 		G4int nEvent =
+ 			( ( (GatePrimaryGeneratorAction*)GateRunManager::GetRunManager()->
+ 			GetUserPrimaryGeneratorAction())->GetEventNumber() );
+diff --git a/source/digits_hits/src/GateToImageCT.cc b/source/digits_hits/src/GateToImageCT.cc
+index a2f0a64..9b7e8a1 100644
+--- a/source/digits_hits/src/GateToImageCT.cc
++++ b/source/digits_hits/src/GateToImageCT.cc
+@@ -26,7 +26,6 @@
+ #include "GateToImageCTMessenger.hh"
+ #include "GateArrayComponent.hh"
+ #include "GateVSystem.hh"
+-#include "GateRunManager.hh"
+ 
+ GateToImageCT::GateToImageCT( const G4String& name, GateOutputMgr* outputMgr,
+                               GateVSystem* itsSystem, DigiMode digiMode )
+@@ -387,9 +386,7 @@ void GateToImageCT::RecordBeginOfEvent( const G4Event* aEvent )
+   if( fabs( newPosition.getX() ) > m_detectorInX / 2
+       || fabs( newPosition.getY() )  > m_detectorInY / 2 )
+     {
+-
+       GateRunManager::GetRunManager()->AbortEvent();
+-
+       if ( nVerboseLevel > 1 )
+         G4cout << " Abort event: Out of detector section "<< Gateendl;
+     }
+diff --git a/source/digits_hits/src/GateToRoot.cc b/source/digits_hits/src/GateToRoot.cc
+index 9914e6e..19521ec 100644
+--- a/source/digits_hits/src/GateToRoot.cc
++++ b/source/digits_hits/src/GateToRoot.cc
+@@ -281,8 +281,7 @@ void GateToRoot::RecordBeginOfAcquisition()
+   if (nVerboseLevel > 2)
+     G4cout << "GateToRoot::RecordBeginOfAcquisition" << Gateendl;
+ 
+-  GateSteppingAction* myAction = ( (GateSteppingAction *)(GateRunManager::GetRunManager()->GetUserSteppingAction() ) );  
+-
++  GateSteppingAction* myAction = ( (GateSteppingAction *)(GateRunManager::GetRunManager()->GetUserSteppingAction() ) );
+   TrackingMode theMode = myAction->GetMode();
+   if (nVerboseLevel > 1) G4cout << " GateToRoot::RecordBeginOfAcquisition()  Tracking Mode " << theMode << Gateendl;
+ 
+@@ -514,7 +513,6 @@ void GateToRoot::RecordEndOfAcquisition()
+   /* PY Descourt 08/09/2009 */
+ 
+   GateSteppingAction* myAction = ( (GateSteppingAction *)(GateRunManager::GetRunManager()->GetUserSteppingAction() ) );
+-
+   TrackingMode theMode = myAction->GetMode();
+   if ( theMode == kTracker )
+     {
+@@ -650,8 +648,8 @@ void GateToRoot::RecordBeginOfEvent(const G4Event* evt )
+   strcpy( theCRData.theRayleighVolumeName1, G4String("NULL").c_str()  );
+   strcpy( theCRData.theRayleighVolumeName2, G4String("NULL").c_str()  );
+ 
+-  TrackingMode theMode =( (GateSteppingAction *)(GateRunManager::GetRunManager()->GetUserSteppingAction() ) )->GetMode();  
+ 
++  TrackingMode theMode =( (GateSteppingAction *)(GateRunManager::GetRunManager()->GetUserSteppingAction() ) )->GetMode();
+   if ( (theMode == kDetector) &&   (evt->GetNumberOfPrimaryVertex() > 0) )
+     {
+ 
+@@ -692,8 +690,8 @@ void GateToRoot::RecordEndOfEvent(const G4Event* event)
+ 
+   // GateMessage("Output", 5 , " GateToRoot::RecordEndOfEvent -- begin" << Gateendl;);
+ 
+-  GateSteppingAction* myAction = ( (GateSteppingAction *)(GateRunManager::GetRunManager()->GetUserSteppingAction() ) );
+ 
++  GateSteppingAction* myAction = ( (GateSteppingAction *)(GateRunManager::GetRunManager()->GetUserSteppingAction() ) );
+   TrackingMode theMode = myAction->GetMode();
+   if ( theMode == kTracker )return;
+ 
+@@ -786,10 +784,8 @@ void GateToRoot::RecordEndOfEvent(const G4Event* event)
+       } else {
+ 	//! better than the simple eventID, but still not enough: it's valid only for
+ 	//! the single run and not for the application
+-
+ 	G4int iEvent = ((GatePrimaryGeneratorAction*)GateRunManager::GetRunManager()->
+ 			GetUserPrimaryGeneratorAction())->GetEventNumber();
+-
+ 	if (m_rootNtupleFlag) ntuple->Fill(iEvent,
+ 					   eventTime/s,
+ 					   m_positronKinEnergy/MeV,
+@@ -1292,10 +1288,12 @@ void GateToRoot::OpenTracksFile()
+   G4int lastEventID = -1;
+   G4String previousFN = fTracksFN ;
+ 
++
+   GateSteppingAction* myAction = ( (GateSteppingAction *)(GateRunManager::GetRunManager()->GetUserSteppingAction() ) );
+ 
+   G4int currentN = myAction->GetcurrentN();
+ 
++
+   G4int NbOfFiles = myAction->GetNfiles();
+ 
+   //if ( m_verboseLevel > 3 )
+@@ -1474,9 +1472,7 @@ void GateToRoot::GetCurrentRecStepData( const G4Event* evt )
+   //PrintRecStep();
+ 
+   if ( m_RSEventID != evt->GetEventID() )
+-    {
+-      const G4Run* currentRun =  GateRunManager::GetRunManager()->GetCurrentRun() ;      
+-
++    {const G4Run* currentRun =  GateRunManager::GetRunManager()->GetCurrentRun() ;
+       G4int RunID = currentRun->GetRunID();
+       G4cout << " GateToRoot::GetCurrentRecStepData :::: current Run ID "<< RunID <<"    current RecStep File " <<m_RecStepTree->GetCurrentFile()->GetName()<<Gateendl;
+       G4cout << " GateToRoot::GetCurrentRecStepData :::: m_currentTracksData = "<<m_currentTracksData  <<"     tracksTuple->GetEntries()   "<< tracksTuple->GetEntries() <<Gateendl;
+@@ -1491,9 +1487,7 @@ void GateToRoot::GetCurrentRecStepData( const G4Event* evt )
+ 
+ GateTrack* GateToRoot::GetCurrentTracksData()
+ {
+-
+-  GateSteppingAction* myAction = ( (GateSteppingAction *)(GateRunManager::GetRunManager()->GetUserSteppingAction() ) );  
+-
++  GateSteppingAction* myAction = ( (GateSteppingAction *)(GateRunManager::GetRunManager()->GetUserSteppingAction() ) );
+   if ( m_currentTracksData ==  tracksTuple->GetEntries() ) // check if we are done
+     {
+       m_EOF = 1;
+@@ -1557,9 +1551,7 @@ void GateToRoot::RecordRecStepData( const G4Event* evt )
+ {
+   //G4cout << " GateToRoot::RecordRecStepData : recording RecStep Data to ROOT file " << Gateendl;
+   m_RSEventID = evt->GetEventID();
+-
+-  m_RSRunID   = GateRunManager::GetRunManager()->GetCurrentRun()->GetRunID();  
+-
++  m_RSRunID   = GateRunManager::GetRunManager()->GetCurrentRun()->GetRunID();
+   m_RecStepTree->Fill();
+   //PrintRecStep();
+   //G4cout << " GateToRoot::RecordRecStepData : runID " << m_RSRunID << "  eventID "<< m_RSEventID  << Gateendl;
+diff --git a/source/digits_hits/src/GateToSinogram.cc b/source/digits_hits/src/GateToSinogram.cc
+index 5782800..22e42ea 100644
+--- a/source/digits_hits/src/GateToSinogram.cc
++++ b/source/digits_hits/src/GateToSinogram.cc
+@@ -29,7 +29,6 @@ See GATE/LICENSE.txt for further details
+ #include "GateTools.hh"
+ #include "GateVSystem.hh"
+ #include "GateApplicationMgr.hh"
+-#include "GateMessageManager.hh"
+ 
+ // #include "GatePlacementMove.hh"
+ 
+diff --git a/source/digits_hits/src/GateTrajectoryNavigator.cc b/source/digits_hits/src/GateTrajectoryNavigator.cc
+index 55ad6b2..c05d797 100644
+--- a/source/digits_hits/src/GateTrajectoryNavigator.cc
++++ b/source/digits_hits/src/GateTrajectoryNavigator.cc
+@@ -119,7 +119,7 @@ G4int GateTrajectoryNavigator::FindPositronTrackID()
+ std::vector<G4int> GateTrajectoryNavigator::FindAnnihilationGammasTrackID()
+ {
+ 
+-  TrackingMode theMode =( (GateSteppingAction *)(GateRunManager::GetRunManager()->GetUserSteppingAction() ) )->GetMode();  
++TrackingMode theMode =( (GateSteppingAction *)(GateRunManager::GetRunManager()->GetUserSteppingAction() ) )->GetMode();
+ 
+   if (nVerboseLevel > 2)
+     G4cout << "GateTrajectoryNavigator::FindAnnihilationGammasTrackID" << Gateendl;
+diff --git a/source/digits_hits/src/GateUserActions.cc b/source/digits_hits/src/GateUserActions.cc
+index a71814c..7abba4e 100644
+--- a/source/digits_hits/src/GateUserActions.cc
++++ b/source/digits_hits/src/GateUserActions.cc
+@@ -12,9 +12,7 @@ See GATE/LICENSE.txt for further details
+ 
+ #include "GateUserActions.hh"
+ #include "GateActions.hh"
+-#ifdef G4MULTITHREADED
+-#include "GateActionInitialization.hh"
+-#endif
++
+ #include "G4UImanager.hh"
+ #include "G4VVisManager.hh"
+ //#include "G4Run.hh"
+@@ -53,10 +51,6 @@ GateUserActions::GateUserActions(GateRunManager* m, GateRecorderBase* r)
+ 
+ 
+   // Set fGate' user action classes to the GateRunmanager :
+-#ifdef G4MULTITHREADED
+-  GateActionInitialization* ActionInitialization = new GateActionInitialization(this, recorder);
+-  pRunManager->SetUserInitialization(ActionInitialization);
+-#else
+   // Run/Event/Tracking/Stepping in order to get the callbacks
+   GateRunAction* RunAction = new GateRunAction(this, recorder);
+   GateEventAction* EventAction = new GateEventAction(this, recorder);
+@@ -66,8 +60,7 @@ GateUserActions::GateUserActions(GateRunManager* m, GateRecorderBase* r)
+   pRunManager->SetUserAction(RunAction);
+   pRunManager->SetUserAction(EventAction);
+   pRunManager->SetUserAction(TrackingAction);
+-  pRunManager->SetUserAction(SteppingAction);  
+-#endif
++  pRunManager->SetUserAction(SteppingAction);
+ 
+   //pRunManager->SetUserAction(dynamic_cast<G4UserRunAction *>(this)); //Don't know why this don't work
+   //pRunManager->SetUserAction(dynamic_cast<G4UserEventAction *>(this));
+diff --git a/source/digits_hits/src/GateVDistributionArray.cc b/source/digits_hits/src/GateVDistributionArray.cc
+index a20f5b2..e0918c5 100644
+--- a/source/digits_hits/src/GateVDistributionArray.cc
++++ b/source/digits_hits/src/GateVDistributionArray.cc
+@@ -12,7 +12,6 @@ See GATE/LICENSE.txt for further details
+ #include <math.h>
+ #include <CLHEP/Random/RandFlat.h>
+ #include "GateTools.hh"
+-#include "GateMessageManager.hh"
+ 
+ 
+ GateVDistributionArray::GateVDistributionArray(const G4String& itsName)
+diff --git a/source/digits_hits/src/GateVOutputModule.cc b/source/digits_hits/src/GateVOutputModule.cc
+index 2f4ead5..d1ebc93 100644
+--- a/source/digits_hits/src/GateVOutputModule.cc
++++ b/source/digits_hits/src/GateVOutputModule.cc
+@@ -10,7 +10,6 @@ See GATE/LICENSE.txt for further details
+ #include "GateVOutputModule.hh"
+ //#include "GateOutputModuleMessenger.hh"
+ #include "GateTools.hh"
+-#include "GateMessageManager.hh"
+ 
+ GateVOutputModule::GateVOutputModule(const G4String& name, GateOutputMgr* outputMgr,DigiMode digiMode)
+   : m_outputMgr(outputMgr),
+diff --git a/source/externals/clhep/include/CLHEP/Matrix/DiagMatrix.h b/source/externals/clhep/include/CLHEP/Matrix/DiagMatrix.h
+old mode 100644
+new mode 100755
+diff --git a/source/externals/clhep/include/CLHEP/Matrix/DiagMatrix.icc b/source/externals/clhep/include/CLHEP/Matrix/DiagMatrix.icc
+old mode 100644
+new mode 100755
+diff --git a/source/externals/clhep/include/CLHEP/Matrix/GenMatrix.h b/source/externals/clhep/include/CLHEP/Matrix/GenMatrix.h
+old mode 100644
+new mode 100755
+diff --git a/source/externals/clhep/include/CLHEP/Matrix/GenMatrix.icc b/source/externals/clhep/include/CLHEP/Matrix/GenMatrix.icc
+old mode 100644
+new mode 100755
+diff --git a/source/externals/clhep/include/CLHEP/Matrix/Matrix.h b/source/externals/clhep/include/CLHEP/Matrix/Matrix.h
+old mode 100644
+new mode 100755
+diff --git a/source/externals/clhep/include/CLHEP/Matrix/Matrix.icc b/source/externals/clhep/include/CLHEP/Matrix/Matrix.icc
+old mode 100644
+new mode 100755
+diff --git a/source/externals/clhep/include/CLHEP/Matrix/SymMatrix.h b/source/externals/clhep/include/CLHEP/Matrix/SymMatrix.h
+old mode 100644
+new mode 100755
+diff --git a/source/externals/clhep/include/CLHEP/Matrix/SymMatrix.icc b/source/externals/clhep/include/CLHEP/Matrix/SymMatrix.icc
+old mode 100644
+new mode 100755
+diff --git a/source/externals/clhep/include/CLHEP/Matrix/Vector.h b/source/externals/clhep/include/CLHEP/Matrix/Vector.h
+old mode 100644
+new mode 100755
+diff --git a/source/externals/clhep/include/CLHEP/Matrix/Vector.icc b/source/externals/clhep/include/CLHEP/Matrix/Vector.icc
+old mode 100644
+new mode 100755
+diff --git a/source/externals/clhep/include/CLHEP/RandomObjects/RandMultiGauss.h b/source/externals/clhep/include/CLHEP/RandomObjects/RandMultiGauss.h
+old mode 100644
+new mode 100755
+diff --git a/source/externals/clhep/include/CLHEP/RandomObjects/RandomVector.h b/source/externals/clhep/include/CLHEP/RandomObjects/RandomVector.h
+old mode 100644
+new mode 100755
+diff --git a/source/externals/clhep/include/CLHEP/RandomObjects/RandomVector.icc b/source/externals/clhep/include/CLHEP/RandomObjects/RandomVector.icc
+old mode 100644
+new mode 100755
+diff --git a/source/externals/clhep/src/CLHEP/Matrix/DiagMatrix.cc b/source/externals/clhep/src/CLHEP/Matrix/DiagMatrix.cc
+old mode 100644
+new mode 100755
+diff --git a/source/externals/clhep/src/CLHEP/Matrix/GenMatrix.cc b/source/externals/clhep/src/CLHEP/Matrix/GenMatrix.cc
+old mode 100644
+new mode 100755
+diff --git a/source/externals/clhep/src/CLHEP/Matrix/Matrix.cc b/source/externals/clhep/src/CLHEP/Matrix/Matrix.cc
+old mode 100644
+new mode 100755
+diff --git a/source/externals/clhep/src/CLHEP/Matrix/MatrixInvert.cc b/source/externals/clhep/src/CLHEP/Matrix/MatrixInvert.cc
+old mode 100644
+new mode 100755
+diff --git a/source/externals/clhep/src/CLHEP/Matrix/MatrixLinear.cc b/source/externals/clhep/src/CLHEP/Matrix/MatrixLinear.cc
+old mode 100644
+new mode 100755
+diff --git a/source/externals/clhep/src/CLHEP/Matrix/SymMatrix.cc b/source/externals/clhep/src/CLHEP/Matrix/SymMatrix.cc
+old mode 100644
+new mode 100755
+diff --git a/source/externals/clhep/src/CLHEP/Matrix/SymMatrixInvert.cc b/source/externals/clhep/src/CLHEP/Matrix/SymMatrixInvert.cc
+old mode 100644
+new mode 100755
+diff --git a/source/externals/clhep/src/CLHEP/Matrix/Vector.cc b/source/externals/clhep/src/CLHEP/Matrix/Vector.cc
+old mode 100644
+new mode 100755
+diff --git a/source/externals/clhep/src/CLHEP/RandomObjects/RandMultiGauss.cc b/source/externals/clhep/src/CLHEP/RandomObjects/RandMultiGauss.cc
+old mode 100644
+new mode 100755
+diff --git a/source/externals/clhep/src/CLHEP/RandomObjects/RandomVector.cc b/source/externals/clhep/src/CLHEP/RandomObjects/RandomVector.cc
+old mode 100644
+new mode 100755
+diff --git a/source/general/include/GateRunManager.hh b/source/general/include/GateRunManager.hh
+index 3269e2e..c4164d9 100644
+--- a/source/general/include/GateRunManager.hh
++++ b/source/general/include/GateRunManager.hh
+@@ -28,23 +28,12 @@
+ #define GateRunManager_h 1
+ 
+ #include "G4RunManager.hh"
+-#ifdef G4MULTITHREADED
+- #include "G4MTRunManager.hh"
+-#endif
+ #include "GateHounsfieldToMaterialsBuilder.hh"
+ 
+ class GateRunManagerMessenger;
+ class GateDetectorConstruction;
+ 
+-static G4String DefaultRegion="DefaultRegionForTheWorld";
+-
+-#ifdef G4MULTITHREADED
+-//static G4String DefaultRegion="DefaultRegionForParallelWorld";
+-class GateRunManager : public G4MTRunManager
+-#else
+-//static G4String DefaultRegion="DefaultRegionForTheWorld";
+ class GateRunManager : public G4RunManager
+-#endif
+ {
+ public:
+   //! Constructor
+@@ -71,11 +60,8 @@ public:
+ 
+   //! Return the instance of the run manager
+   static GateRunManager* GetRunManager()
+-  #ifdef G4MULTITHREADED
+-  {	return dynamic_cast<GateRunManager*>(G4MTRunManager::GetRunManager()); }
+-  #else
+   {	return dynamic_cast<GateRunManager*>(G4RunManager::GetRunManager()); }
+-  #endif
++
+   bool GetGlobalOutputFlag() { return mGlobalOutputFlag; }
+   void EnableGlobalOutput(bool b) { mGlobalOutputFlag = b; }
+   void SetUserPhysicList(G4VUserPhysicsList * m) { mUserPhysicList = m; }
+diff --git a/source/general/src/GateApplicationMgr.cc b/source/general/src/GateApplicationMgr.cc
+index 3cf1604..4867589 100644
+--- a/source/general/src/GateApplicationMgr.cc
++++ b/source/general/src/GateApplicationMgr.cc
+@@ -710,7 +710,6 @@ void GateApplicationMgr::EnableTimeStudyForSteps(G4String filename)
+ void GateApplicationMgr::PrintStatus()
+ {
+     const G4Run * run = GateRunManager::GetRunManager()->GetCurrentRun();
+-
+     const int runID = run->GetRunID() + 1;
+     const int runTotal = listOfTimeSlice.size();
+ 
+diff --git a/source/general/src/GateClockDependent.cc b/source/general/src/GateClockDependent.cc
+index 95394d3..d9f6258 100644
+--- a/source/general/src/GateClockDependent.cc
++++ b/source/general/src/GateClockDependent.cc
+@@ -11,7 +11,6 @@ See GATE/LICENSE.txt for further details
+ 
+ #include "GateClock.hh"
+ #include "GateTools.hh"
+-#include "GateMessageManager.hh"
+ 
+ //-------------------------------------------------------------------------------------------------------
+ // Constructor.
+diff --git a/source/general/src/GateHounsfieldMaterialProperties.cc b/source/general/src/GateHounsfieldMaterialProperties.cc
+index 6aac641..96531e4 100644
+--- a/source/general/src/GateHounsfieldMaterialProperties.cc
++++ b/source/general/src/GateHounsfieldMaterialProperties.cc
+@@ -17,7 +17,6 @@ See GATE/LICENSE.txt for further details
+ #include "GateMiscFunctions.hh"
+ #include "GateMaterialDatabase.hh"
+ #include "GateDetectorConstruction.hh"
+-#include "GateROGeometry.hh"
+ 
+ //-----------------------------------------------------------------------------
+ GateHounsfieldMaterialProperties::GateHounsfieldMaterialProperties()
+diff --git a/source/general/src/GateMiscFunctions.cc b/source/general/src/GateMiscFunctions.cc
+index 89b3750..5432064 100644
+--- a/source/general/src/GateMiscFunctions.cc
++++ b/source/general/src/GateMiscFunctions.cc
+@@ -11,7 +11,6 @@ See GATE/LICENSE.txt for further details
+ 
+ #include "GateMiscFunctions.hh"
+ #include "GateActorManager.hh"
+-#include "GateRunManager.hh"
+ 
+ #include "G4SystemOfUnits.hh"
+ #include "G4UIcmdWithADouble.hh"
+@@ -658,9 +657,7 @@ int GetIndexFromTime(std::vector<double> & mTimeList, double aTime) {
+ G4String GetSaveCurrentFilename(G4String & mSaveFilename) {
+   int nr=0;
+   int ne=0;
+-
+-  const G4Run * run = GateRunManager::GetRunManager()->GetCurrentRun();  
+-
++  const G4Run * run = GateRunManager::GetRunManager()->GetCurrentRun();
+   if (run) nr = run->GetRunID(); 
+   else {
+     nr = 0;
+diff --git a/source/general/src/GateModuleListManager.cc b/source/general/src/GateModuleListManager.cc
+index dbfbe20..39954b6 100644
+--- a/source/general/src/GateModuleListManager.cc
++++ b/source/general/src/GateModuleListManager.cc
+@@ -9,7 +9,6 @@ See GATE/LICENSE.txt for further details
+ 
+ #include "GateModuleListManager.hh"
+ #include "GateTools.hh"
+-#include "GateMessageManager.hh"
+ 
+ //--------------------------------------------------------------------------------------------
+ GateModuleListManager::GateModuleListManager(GateNamedObject* itsMotherObject,
+diff --git a/source/general/src/GatePrimaryGeneratorAction.cc b/source/general/src/GatePrimaryGeneratorAction.cc
+index 9b6fc97..31762c7 100644
+--- a/source/general/src/GatePrimaryGeneratorAction.cc
++++ b/source/general/src/GatePrimaryGeneratorAction.cc
+@@ -11,9 +11,6 @@ See GATE/LICENSE.txt for further details
+ #include "G4GeneralParticleSource.hh"
+ #include "G4ParticleGun.hh"
+ #include "G4UImanager.hh"
+-#ifdef G4MULTITHREADED
+-#include "G4MTRunManager.hh"
+-#endif
+ 
+ #include "Randomize.hh"
+ #include "G4ios.hh"
+@@ -109,12 +106,7 @@ void GatePrimaryGeneratorAction::GenerateSimulationPrimaries(G4Event* event)
+   G4int numVertices = sourceMgr->PrepareNextEvent(event);  
+   //! stop the run if no particle has been generated by the source manager
+   if (numVertices == 0) {
+-
+-#ifdef G4MULTITHREADED
+-    G4MTRunManager* runManager = GateRunManager::GetMasterRunManager();
+-#else
+-    G4RunManager* runManager = GateRunManager::GetRunManager();
+-#endif
++    GateRunManager* runManager = GateRunManager::GetRunManager();
+ 
+     runManager->AbortRun(true);
+     if (m_nVerboseLevel>1) G4cout << "GatePrimaryGeneratorAction::GeneratePrimaries: numVertices == 0, run aborted " << Gateendl;  
+diff --git a/source/general/src/GateRunManager.cc b/source/general/src/GateRunManager.cc
+index b7635e6..60ef31e 100644
+--- a/source/general/src/GateRunManager.cc
++++ b/source/general/src/GateRunManager.cc
+@@ -8,10 +8,6 @@
+ 
+ 
+ #include "GateRunManager.hh"
+-#ifdef G4MULTITHREADED
+- #include "G4MTRunManager.hh"
+- #include "GateROGeometry.hh"
+-#endif
+ #include "GateDetectorConstruction.hh"
+ #include "GateRunManagerMessenger.hh"
+ #include "GateHounsfieldToMaterialsBuilder.hh"
+@@ -22,7 +18,6 @@
+ #include "G4PhysListFactory.hh"
+ #include "G4VUserPhysicsList.hh"
+ #include "G4VModularPhysicsList.hh"
+-#include "G4ParallelWorldPhysics.hh"
+ #include "G4RegionStore.hh"
+ #include "G4Region.hh"
+ #include "G4LossTableManager.hh"
+@@ -32,11 +27,7 @@
+ #endif
+ 
+ //----------------------------------------------------------------------------------------
+-#ifdef G4MULTITHREADED
+-GateRunManager::GateRunManager():G4MTRunManager()
+-#else
+ GateRunManager::GateRunManager():G4RunManager()
+-#endif
+ {
+   pMessenger = new GateRunManagerMessenger(this);
+   mHounsfieldToMaterialsBuilder = new GateHounsfieldToMaterialsBuilder();
+@@ -111,7 +102,7 @@ void GateRunManager::InitializeAll()
+     // the Gate one is used to store/retrieve cuts parameters.
+ 
+     // Consider the e- cut as default (in mm)
+-    double def = GatePhysicsList::GetInstance()->mapOfRegionCuts[DefaultRegion].electronCut;
++    double def = GatePhysicsList::GetInstance()->mapOfRegionCuts["DefaultRegionForTheWorld"].electronCut;
+     mUserPhysicList->SetDefaultCutValue(def*mm);
+     mUserPhysicList->SetCutsWithDefault();
+ 
+@@ -168,7 +159,7 @@ void GateRunManager::InitGeometryOnly()
+     //G4bool unique;
+     G4String regionName = (*pi)->GetName();
+ 
+-    if(regionName!=DefaultRegion){
++    if(regionName!="DefaultRegionForTheWorld"){
+       RegionStore->DeRegister((*pi));
+       GateMessage("Cuts", 5, "Region "<<regionName<<" deleted."<< Gateendl);
+     }
+@@ -188,15 +179,9 @@ void GateRunManager::InitGeometryOnly()
+       det = detConstruction->GateDetectorConstruction::GetGateDetectorConstruction();
+       det->GateDetectorConstruction::SetGeometryStatusFlag(GateDetectorConstruction::geometry_needs_rebuild);
+       det->GateDetectorConstruction::UpdateGeometry();
+-      geometryInitialized=true;
+-#ifdef G4MULTITHREADED      
+-      GateROGeometry* RO = (GateROGeometry*) det->GetParallelWorld(0); 
+-      det->GateDetectorConstruction::RegisterParallelWorld(RO);
+-  //Parallel world sensitivity
+-    //
+-    G4ParallelWorldPhysics* pWorld = new G4ParallelWorldPhysics("GateROGeometry");
+-    pWorld->ConstructProcess();
+-#endif
++      //	  nParallelWorlds = userDetector->ConstructParallelGeometries();
++      //          kernel->SetNumberOfParallelWorld(nParallelWorlds);
++      //	  geometryInitialized=true;
+     }
+ 
+ }
+@@ -221,9 +206,8 @@ void GateRunManager::RunInitialization()
+   }
+ 
+   // GateMessage("Core", 0, "Initialization of the run " << Gateendl);
+-
+-  // Perform a regular initialisation from parent class
+-  G4RunManager::RunInitialization(); // G4MTRunManager class doesn't override this method
++  // Perform a regular initialisation
++  G4RunManager::RunInitialization();
+ 
+   // Initialization of the atom deexcitation processes
+   // must be done after all other initialization
+diff --git a/source/general/src/GateUIcontrolMessenger.cc b/source/general/src/GateUIcontrolMessenger.cc
+index 9eecea2..d1f7cca 100644
+--- a/source/general/src/GateUIcontrolMessenger.cc
++++ b/source/general/src/GateUIcontrolMessenger.cc
+@@ -8,7 +8,6 @@ See GATE/LICENSE.txt for further details
+ 
+ 
+ #include "GateUIcontrolMessenger.hh"
+-#include "GateMessageManager.hh"
+ 
+ #include "G4UIdirectory.hh"
+ #include "G4UIcmdWithoutParameter.hh"
+diff --git a/source/geometry/include/GateDetectorConstruction.hh b/source/geometry/include/GateDetectorConstruction.hh
+index de33bf3..bb3971d 100644
+--- a/source/geometry/include/GateDetectorConstruction.hh
++++ b/source/geometry/include/GateDetectorConstruction.hh
+@@ -19,7 +19,6 @@
+ #include "GateObjectMoveListMessenger.hh"
+ #include "GatePhysicsList.hh"
+ #include "GateRTPhantomMgr.hh"
+-#include "GateROGeometry.hh"
+ 
+ class G4UniformMagField;
+ class GateObjectStore;
+@@ -33,6 +32,8 @@ class GateBox;
+ class GateSystemListManager;
+ class GateARFSD;
+ 
++#define theMaterialDatabase GateDetectorConstruction::GetGateDetectorConstruction()->mMaterialDatabase
++
+ class GateDetectorConstruction : public G4VUserDetectorConstruction
+ {
+ 
+@@ -43,16 +44,22 @@ public:
+ 
+   virtual G4VPhysicalVolume* Construct();
+   virtual void UpdateGeometry();
++  virtual void SetMagField (G4ThreeVector);
++  virtual void BuildMagField ();
+ 
+   /* PY Descourt 08/09/2009 */
+   GateARFSD* GetARFSD(){ return m_ARFSD;};
+   void insertARFSD( G4String , G4int );
+   /* PY Descourt 08/09/2009 */
+ 
++
++#ifdef GATE_USE_OPTICAL
++  virtual void BuildSurfaces();
++#endif
++
+   // Material DB
+   /// Mandatory : Adds a Material Database to use (filename, callback for Messenger)
+-  inline void AddFileToMaterialDatabase(const G4String& f) 
+-  { pworld->AddFileToMaterialDatabase(f); }
++  void AddFileToMaterialDatabase(const G4String& f);
+ 
+   static GateDetectorConstruction* GetGateDetectorConstruction()
+   {
+@@ -60,12 +67,10 @@ public:
+   };
+ 
+   inline G4VPhysicalVolume*   GetWorldVolume()
+-  { return pworld->GetWorldVolume(); }
++  { return pworldPhysicalVolume; }
+ 
+   inline GateObjectStore* GetObjectStore()
+-  { return pworld->GetObjectStore(); }
+-  
+-  inline void SetMagField (G4ThreeVector theVector){pworld->SetMagField(theVector);}
++  { return pcreatorStore; }
+ 
+   enum GeometryStatus {
+     geometry_is_uptodate = 0,
+@@ -96,40 +101,53 @@ public:
+   GateMaterialDatabase mMaterialDatabase;
+ 
+   inline GateCrystalSD* GetCrystalSD()
+-  { return pworld->GetCrystalSD(); }
++  { return m_crystalSD; }
+ 
+ 
+   inline GatePhantomSD*   GetPhantomSD()
+-  { return pworld->GetPhantomSD(); }
++  { return m_phantomSD; }
+ 
+   //private:
+ 
+   virtual void DestroyGeometry();
+ 
+   //void SetIonisationPotential(G4String n, G4double v){mMaterialDatabase.SetMaterialIoniPotential(n,v);}
+-  void SetMaterialIoniPotential(G4String n,G4double v){pworld->SetMaterialIoniPotential(n,v);}
+-  G4double GetMaterialIoniPotential(G4String n){ return pworld->GetMaterialIoniPotential(n);}
++
++  void SetMaterialIoniPotential(G4String n,G4double v){theListOfIonisationPotential[n]=v;}
++  G4double GetMaterialIoniPotential(G4String n){ return theListOfIonisationPotential[n];}
++
+ 
+ 
+ private :
+ 
+-  GateROGeometry* pworld;
++  GateBox* pworld;
++  G4VPhysicalVolume* pworldPhysicalVolume;
+ 
+   GeometryStatus nGeometryStatus;
+   G4bool flagAutoUpdate;
+ 
++  GateCrystalSD*   m_crystalSD;
++  GatePhantomSD*   m_phantomSD;
++
++  GateObjectStore* pcreatorStore;
+   GateSystemListManager*  psystemStore;
+ 
+   // Pour utiliser le DetectorMessenger
+   GateDetectorMessenger* pdetectorMessenger;  //pointer to the Messenger
+ 
+   static GateDetectorConstruction* pTheGateDetectorConstruction;
+-  
++
+ protected :
+   //!< List of movements
+   G4bool moveFlag;
+ 
++  std::map<G4String,G4double> theListOfIonisationPotential;
++
++
+ private:
++  //! Magnetic field
++  G4UniformMagField* m_magField;
++  G4ThreeVector      m_magFieldValue;
+ 
+   GateARFSD* m_ARFSD; // PY Descourt 8/09/2009
+   GateRTPhantomMgr* m_RTPhantomMgr; // PY Descourt 08/09/2009
+diff --git a/source/geometry/include/GateROGeometry.hh b/source/geometry/include/GateROGeometry.hh
+deleted file mode 100644
+index 3664679..0000000
+--- a/source/geometry/include/GateROGeometry.hh
++++ /dev/null
+@@ -1,106 +0,0 @@
+-/*----------------------
+-  Copyright (C): OpenGATE Collaboration
+-
+-  This software is distributed under the terms
+-  of the GNU Lesser General  Public Licence (LGPL)
+-  See GATE/LICENSE.txt for further details
+-  ----------------------*/
+-//
+-// $Id: GateROGeometry.hh 68698 2013-04-05 08:41:22Z gcosmo $
+-//
+-/// \file geometry/include/GateROGeometry.hh
+-/// \brief Definition of the GateROGeometry class
+-//
+-
+-#ifndef GateROGeometry_h
+-#define GateROGeometry_h 1
+-
+-#include "G4VUserParallelWorld.hh"
+-
+-#include "GateConfiguration.h"
+-#include "GateMaterialDatabase.hh"
+-#include "GateCrystalSD.hh"
+-#include "GatePhantomSD.hh"
+-
+-#include "globals.hh"
+-
+-class G4UniformMagField;
+-class GateObjectStore;
+-class GateVVolume;
+-class GateBox;
+-
+-#define theMaterialDatabase GateROGeometry::GetGateROGeometry()->mMaterialDatabase
+-
+-class GateROGeometry : public G4VUserParallelWorld
+-{
+-public:
+-  GateROGeometry(G4String);
+-  virtual ~GateROGeometry();
+-  
+-  enum GeometryStatus {
+-    geometry_is_uptodate = 0,
+-    geometry_needs_update = 1,
+-    geometry_needs_rebuild = 2
+-  };
+-
+-  virtual void Construct();
+-  virtual void ConstructSD();
+-  void Initialize(G4double, G4double, G4double, G4ThreeVector);
+-  inline G4VPhysicalVolume* GetWorldVolume() {return pworldPhysicalVolume;}
+-  //inline G4VPhysicalVolume* GetWorldVolume() {return this->GetWorld();}
+-  inline GateObjectStore* GetObjectStore()  { return pcreatorStore; }
+-  inline virtual void SetGeometryStatusFlag(GeometryStatus val)  { nGeometryStatus = val; }
+-  inline virtual G4bool GetGeometryStatusFlag()  { return nGeometryStatus; }
+-  static GateROGeometry* GetGateROGeometry()
+-  {
+-    return pTheGateROGeometry;
+-  };
+-  virtual void SetMagField (G4ThreeVector);
+-  virtual void BuildMagField ();
+-    /// The Material database
+-  GateMaterialDatabase mMaterialDatabase;
+-  // Material DB
+-  /// Mandatory : Adds a Material Database to use (filename, callback for Messenger)
+-  void AddFileToMaterialDatabase(const G4String& f);
+-
+-  inline GateCrystalSD* GetCrystalSD()
+-  { return m_crystalSD; }
+-
+-  inline GatePhantomSD*   GetPhantomSD()
+-  { return m_phantomSD; }
+-  
+-#ifdef GATE_USE_OPTICAL
+-  virtual void BuildSurfaces();
+-#endif
+-  
+-  void SetMaterialIoniPotential(G4String n,G4double v){theListOfIonisationPotential[n]=v;}
+-  G4double GetMaterialIoniPotential(G4String n){ return theListOfIonisationPotential[n];}
+-  
+-  virtual void DestroyGeometry();
+-  
+-private:
+-  GateBox* pworld;
+-  GeometryStatus nGeometryStatus;
+-  GateCrystalSD*   m_crystalSD;
+-  GatePhantomSD*   m_phantomSD;
+-  GateObjectStore* pcreatorStore;
+-  //GateDetectorConstruction * pdet;
+-  G4double pworld_x;
+-  G4double pworld_y;
+-  G4double pworld_z;
+-  G4bool isBuilt;
+-  G4bool isInitialized;
+-  
+-    //! Magnetic field
+-  G4UniformMagField* m_magField;
+-  G4ThreeVector      m_magFieldValue;
+-  
+-  static GateROGeometry* pTheGateROGeometry;
+-  G4VPhysicalVolume*  pworldPhysicalVolume;
+-  G4LogicalVolume* sensitiveLogicalVolume;
+-  
+-protected:
+-  std::map<G4String,G4double> theListOfIonisationPotential;
+-};
+-
+-#endif
+diff --git a/source/geometry/src/GateDetectorConstruction.cc b/source/geometry/src/GateDetectorConstruction.cc
+index 6266a26..49ce02b 100644
+--- a/source/geometry/src/GateDetectorConstruction.cc
++++ b/source/geometry/src/GateDetectorConstruction.cc
+@@ -29,6 +29,7 @@
+ #include "G4Navigator.hh"
+ #include "G4SDManager.hh"
+ #include "G4Material.hh"
++#include "G4Material.hh"
+ 
+ #ifdef GATE_USE_OPTICAL
+ #include "GateSurfaceList.hh"
+@@ -39,10 +40,14 @@ GateDetectorConstruction* GateDetectorConstruction::pTheGateDetectorConstruction
+ //---------------------------------------------------------------------------------
+ GateDetectorConstruction::GateDetectorConstruction()
+   :  pworld(0),
++     pworldPhysicalVolume(0),
+      nGeometryStatus(geometry_needs_rebuild),
+      flagAutoUpdate(false),
++     m_crystalSD(0),
++     m_phantomSD(0),
+      pdetectorMessenger(0),
+-     moveFlag(0)
++     moveFlag(0),
++     m_magField(0), m_magFieldValue(0)
+ {
+ 
+   GateMessage("Geometry", 1, "GateDetectorConstruction instantiating...\n");
+@@ -51,12 +56,42 @@ GateDetectorConstruction::GateDetectorConstruction()
+ 
+   pTheGateDetectorConstruction = this;
+ 
++  pcreatorStore = GateObjectStore::GetInstance();
+   psystemStore=GateSystemListManager::GetInstance();
+ 
+   pdetectorMessenger = new GateDetectorMessenger(this);
+-  
+-  SetGeometryStatusFlag(geometry_needs_update);
+ 
++  m_magFieldValue = G4ThreeVector(0.,0.,0. * tesla);
++
++  G4double pworld_x = 50.*cm;
++  G4double pworld_y = 50.*cm;
++  G4double pworld_z = 50.*cm;
++
++  //-------------------------------------------------------------------------
++  // Create default material (air) for the world
++  G4Element* N  = new G4Element("worldDefaultN","N" , 7., 14.01*g/mole );
++  G4Element* O  = new G4Element("worldDefaultO"  ,"O" , 8., 16.00*g/mole);
++  G4Material* Air = new G4Material("worldDefaultAir"  , 1.290*mg/cm3, 2);
++  Air->AddElement(N, 0.7);
++  Air->AddElement(O, 0.3);
++  //-------------------------------------------------------------------------
++
++  pworld = new GateBox("world", "worldDefaultAir",  pworld_x, pworld_y, pworld_z, true);
++  pworld->SetMaterialName("worldDefaultAir");
++
++  G4SDManager* SDman = G4SDManager::GetSDMpointer();
++
++  if(!m_crystalSD) {
++    G4String crystalSDname = "/gate/crystal";
++    m_crystalSD = new GateCrystalSD(crystalSDname);
++    SDman->AddNewDetector(m_crystalSD);
++  }
++
++  if(!m_phantomSD) {
++    G4String phantomSDname = "/gate/phantom";
++    m_phantomSD = new GatePhantomSD(phantomSDname);
++    SDman->AddNewDetector(m_phantomSD);
++  }
+   GateMessage("Geometry", 5, "  GateDetectorConstruction constructor -- end ");
+ 
+ 
+@@ -70,6 +105,11 @@ GateDetectorConstruction::GateDetectorConstruction()
+ //---------------------------------------------------------------------------------
+ GateDetectorConstruction::~GateDetectorConstruction()
+ {
++  if (pworld) {
++    DestroyGeometry();
++    delete pworld;
++    pworld = 0;
++  }
+   delete pdetectorMessenger;
+ }
+ //---------------------------------------------------------------------------------
+@@ -77,70 +117,131 @@ GateDetectorConstruction::~GateDetectorConstruction()
+ //---------------------------------------------------------------------------------
+ G4VPhysicalVolume* GateDetectorConstruction::Construct()
+ {
+-  GateMessage("Geometry", 3, "Geometry construction starts. " << Gateendl);
+-
+-  G4ThreeVector magFieldValue = G4ThreeVector(0.,0.,0. * tesla);
++  GateMessage("Geometry", 3, "Geometry construction starts. \n");
+ 
+-  G4double pworld_x = 50.*cm;
+-  G4double pworld_y = 50.*cm;
+-  G4double pworld_z = 50.*cm;
+-  
+-  pworld = new GateROGeometry("world");
+-  pworld->Initialize(pworld_x, pworld_y, pworld_z, magFieldValue);
+-
+-  pworld->Construct();
+-  pworld->ConstructSD();
+-  
+-  this->RegisterParallelWorld(pworld);
+-  GateRunManager::GetRunManager()->DefineWorldVolume(pworld->GetWorldVolume());
++  pworldPhysicalVolume = pworld->GateVVolume::Construct();
+   SetGeometryStatusFlag(geometry_is_uptodate);
+ 
+-  GateMessage("Geometry", 3, "Geometry has been constructed (status = " << nGeometryStatus << ")." << Gateendl);
++  GateMessage("Physic", 1, " "<<Gateendl);
++  GateMessage("Physic", 1, "----------------------------------------------------------"<<Gateendl);
++  GateMessage("Physic", 1, "                    Ionization potential "<<Gateendl);
++
++  const G4MaterialTable * theTable = G4Material::GetMaterialTable();
++  for(unsigned int i =0;i<(*theTable).size();i++){
++    if(theListOfIonisationPotential[(*theTable)[i]->GetName()]){
++      (*theTable)[i]->GetIonisation()->SetMeanExcitationEnergy(theListOfIonisationPotential[(*theTable)[i]->GetName()]);
++      GateMessage("Physic", 1, " - " << (*theTable)[i]->GetName() << "\t defaut value: I = " <<
++                  G4BestUnit((*theTable)[i]->GetIonisation()->GetMeanExcitationEnergy(),"Energy") <<
++                  "\t-->  new value: I = " <<
++                  G4BestUnit((*theTable)[i]->GetIonisation()->GetMeanExcitationEnergy(),"Energy") << Gateendl);
++    }
++    else {
++      GateMessage("Physic", 1, " - " << (*theTable)[i]->GetName() << "\t defaut value: I = " <<
++                  G4BestUnit((*theTable)[i]->GetIonisation()->GetMeanExcitationEnergy(),"Energy") << Gateendl);
++    }
++  }
++  GateMessage("Physic", 1, "----------------------------------------------------------"<<Gateendl);
++
++  GateMessage("Geometry", 3, "Geometry has been constructed (status = " << nGeometryStatus << ").\n");
++
++#ifdef GATE_USE_OPTICAL
++  BuildSurfaces();
++#endif
++  BuildMagField();
++
++  return pworldPhysicalVolume;
++}
++//---------------------------------------------------------------------------------
++
++//---------------------------------------------------------------------------------
++// Adds a Material Database
++void GateDetectorConstruction::AddFileToMaterialDatabase(const G4String& f)
++{
++  mMaterialDatabase.AddMDBFile(f);
++}
++//---------------------------------------------------------------------------------
+ 
+-  return pworld->GetWorldVolume();
++//---------------------------------------------------------------------------------
++void GateDetectorConstruction::SetMagField(G4ThreeVector fieldValue)
++{
++  m_magFieldValue = fieldValue;
+ }
+ //---------------------------------------------------------------------------------
+ 
+ //---------------------------------------------------------------------------------
++void GateDetectorConstruction::BuildMagField()
++{
++  //apply a global uniform magnetic field along Z axis
++  G4FieldManager* fieldMgr
++    = G4TransportationManager::GetTransportationManager()->GetFieldManager();
++
++  if(m_magField) delete m_magField;             //delete the existing magn field
++
++  if(m_magFieldValue.mag()!=0.)                 // create a new one if non nul
++    { m_magField = new G4UniformMagField(m_magFieldValue);
++      fieldMgr->SetDetectorField(m_magField);
++      fieldMgr->CreateChordFinder(m_magField);
++    } else {
++    m_magField = NULL;
++    fieldMgr->SetDetectorField(m_magField);
++  }
++}
++//---------------------------------------------------------------------------------
++
++//---------------------------------------------------------------------------------
++#ifdef GATE_USE_OPTICAL
++void GateDetectorConstruction::BuildSurfaces()
++{
++  GateObjectStore* store = GateObjectStore::GetInstance();
++  for (GateObjectStore::iterator p = store->begin(); p != store->end(); p++)
++    {
++      p->second->GetSurfaceList()->BuildSurfaces();
++    }
++
++}
++#endif
++//---------------------------------------------------------------------------------
++
++//---------------------------------------------------------------------------------
+ void GateDetectorConstruction::UpdateGeometry()
+ {
+-  GateMessage("Geometry", 3,"UpdateGeometry starts (status = " << nGeometryStatus << "). " << Gateendl);
++  GateMessage("Geometry", 3,"UpdateGeometry starts (status = " << nGeometryStatus << "). \n");
++
++  if (nGeometryStatus == geometry_is_uptodate){
++    GateMessage("Geometry", 3,"Geometry is uptodate.\n");
++    return;
++  }
+ 
+   switch (nGeometryStatus){
+-  case geometry_is_uptodate:  
+-    GateMessage("Geometry", 3,"Geometry is uptodate." << Gateendl);
+-    break;
+-    
+   case geometry_needs_update:
+-    Construct();
++    pworld->Construct(true);
+     break;
+ 
+   case geometry_needs_rebuild:
++  default:
+     DestroyGeometry();
+     Construct();
+     break;
+-    
+-  default:
+-    break;
+   }
++  GateRunManager::GetRunManager()->DefineWorldVolume(pworldPhysicalVolume);
+ 
+   nGeometryStatus = geometry_is_uptodate;
+ 
+-  GateMessage("Geometry", 3, "nGeometryStatus = geometry_is_uptodate " << Gateendl);
+-  GateMessage("Geometry", 3, "UpdateGeometry finished. " << Gateendl);
++  GateMessage("Geometry", 3, "nGeometryStatus = geometry_is_uptodate \n");
++  GateMessage("Geometry", 3, "UpdateGeometry finished. \n");
+ }
+ //---------------------------------------------------------------------------------
+ 
+ //---------------------------------------------------------------------------------
+ void GateDetectorConstruction::DestroyGeometry()
+ {
+-  GateMessage("Geometry", 4,"Geometry is going to be destroyed. " << Gateendl);
++  GateMessage("Geometry", 4,"Geometry is going to be destroyed. \n");
+ 
+   pworld->DestroyGeometry();
+   nGeometryStatus = geometry_needs_rebuild;
+ 
+-  GateMessage("Geometry", 4,"nGeometryStatus = geometry_needs_rebuild     " << Gateendl);
+-  GateMessage("Geometry", 4,"Geometry has been destroyed." << Gateendl);
++  GateMessage("Geometry", 4,"nGeometryStatus = geometry_needs_rebuild     \n");
++  GateMessage("Geometry", 4,"Geometry has been destroyed.\n");
+ }
+ //---------------------------------------------------------------------------------
+ 
+@@ -168,7 +269,7 @@ void GateDetectorConstruction::DestroyGeometry()
+   }
+ 
+   if (flagAutoUpdate){
+-  GateMessage("Geometry", 0,"The geometry is going to be updated." << Gateendl);
++  GateMessage("Geometry", 0,"The geometry is going to be updated.\n");
+   UpdateGeometry();}
+   }
+ */
+@@ -180,18 +281,18 @@ void GateDetectorConstruction::ClockHasChanged()
+   GateMessage("Move", 5, "ClockHasChanged = " << GetFlagMove() << Gateendl; );
+ 
+   if ( GetFlagMove()) {
+-    GateMessage("Move", 6, "moveFlag = 1" << Gateendl);
++    GateMessage("Move", 6, "moveFlag = 1\n");
+     nGeometryStatus = geometry_needs_update;
+   }
+   else {
+-    GateMessage("Move", 6, "Geometry is uptodate." << Gateendl);
++    GateMessage("Move", 6, "Geometry is uptodate.\n");
+     nGeometryStatus = geometry_is_uptodate;
+   }
+ 
+   GateMessage("Move", 6, "  Geometry status = " << nGeometryStatus << Gateendl;);
+ 
+   UpdateGeometry();
+-  GateMessage("Move", 6, "Clock has changed." << Gateendl);
++  GateMessage("Move", 6, "Clock has changed.\n");
+ }
+ //---------------------------------------------------------------------------------
+ /*PY Descourt 08/09/2008 */
+diff --git a/source/geometry/src/GateROGeometry.cc b/source/geometry/src/GateROGeometry.cc
+deleted file mode 100644
+index 169819e..0000000
+--- a/source/geometry/src/GateROGeometry.cc
++++ /dev/null
+@@ -1,233 +0,0 @@
+-/*----------------------
+-  Copyright (C): OpenGATE Collaboration
+-
+-  This software is distributed under the terms
+-  of the GNU Lesser General  Public Licence (LGPL)
+-  See GATE/LICENSE.txt for further details
+-  ----------------------*/
+-//
+-// $Id: $
+-//
+-/// \file geometry/src/GateROGeometry.cc
+-/// \brief Implementation of the GateROGeometry class
+-//
+-#include "GateConfiguration.h"
+-#include "GateROGeometry.hh"
+-#include "GateMessageManager.hh"
+-#include "GateException.hh"
+-#include "GateBox.hh"
+-#include "GateObjectStore.hh"
+-#include "GateSystemListManager.hh"
+-#include "GateMaterialDatabase.hh"
+-#include "GateCrystalSD.hh"
+-#include "GatePhantomSD.hh"
+-#include "GateDetectorMessenger.hh"
+-#include "GateRunManager.hh"
+-#include "GateVVolume.hh"
+-#include "GateMessageManager.hh"
+-#include "GateObjectMoveListMessenger.hh"
+-
+-#include "G4LogicalVolume.hh"
+-#include "G4VPhysicalVolume.hh"
+-#include "G4PVPlacement.hh"
+-#include "G4PVReplica.hh"
+-#include "G4SDManager.hh"
+-#include "G4Box.hh"
+-#include "G4Tubs.hh"
+-#include "G4ThreeVector.hh"
+-#include "G4Material.hh"
+-#include "G4VisAttributes.hh"
+-#include "G4SystemOfUnits.hh"
+-#include "globals.hh"
+-#include "G4UniformMagField.hh"
+-#include "G4FieldManager.hh"
+-#include "G4TransportationManager.hh"
+-#include "G4Navigator.hh"
+-#include "G4UnitsTable.hh"
+-
+-#ifdef GATE_USE_OPTICAL
+-#include "GateSurfaceList.hh"
+-#endif
+-
+-GateROGeometry* GateROGeometry::pTheGateROGeometry=0;
+-
+-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+-
+-GateROGeometry::GateROGeometry(G4String parallelWorldName)
+-  : G4VUserParallelWorld(parallelWorldName), 
+-    pworld(0), nGeometryStatus(geometry_needs_rebuild), 
+-    m_crystalSD(0), m_phantomSD(0),
+-    pcreatorStore(0), m_magField(0), m_magFieldValue(0),
+-    sensitiveLogicalVolume(0)
+-{ 
+-  pTheGateROGeometry = this;
+-  
+-  isBuilt = false;
+-  isInitialized = false;
+-}
+-
+-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+-
+-GateROGeometry::~GateROGeometry()
+-{
+-  if (pworld) {
+-    DestroyGeometry();
+-    delete pworld;
+-    pworld = 0;
+-  }
+-}
+-
+-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+-
+-void GateROGeometry::Initialize(G4double sizeX, G4double sizeY, G4double sizeZ, G4ThreeVector magFieldValue)
+-{
+-  pworld_x = sizeX;
+-  pworld_y = sizeY;
+-  pworld_z = sizeZ;
+-  m_magFieldValue = magFieldValue;
+-  isInitialized = true;
+-}
+-
+-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+-
+-void GateROGeometry::Construct()
+-{
+-  GateMessage("Geometry", 1, "GateROGeometry instantiating..." << Gateendl);
+-  GateMessage("Geometry", 5, " GateROGeometry constructor -- begin ");
+-  
+-  if (!isInitialized)
+-    {
+-      //GateError("GateROGeometry::Construct() error" << Gateendl <<
+-	//	"Parameters of the RO geometry are not initialized");
+-      //return;
+-      
+-      //Default Initialization
+-      G4ThreeVector magFieldValue = G4ThreeVector(0.,0.,0. * tesla);
+-
+-      G4double pworld_x = 50.*cm;
+-      G4double pworld_y = 50.*cm;
+-      G4double pworld_z = 50.*cm;
+-      
+-      Initialize(pworld_x, pworld_y, pworld_z, magFieldValue);
+-    }
+-  
+-  pcreatorStore = GateObjectStore::GetInstance();
+-  //-------------------------------------------------------------------------
+-  // Create default material (air) for the world
+-  G4Element* N  = new G4Element("worldDefaultN","N" , 7., 14.01*g/mole );
+-  G4Element* O  = new G4Element("worldDefaultO"  ,"O" , 8., 16.00*g/mole);
+-  G4Material* Air = new G4Material("worldDefaultAir"  , 1.290*mg/cm3, 2);
+-  Air->AddElement(N, 0.7);
+-  Air->AddElement(O, 0.3);
+-  //-------------------------------------------------------------------------
+-  pworld = new GateBox(GetName(), "worldDefaultAir",  pworld_x, pworld_y, pworld_z, true);
+-  pworld->SetMaterialName("worldDefaultAir");
+-  
+-  pworldPhysicalVolume = pworld->GateVVolume::Construct();
+-  G4TransportationManager::GetTransportationManager()->RegisterWorld(pworldPhysicalVolume);
+-  sensitiveLogicalVolume = GetWorldVolume()->GetLogicalVolume();
+-  
+-  GateMessage("Physic", 1, " "<<Gateendl);
+-  GateMessage("Physic", 1, "----------------------------------------------------------"<<Gateendl);
+-  GateMessage("Physic", 1, "                    Ionization potential "<<Gateendl);
+-
+-  const G4MaterialTable * theTable = G4Material::GetMaterialTable();
+-  for(unsigned int i =0;i<(*theTable).size();i++){
+-    if(theListOfIonisationPotential[(*theTable)[i]->GetName()]){
+-      (*theTable)[i]->GetIonisation()->SetMeanExcitationEnergy(theListOfIonisationPotential[(*theTable)[i]->GetName()]);
+-      GateMessage("Physic", 1, " - " << (*theTable)[i]->GetName() << "\t defaut value: I = " <<
+-                  G4BestUnit((*theTable)[i]->GetIonisation()->GetMeanExcitationEnergy(),"Energy") <<
+-                  "\t-->  new value: I = " <<
+-                  G4BestUnit((*theTable)[i]->GetIonisation()->GetMeanExcitationEnergy(),"Energy") << Gateendl);
+-    }
+-    else {
+-      GateMessage("Physic", 1, " - " << (*theTable)[i]->GetName() << "\t defaut value: I = " <<
+-                  G4BestUnit((*theTable)[i]->GetIonisation()->GetMeanExcitationEnergy(),"Energy") << Gateendl);
+-    }
+-  }
+-  GateMessage("Physic", 1, "----------------------------------------------------------"<<Gateendl);
+-  
+-  GateMessage("Geometry", 5, "  GateROGeometry constructor -- end ");
+-  isBuilt = true;
+-}
+-
+-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+-
+-void GateROGeometry::ConstructSD()
+-{
+-  //G4SDManager* SDman = G4SDManager::GetSDMpointer();
+-
+-  if(!m_crystalSD) {
+-    G4String crystalSDname = "/gate/crystal";
+-    m_crystalSD = new GateCrystalSD(crystalSDname);
+-    //SDman->AddNewDetector(m_crystalSD);
+-    SetSensitiveDetector(sensitiveLogicalVolume, m_crystalSD);
+-  }
+-
+-  if(!m_phantomSD) {
+-    G4String phantomSDname = "/gate/phantom";
+-    m_phantomSD = new GatePhantomSD(phantomSDname);
+-    //SDman->AddNewDetector(m_phantomSD);
+-    SetSensitiveDetector(sensitiveLogicalVolume, m_phantomSD);
+-  }
+-}
+-
+-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+-
+-void GateROGeometry::DestroyGeometry()
+-{
+-  GateMessage("Geometry", 4,"Geometry is going to be destroyed. " << Gateendl);
+-
+-  pworld->DestroyGeometry();
+-  nGeometryStatus = geometry_needs_rebuild;
+-
+-  GateMessage("Geometry", 4,"nGeometryStatus = geometry_needs_rebuild     " << Gateendl);
+-  GateMessage("Geometry", 4,"Geometry has been destroyed." << Gateendl);
+-}
+-
+-//---------------------------------------------------------------------------------
+-void GateROGeometry::BuildMagField()
+-{
+-  //apply a global uniform magnetic field along Z axis
+-  G4FieldManager* fieldMgr
+-    = G4TransportationManager::GetTransportationManager()->GetFieldManager();
+-
+-  if(m_magField) delete m_magField;             //delete the existing magn field
+-
+-  if(m_magFieldValue.mag()!=0.)                 // create a new one if non nul
+-    { m_magField = new G4UniformMagField(m_magFieldValue);
+-      fieldMgr->SetDetectorField(m_magField);
+-      fieldMgr->CreateChordFinder(m_magField);
+-    } else {
+-    m_magField = NULL;
+-    fieldMgr->SetDetectorField(m_magField);
+-  }
+-}
+-//---------------------------------------------------------------------------------
+-//---------------------------------------------------------------------------------
+-// Adds a Material Database
+-void GateROGeometry::AddFileToMaterialDatabase(const G4String& f)
+-{
+-  mMaterialDatabase.AddMDBFile(f);
+-}
+-//---------------------------------------------------------------------------------
+-//---------------------------------------------------------------------------------
+-void GateROGeometry::SetMagField(G4ThreeVector fieldValue)
+-{
+-  m_magFieldValue = fieldValue;
+-}
+-//---------------------------------------------------------------------------------
+-//---------------------------------------------------------------------------------
+-#ifdef GATE_USE_OPTICAL
+-void GateROGeometry::BuildSurfaces()
+-{
+-  GateObjectStore* store = GateObjectStore::GetInstance();
+-  for (GateObjectStore::iterator p = store->begin(); p != store->end(); p++)
+-    {
+-      p->second->GetSurfaceList()->BuildSurfaces();
+-    }
+-
+-}
+-#endif
+-//---------------------------------------------------------------------------------
+-  
+\ No newline at end of file
+diff --git a/source/physics/src/GateFakePhysicsList.cc b/source/physics/src/GateFakePhysicsList.cc
+index 88c02b8..03bf73d 100644
+--- a/source/physics/src/GateFakePhysicsList.cc
++++ b/source/physics/src/GateFakePhysicsList.cc
+@@ -16,7 +16,6 @@ See GATE/LICENSE.txt for further details
+  */
+ 
+ #include "GateFakePhysicsList.hh"
+-#include "GateMessageManager.hh"
+ 
+ #include "G4ProcessManager.hh"
+ #include "G4ParticleTypes.hh"
+diff --git a/source/physics/src/GatePhysicsList.cc b/source/physics/src/GatePhysicsList.cc
+index 6dcfa6d..e592260 100644
+--- a/source/physics/src/GatePhysicsList.cc
++++ b/source/physics/src/GatePhysicsList.cc
+@@ -32,7 +32,6 @@
+ #include "G4VModularPhysicsList.hh"
+ #include "G4ExceptionHandler.hh"
+ #include "G4StateManager.hh"
+-#include "G4ParallelWorldPhysics.hh"
+ 
+ #include "G4EmStandardPhysics.hh"
+ #include "G4EmStandardPhysics_option1.hh"
+@@ -68,7 +67,7 @@ GatePhysicsList::GatePhysicsList(): G4VModularPhysicsList()
+   worldCuts.electronCut = -1;
+   worldCuts.positronCut = -1;
+   worldCuts.protonCut = -1;
+-  mapOfRegionCuts[DefaultRegion] = worldCuts;
++  mapOfRegionCuts["DefaultRegionForTheWorld"] = worldCuts;
+   mLoadState=0;
+   mDEDXBinning=-1;
+   mLambdaBinning=-1;
+@@ -208,8 +207,8 @@ void GatePhysicsList::ConstructProcess()
+       }
+ 
+       for(unsigned int i=0; i<GetTheListOfProcesss()->size(); i++)
+-      (*GetTheListOfProcesss())[i]->ConstructProcess();
+-      
++        (*GetTheListOfProcesss())[i]->ConstructProcess();
++
+       //opt->SetVerbose(2);
+       if(mDEDXBinning>0)   opt->SetDEDXBinning(mDEDXBinning);
+       if(mLambdaBinning>0) opt->SetLambdaBinning(mLambdaBinning);
+@@ -285,7 +284,7 @@ void GatePhysicsList::ConstructPhysicsList(G4String name)
+   }
+ 
+   mUserPhysicListName = name;
+-  
++
+   // First, try to create EM only Physic lists
+   G4VPhysicsConstructor * pl = NULL;
+   if (mUserPhysicListName == "emstandard") {
+@@ -319,12 +318,6 @@ void GatePhysicsList::ConstructPhysicsList(G4String name)
+   if (pl != NULL) {
+     pl->ConstructParticle();
+     pl->ConstructProcess();
+-#ifdef G4MULTITHREADED
+-    //Parallel world sensitivity
+-    //
+-    G4ParallelWorldPhysics* pWorld = new G4ParallelWorldPhysics(mUserPhysicListName);
+-    pWorld->ConstructProcess();
+-#endif
+     //pl->SetVerboseLevel(2);
+     AddTransportation(); // don't forget transportation process.
+     GateRunManager::GetRunManager()->SetUserPhysicListName("");
+@@ -333,7 +326,6 @@ void GatePhysicsList::ConstructPhysicsList(G4String name)
+     // Set the phys list name. It will be build in GateRunManager.
+     GateRunManager::GetRunManager()->SetUserPhysicListName(mUserPhysicListName);
+   }
+-  //GateRunManager::GetRunManager() -> PhysicsHasBeenModified();
+ 
+   // Fluorescence processes
+   // - default activation of deexcitation process
+@@ -359,7 +351,6 @@ void GatePhysicsList::ConstructPhysicsListDNAMixed(G4String name)
+       GateError("The mixed Physics List "<<name<<" does not exist!");
+     }
+   }
+-  //GateRunManager::GetRunManager() -> PhysicsHasBeenModified();
+ }
+ //-----------------------------------------------------------------------------------------
+ 
+@@ -766,7 +757,7 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
+ 
+   //-----------------------------------------------------------------------------
+   // Set defaults production cut for the world
+-  ParticleCutType worldCuts =  mapOfRegionCuts[DefaultRegion];
++  ParticleCutType worldCuts =  mapOfRegionCuts["DefaultRegionForTheWorld"];
+ 
+   if(worldCuts.gammaCut == -1) worldCuts.gammaCut = defaultCutValue;
+   if(worldCuts.electronCut == -1) worldCuts.electronCut = defaultCutValue;
+@@ -779,10 +770,10 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
+               << worldCuts.positronCut << " "
+               << worldCuts.protonCut   << " mm" << Gateendl);
+ 
+-  phys->SetCutValue(worldCuts.gammaCut, "gamma",DefaultRegion);
+-  phys->SetCutValue(worldCuts.electronCut, "e-",DefaultRegion);
+-  phys->SetCutValue(worldCuts.positronCut, "e+",DefaultRegion);
+-  phys->SetCutValue(worldCuts.protonCut, "proton",DefaultRegion);
++  phys->SetCutValue(worldCuts.gammaCut, "gamma","DefaultRegionForTheWorld");
++  phys->SetCutValue(worldCuts.electronCut, "e-","DefaultRegionForTheWorld");
++  phys->SetCutValue(worldCuts.positronCut, "e+","DefaultRegionForTheWorld");
++  phys->SetCutValue(worldCuts.protonCut, "proton","DefaultRegionForTheWorld");
+ 
+   //-----------------------------------------------------------------------------
+   // Set default production cut to other regions
+@@ -792,7 +783,7 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
+   while (pi != pe) {
+     G4String regionName = (*pi)->GetName();
+ 
+-    if (regionName != DefaultRegion && regionName !="world") {
++    if (regionName != "DefaultRegionForTheWorld" && regionName !="world") {
+       RegionCutMapType::iterator current = mapOfRegionCuts.find(regionName);
+       if (current == mapOfRegionCuts.end()) {
+ 	// GateMessage("Cuts",5, " Cut not set for region " << regionName << " put -1" << Gateendl);
+@@ -811,8 +802,7 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
+   while (it != mapOfRegionCuts.end()) {
+     // do not apply cut for the world region
+     // GateMessage("Cuts", 5, "Region (*it).first : " << (*it).first<< Gateendl);
+-    if (((*it).first != DefaultRegion) && ((*it).first != "world")) {
+-
++    if (((*it).first != "DefaultRegionForTheWorld") && ((*it).first != "world")) {
+       G4Region* region = RegionStore->GetRegion((*it).first);
+       if (!region) {
+ 	GateError( "The region '" << (*it).first << "' does not exist !");
+@@ -826,7 +816,7 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
+         {
+           G4bool unique;
+           parentRegion =  parentRegion->GetParentRegion(unique);
+-          if(parentRegion->GetName() != DefaultRegion){
++          if(parentRegion->GetName() != "DefaultRegionForTheWorld"){
+             ParticleCutType parentRegionCuts = mapOfRegionCuts[parentRegion->GetName()];
+             regionCuts.gammaCut = parentRegionCuts.gammaCut;
+           }
+@@ -839,7 +829,7 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
+         {
+           G4bool unique;
+           parentRegion =  parentRegion->GetParentRegion(unique);
+-          if(parentRegion->GetName() != DefaultRegion){
++          if(parentRegion->GetName() != "DefaultRegionForTheWorld"){
+             ParticleCutType parentRegionCuts = mapOfRegionCuts[parentRegion->GetName()];
+             regionCuts.electronCut = parentRegionCuts.electronCut;
+           }
+@@ -852,7 +842,7 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
+         {
+           G4bool unique;
+           parentRegion =  parentRegion->GetParentRegion(unique);
+-          if(parentRegion->GetName() != DefaultRegion){
++          if(parentRegion->GetName() != "DefaultRegionForTheWorld"){
+             ParticleCutType parentRegionCuts = mapOfRegionCuts[parentRegion->GetName()];
+             regionCuts.positronCut = parentRegionCuts.positronCut;
+           }
+@@ -864,7 +854,7 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
+         {
+           G4bool unique;
+           parentRegion =  parentRegion->GetParentRegion(unique);
+-          if(parentRegion->GetName() != DefaultRegion){
++          if(parentRegion->GetName() != "DefaultRegionForTheWorld"){
+             ParticleCutType parentRegionCuts = mapOfRegionCuts[parentRegion->GetName()];
+             regionCuts.protonCut = parentRegionCuts.protonCut;
+           }
+@@ -911,18 +901,18 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
+   //G4LogicalVolumeStore * logicalVolumeStore = G4LogicalVolumeStore::GetInstance();
+ 
+   GateUserLimits *  worldUserLimit = new GateUserLimits();
+-  if(mapOfVolumeUserLimits[DefaultRegion] != 0)
++  if(mapOfVolumeUserLimits["DefaultRegionForTheWorld"] != 0)
+     {
+-      if(mapOfVolumeUserLimits[DefaultRegion]->GetMaxStepSize()       != -1.)
+-        worldUserLimit->SetMaxStepSize(mapOfVolumeUserLimits[DefaultRegion]->GetMaxStepSize());
+-      if(mapOfVolumeUserLimits[DefaultRegion]->GetMaxTrackLength()    != -1.)
+-        worldUserLimit->SetMaxTrackLength(mapOfVolumeUserLimits[DefaultRegion]->GetMaxTrackLength());
+-      if(mapOfVolumeUserLimits[DefaultRegion]->GetMaxToF()            != -1.)
+-        worldUserLimit->SetMaxToF(mapOfVolumeUserLimits[DefaultRegion]->GetMaxToF());
+-      if(mapOfVolumeUserLimits[DefaultRegion]->GetMinKineticEnergy()  != -1.)
+-        worldUserLimit->SetMinKineticEnergy(mapOfVolumeUserLimits[DefaultRegion]->GetMinKineticEnergy());
+-      if(mapOfVolumeUserLimits[DefaultRegion]->GetMinRemainingRange() != -1.)
+-        worldUserLimit->SetMinRemainingRange(mapOfVolumeUserLimits[DefaultRegion]->GetMinRemainingRange());
++      if(mapOfVolumeUserLimits["DefaultRegionForTheWorld"]->GetMaxStepSize()       != -1.)
++        worldUserLimit->SetMaxStepSize(mapOfVolumeUserLimits["DefaultRegionForTheWorld"]->GetMaxStepSize());
++      if(mapOfVolumeUserLimits["DefaultRegionForTheWorld"]->GetMaxTrackLength()    != -1.)
++        worldUserLimit->SetMaxTrackLength(mapOfVolumeUserLimits["DefaultRegionForTheWorld"]->GetMaxTrackLength());
++      if(mapOfVolumeUserLimits["DefaultRegionForTheWorld"]->GetMaxToF()            != -1.)
++        worldUserLimit->SetMaxToF(mapOfVolumeUserLimits["DefaultRegionForTheWorld"]->GetMaxToF());
++      if(mapOfVolumeUserLimits["DefaultRegionForTheWorld"]->GetMinKineticEnergy()  != -1.)
++        worldUserLimit->SetMinKineticEnergy(mapOfVolumeUserLimits["DefaultRegionForTheWorld"]->GetMinKineticEnergy());
++      if(mapOfVolumeUserLimits["DefaultRegionForTheWorld"]->GetMinRemainingRange() != -1.)
++        worldUserLimit->SetMinRemainingRange(mapOfVolumeUserLimits["DefaultRegionForTheWorld"]->GetMinRemainingRange());
+     }
+ 
+ 
+@@ -972,7 +962,7 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
+   while (pi != pe) {
+     G4String regionName = (*pi)->GetName();
+ 
+-    if (regionName != DefaultRegion && regionName !="world") {
++    if (regionName != "DefaultRegionForTheWorld" && regionName !="world") {
+       VolumeUserLimitsMapType::iterator current = mapOfVolumeUserLimits.find(regionName);
+       if (current == mapOfVolumeUserLimits.end()) {
+ 	GateMessage("Cuts",5, " UserCuts not set for region " << regionName << " put -1" << Gateendl);
+@@ -986,8 +976,7 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
+   while (it2 != mapOfVolumeUserLimits.end()) {
+     // do not apply cut for the world region
+     // GateMessage("Cuts", 5, "Region (*it2).first : " << (*it2).first<< Gateendl);
+-    if (((*it2).first != DefaultRegion) && ((*it2).first != "world")) {
+-
++    if (((*it2).first != "DefaultRegionForTheWorld") && ((*it2).first != "world")) {
+       G4Region* region = RegionStore->GetRegion((*it2).first);
+       if (!region) {
+ 	GateError( "The region '" << (*it2).first << "' does not exist !");
+@@ -997,11 +986,11 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
+       G4Region* parentRegion =  region;
+       G4Region* regionTmp =  region;
+       while((regionUserLimit->GetMaxStepSize() == -1) &&
+-            (regionTmp->GetName() != DefaultRegion))
++            (regionTmp->GetName() != "DefaultRegionForTheWorld"))
+         {
+           G4bool unique;
+           parentRegion =  regionTmp->GetParentRegion(unique);
+-          if(parentRegion->GetName() != DefaultRegion){
++          if(parentRegion->GetName() != "DefaultRegionForTheWorld"){
+             GateUserLimits * parentRegionUserLimits = mapOfVolumeUserLimits[parentRegion->GetName()];
+             regionUserLimit->SetMaxStepSize(  parentRegionUserLimits->GetMaxStepSize()) ;
+             GateMessage("Cuts", 5, "Region " << (*it2).first << " maxStepSize " << parentRegionUserLimits->GetMaxStepSize() << Gateendl);
+@@ -1011,11 +1000,11 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
+         }
+ 
+       regionTmp =  region;
+-      while(regionUserLimit->GetMaxTrackLength() == -1 && regionTmp->GetName() != DefaultRegion)
++      while(regionUserLimit->GetMaxTrackLength() == -1 && regionTmp->GetName() != "DefaultRegionForTheWorld")
+         {
+           G4bool unique;
+           parentRegion =  regionTmp->GetParentRegion(unique);
+-          if(parentRegion->GetName() != DefaultRegion){
++          if(parentRegion->GetName() != "DefaultRegionForTheWorld"){
+             GateUserLimits * parentRegionUserLimits = mapOfVolumeUserLimits[parentRegion->GetName()];
+             regionUserLimit->SetMaxTrackLength(  parentRegionUserLimits->GetMaxTrackLength()) ;
+             GateMessage("Cuts", 5, "Region " << (*it2).first << " maxTrackLength " << parentRegionUserLimits->GetMaxTrackLength() << Gateendl);
+@@ -1026,11 +1015,11 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
+ 
+ 
+       regionTmp =  region;
+-      while(regionUserLimit->GetMaxToF() == -1 && regionTmp->GetName() != DefaultRegion)
++      while(regionUserLimit->GetMaxToF() == -1 && regionTmp->GetName() != "DefaultRegionForTheWorld")
+         {
+           G4bool unique;
+           parentRegion =  regionTmp->GetParentRegion(unique);
+-          if(parentRegion->GetName() != DefaultRegion){
++          if(parentRegion->GetName() != "DefaultRegionForTheWorld"){
+             GateUserLimits * parentRegionUserLimits = mapOfVolumeUserLimits[parentRegion->GetName()];
+             regionUserLimit->SetMaxToF(  parentRegionUserLimits->GetMaxToF()) ;
+           }
+@@ -1039,11 +1028,11 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
+         }
+ 
+       regionTmp =  region;
+-      while(regionUserLimit->GetMinKineticEnergy() == -1 && regionTmp->GetName() != DefaultRegion)
++      while(regionUserLimit->GetMinKineticEnergy() == -1 && regionTmp->GetName() != "DefaultRegionForTheWorld")
+         {
+           G4bool unique;
+           parentRegion =  regionTmp->GetParentRegion(unique);
+-          if(parentRegion->GetName() != DefaultRegion){
++          if(parentRegion->GetName() != "DefaultRegionForTheWorld"){
+             GateUserLimits * parentRegionUserLimits = mapOfVolumeUserLimits[parentRegion->GetName()];
+             regionUserLimit->SetMinKineticEnergy(  parentRegionUserLimits->GetMinKineticEnergy()) ;
+           }
+@@ -1052,11 +1041,11 @@ void GatePhysicsList::DefineCuts(G4VUserPhysicsList * phys)
+         }
+ 
+       regionTmp =  region;
+-      while(regionUserLimit->GetMinRemainingRange() == -1 && regionTmp->GetName() != DefaultRegion)
++      while(regionUserLimit->GetMinRemainingRange() == -1 && regionTmp->GetName() != "DefaultRegionForTheWorld")
+         {
+           G4bool unique;
+           parentRegion =  regionTmp->GetParentRegion(unique);
+-          if(parentRegion->GetName() != DefaultRegion){
++          if(parentRegion->GetName() != "DefaultRegionForTheWorld"){
+             GateUserLimits * parentRegionUserLimits = mapOfVolumeUserLimits[parentRegion->GetName()];
+             regionUserLimit->SetMinRemainingRange(  parentRegionUserLimits->GetMinRemainingRange()) ;
+           }
+@@ -1140,7 +1129,7 @@ void GatePhysicsList::SetCutInRegion(G4String particleName, G4String regionName,
+     << "' : " << cutValue << Gateendl);
+   */
+ 
+-  if(regionName=="world") regionName=DefaultRegion;
++  if(regionName=="world") regionName="DefaultRegionForTheWorld";
+ 
+   RegionCutMapType::iterator it = mapOfRegionCuts.find(regionName);
+   if (it == mapOfRegionCuts.end()) {
+@@ -1170,7 +1159,7 @@ void GatePhysicsList::SetCutInRegion(G4String particleName, G4String regionName,
+ //-----------------------------------------------------------------------------
+ void GatePhysicsList::SetSpecialCutInRegion(G4String cutType, G4String regionName, G4double cutValue)
+ {
+-  if(regionName=="world") regionName=DefaultRegion;
++  if(regionName=="world") regionName="DefaultRegionForTheWorld";
+ 
+   VolumeUserLimitsMapType::iterator it = mapOfVolumeUserLimits.find(regionName);
+   if (it == mapOfVolumeUserLimits.end()) {
+diff --git a/source/physics/src/GateRTVPhantomMessenger.cc b/source/physics/src/GateRTVPhantomMessenger.cc
+index b76326c..eaa059c 100644
+--- a/source/physics/src/GateRTVPhantomMessenger.cc
++++ b/source/physics/src/GateRTVPhantomMessenger.cc
+@@ -15,7 +15,6 @@
+ #include "G4UIcmdWithAnInteger.hh"
+ #include "G4UIcmdWithADoubleAndUnit.hh"
+ #include "G4UIcmdWithoutParameter.hh"
+-#include "GateMessageManager.hh"
+ //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
+ 
+ GateRTVPhantomMessenger::GateRTVPhantomMessenger(GateRTVPhantom* RTVPhantom)
+diff --git a/source/physics/src/GateSPSEneDistribution.cc b/source/physics/src/GateSPSEneDistribution.cc
+index 8b657d3..01d1863 100644
+--- a/source/physics/src/GateSPSEneDistribution.cc
++++ b/source/physics/src/GateSPSEneDistribution.cc
+@@ -13,8 +13,6 @@ See GATE/LICENSE.txt for further details
+ #include "GateMessageManager.hh"
+ #include <fstream>
+ #include "G4SystemOfUnits.hh"
+-#include "GateMessageManager.hh"
+-
+ using namespace std;
+ 
+ GateSPSEneDistribution::GateSPSEneDistribution():
+diff --git a/source/physics/src/GateSourceMgr.cc b/source/physics/src/GateSourceMgr.cc
+index 958f04e..288bab4 100644
+--- a/source/physics/src/GateSourceMgr.cc
++++ b/source/physics/src/GateSourceMgr.cc
+@@ -29,7 +29,6 @@
+ #include <cmath>
+ #include "GateActions.hh"
+ 
+-
+ //----------------------------------------------------------------------------------------
+ GateSourceMgr* GateSourceMgr::mInstance = 0;
+ 
+@@ -525,8 +524,8 @@ G4int GateSourceMgr::PrepareNextEvent( G4Event* event )
+ {
+   // GateDebugMessage("Acquisition", 0, "PrepareNextEvent "  << event->GetEventID()
+   //                    << " at time " << m_time/s << " sec." << Gateendl);
+-  GateSteppingAction* myAction = (GateSteppingAction *) ( GateRunManager::GetRunManager()->GetUserSteppingAction() );
+ 
++  GateSteppingAction* myAction = (GateSteppingAction *) ( GateRunManager::GetRunManager()->GetUserSteppingAction() );
+   TrackingMode theMode =myAction->GetMode();
+   m_currentSources.clear();
+ 
+diff --git a/source/physics/src/GateVSource.cc b/source/physics/src/GateVSource.cc
+index c916219..194b0c4 100644
+--- a/source/physics/src/GateVSource.cc
++++ b/source/physics/src/GateVSource.cc
+@@ -445,7 +445,7 @@ G4int GateVSource::GeneratePrimaries( G4Event* event )
+   
+   G4int numVertices = 0;
+ 
+-  GateSteppingAction* myAction = (GateSteppingAction *) ( GateRunManager::GetRunManager()->GetUserSteppingAction() );  
++  GateSteppingAction* myAction = (GateSteppingAction *) ( GateRunManager::GetRunManager()->GetUserSteppingAction() );
+ 
+   TrackingMode theMode =myAction->GetMode();
+ 
+@@ -534,9 +534,7 @@ G4int GateVSource::GeneratePrimaries( G4Event* event )
+           numVertices = 0;
+           return numVertices;
+         }
+-
+-      G4Run* currentRun = const_cast<G4Run*> ( GateRunManager::GetRunManager()->GetCurrentRun() );  
+-
++      G4Run* currentRun = const_cast<G4Run*> ( GateRunManager::GetRunManager()->GetCurrentRun() );
+       currentRun->SetRunID( m_currentTrack->GetRunID() );
+       event->SetEventID( m_currentTrack->GetEventID() );
+       G4int event_id =  m_currentTrack->GetEventID();
+@@ -668,7 +666,6 @@ void GateVSource::GeneratePrimaryVertex( G4Event* aEvent )
+ 
+   /* PY Descourt 08/09/2009 */  
+   TrackingMode theMode =( (GateSteppingAction *)(GateRunManager::GetRunManager()->GetUserSteppingAction() ) )->GetMode();
+-
+   if (  theMode == kBoth || theMode == kTracker ) 
+     {
+       G4ThreeVector particle_position;
