@@ -41,10 +41,10 @@ GateDetectorConstruction* GateDetectorConstruction::pTheGateDetectorConstruction
 GateDetectorConstruction::GateDetectorConstruction()
   :  pworld(0),
      pworldPhysicalVolume(0),
-     pworldLogicalVolume(0),
-     pworldROGeometry(0),
      nGeometryStatus(geometry_needs_rebuild),
      flagAutoUpdate(false),
+     m_crystalSD(0),
+     m_phantomSD(0),
      pdetectorMessenger(0),
      moveFlag(0),
      m_magField(0), m_magFieldValue(0)
@@ -60,10 +60,6 @@ GateDetectorConstruction::GateDetectorConstruction()
   psystemStore=GateSystemListManager::GetInstance();
 
   pdetectorMessenger = new GateDetectorMessenger(this);
-  
-  static G4String ROGeometryName = "DetectorROGeometry";
-  pworldROGeometry = new GateROGeometry(ROGeometryName);
-  RegisterParallelWorld(pworldROGeometry);
 
   m_magFieldValue = G4ThreeVector(0.,0.,0. * tesla);
 
@@ -76,13 +72,13 @@ GateDetectorConstruction::GateDetectorConstruction()
   G4String AirName = "worldDefaultAir";
   G4Material* Air = G4NistManager::Instance()->FindOrBuildMaterial("Air"); // Use Air for NIST Manager
   if (Air==NULL)//will never enter here
-  {
+    {
    	  G4Element* N  = new G4Element("worldDefaultN","N" , 7., 14.01*g/mole );
   	  G4Element* O  = new G4Element("worldDefaultO","O" , 8., 16.00*g/mole);
    	  G4Material* Air = new G4Material(AirName  , 1.290*mg/cm3, 2);
    	  Air->AddElement(N, 0.7);
    	  Air->AddElement(O, 0.3);
-  }
+    }
   else Air->SetName(AirName);//For compatibility put name of this Air material to "worldDefaultAir"
 
   //-------------------------------------------------------------------------
@@ -90,11 +86,26 @@ GateDetectorConstruction::GateDetectorConstruction()
   pworld = new GateBox("world", "worldDefaultAir",  pworld_x, pworld_y, pworld_z, true);
   pworld->SetMaterialName("worldDefaultAir");
 
+  G4SDManager* SDman = G4SDManager::GetSDMpointer();
+
+  if(!m_crystalSD) {
+    G4String crystalSDname = "/gate/crystal";
+    m_crystalSD = new GateCrystalSD(crystalSDname);
+    SDman->AddNewDetector(m_crystalSD);
+  }
+
+  if(!m_phantomSD) {
+    G4String phantomSDname = "/gate/phantom";
+    m_phantomSD = new GatePhantomSD(phantomSDname);
+    SDman->AddNewDetector(m_phantomSD);
+  }
   GateMessage("Geometry", 5, "  GateDetectorConstruction constructor -- end ");
 
 
   /* instantiate the singleton RTPhantom Manager  - PY Descourt 08/09/2008 */
+
   m_RTPhantomMgr = GateRTPhantomMgr::GetInstance();
+  m_ARFSD = 0;
 }
 //---------------------------------------------------------------------------------
 
@@ -107,7 +118,6 @@ GateDetectorConstruction::~GateDetectorConstruction()
     pworld = 0;
   }
   delete pdetectorMessenger;
-  delete pworldROGeometry;
 }
 //---------------------------------------------------------------------------------
 
@@ -116,12 +126,7 @@ G4VPhysicalVolume* GateDetectorConstruction::Construct()
 {
   GateMessage("Geometry", 3, "Geometry construction starts. \n");
 
-  //pworldPhysicalVolume = pworld->GateVVolume::Construct();
-  //pworldLogicalVolume = pworldPhysicalVolume->GetLogicalVolume();
-  InitializeROGeometry();
-  pworldROGeometry->UpdateROGeometry();
-  pworldPhysicalVolume = pworld->Construct(true);
-  pworldLogicalVolume = pworldPhysicalVolume->GetLogicalVolume();
+  pworldPhysicalVolume = pworld->GateVVolume::Construct();
   SetGeometryStatusFlag(geometry_is_uptodate);
 
   GateMessage("Physic", 1, " \n");
@@ -225,13 +230,7 @@ void GateDetectorConstruction::UpdateGeometry()
     Construct();
     break;
   }
-  //GateRunManager::GetRunManager()->DefineWorldVolume(pworldPhysicalVolume);
-  
-  //GateRunManager::GetRunManager()->GetUserDetectorConstruction();
-  
-  //pworldROGeometry = (GateROGeometry*) this->GetParallelWorld(0);
-  //InitializeROGeometry();
-  //pworldROGeometry->UpdateROGeometry();
+  GateRunManager::GetRunManager()->DefineWorldVolume(pworldPhysicalVolume);
 
   nGeometryStatus = geometry_is_uptodate;
 
@@ -253,20 +252,15 @@ void GateDetectorConstruction::DestroyGeometry()
 }
 //---------------------------------------------------------------------------------
 
-void GateDetectorConstruction::InitializeROGeometry()
-{
-  pworldROGeometry->Initialize(pworld);
-}
-
 //---------------------------------------------------------------------------------
 /*
   void GateDetectorConstruction::GeometryHasChanged(GeometryStatus changeLevel)
   {
 
-  GateMessage("Geometry", 3, "   nGeometryStatus = " << nGeometryStatus << " changeLevel = " << changeLevel << G4endl;);
+  GateMessage("Geometry", 3, "   nGeometryStatus = " << nGeometryStatus << " changeLevel = " << changeLevel << Gateendl;);
 
   if (flagAutoUpdate == 0)
-  GateMessage("Geometry", 3, "   flagAutoUpdate = " << flagAutoUpdate << G4endl;);
+  GateMessage("Geometry", 3, "   flagAutoUpdate = " << flagAutoUpdate << Gateendl;);
 
   if ( changeLevel > nGeometryStatus )
   nGeometryStatus = changeLevel;
@@ -291,7 +285,7 @@ void GateDetectorConstruction::InitializeROGeometry()
 //---------------------------------------------------------------------------------
 void GateDetectorConstruction::ClockHasChanged()
 {
-  GateMessage("Move", 5, "ClockHasChanged = " << GetFlagMove() << G4endl; );
+  GateMessage("Move", 5, "ClockHasChanged = " << GetFlagMove() << Gateendl; );
 
   if ( GetFlagMove()) {
     GateMessage("Move", 6, "moveFlag = 1\n");
@@ -302,9 +296,25 @@ void GateDetectorConstruction::ClockHasChanged()
     nGeometryStatus = geometry_is_uptodate;
   }
 
-  GateMessage("Move", 6, "  Geometry status = " << nGeometryStatus << G4endl;);
+  GateMessage("Move", 6, "  Geometry status = " << nGeometryStatus << Gateendl;);
 
   UpdateGeometry();
   GateMessage("Move", 6, "Clock has changed.\n");
 }
+//---------------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------------
+void GateDetectorConstruction::insertARFSD( G4String aName , G4int stage )
+{
+  GateMessage("Geometry", 2, "GateDetectorConstruction::insertARFSD entered");
+
+  if (m_ARFSD == 0) {
+    m_ARFSD = new GateARFSD("/gate/arf", aName );
+    G4SDManager* SDMan = G4SDManager::GetSDMpointer();
+    SDMan->AddNewDetector( m_ARFSD );
+  }
+  m_ARFSD->SetStage( stage );
+}
+//---------------------------------------------------------------------------------
 

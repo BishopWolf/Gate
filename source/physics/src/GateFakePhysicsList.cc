@@ -15,6 +15,7 @@ See GATE/LICENSE.txt for further details
  * \brief fGate Fake Physicslist class for development
  */
 
+#include "G4Version.hh"
 #include "GateFakePhysicsList.hh"
 #include "GateMessageManager.hh"
 
@@ -87,7 +88,10 @@ void GateFakePhysicsList::ConstructProcess()
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void GateFakePhysicsList::ConstructEM()
-{
+{ 
+#if G4VERSION_NUMBER >= 1030
+  auto theParticleIterator=GetParticleIterator();
+#endif
   theParticleIterator->reset();
   while( (*theParticleIterator)() ){
     G4ParticleDefinition* particle = theParticleIterator->value();
@@ -124,7 +128,10 @@ void GateFakePhysicsList::ConstructEM()
 void GateFakePhysicsList::ConstructGeneral()
 {
   // Add Decay Process
-   G4Decay* theDecayProcess = new G4Decay();
+  G4Decay* theDecayProcess = new G4Decay();
+#if G4VERSION_NUMBER >= 1030
+  auto theParticleIterator=GetParticleIterator();
+#endif
   theParticleIterator->reset();
   while( (*theParticleIterator)() ){
     G4ParticleDefinition* particle = theParticleIterator->value();

@@ -20,9 +20,6 @@
 
 // g4
 #include <globals.hh>
-#ifdef G4MULTITHREADED
-#include "G4AutoLock.hh"
-#endif
 
 // std
 #include <fstream>
@@ -32,6 +29,7 @@
 #include "GateVImage.hh"
 #include "GateMachine.hh"
 #include "GateMHDImage.hh"
+#include "GateDICOMImage.hh"
 #include "GateMiscFunctions.hh"
 
 // root
@@ -76,39 +74,17 @@ public:
   inline PixelType& GetValue(const G4ThreeVector& position) { return data[GetIndexFromPosition(position)]; }
   /// Sets the value of the voxel of coordinates x,y,z
 
-  inline void SetValue ( int x, int y, int z, PixelType v ) 
-  { 
-    G4AutoLock l(&mDataMutex);
-    data[x+y*lineSize+z*planeSize]=v; 
-  }
+  inline void SetValue ( int x, int y, int z, PixelType v ) { data[x+y*lineSize+z*planeSize]=v; }
   /// Sets the value of the voxel of index i
 
-  inline void SetValue ( int i, PixelType v ) 
-  { 
-#ifdef G4MULTITHREADED
-    G4AutoLock l(&mDataMutex);
-#endif
-    data[i]=v; 
-  }
+  inline void SetValue ( int i, PixelType v ) { data[i]=v; }
 
   /// Adds a value to the voxel of index provided
-  inline void AddValue(int index, PixelType value) 
-  { 
-#ifdef G4MULTITHREADED
-    G4AutoLock l(&mDataMutex);
-#endif
-    data[index] += value; 
-  }
+  inline void AddValue(int index, PixelType value) { data[index] += value; }
 
   /// Fills the image with a value
   //  inline void Fill(PixelType v) { for (iterator i=begin(); i!=end(); ++i) (*i)=v; }
-  inline void Fill(PixelType v) 
-  { 
-#ifdef G4MULTITHREADED
-    G4AutoLock l(&mDataMutex);
-#endif
-    fill(data.begin(), data.end(), v); 
-  }
+  inline void Fill(PixelType v) { fill(data.begin(), data.end(), v); }
 
   inline PixelType GetMinValue() const{ return *std::min_element(begin(), end()); }
   inline PixelType GetMaxValue() const{ return *std::max_element(begin(), end()); }
@@ -146,6 +122,7 @@ protected:
   void ReadAnalyze(G4String filename);
   void ReadMHD(G4String filename);
   void ReadInterfile(G4String fileName);
+  void ReadDICOM(G4String fileName);
 
   void WriteVox(std::ofstream & os);
   void WriteAscii(std::ofstream & os, const G4String & comment);
@@ -153,11 +130,7 @@ protected:
   void WriteAnalyzeHeader(G4String filename);
   void WriteRoot(G4String filename);
   void WriteMHD(std::string filename);
- 
-private:
-#ifdef G4MULTITHREADED
-  G4Mutex mDataMutex = G4MUTEX_INITIALIZER;
-#endif
+  void WriteDICOM(std::string filename);
 
 };
 
